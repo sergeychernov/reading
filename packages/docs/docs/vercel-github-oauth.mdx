@@ -1,0 +1,69 @@
+---
+title: GitHub OAuth on Vercel
+sidebar_label: GitHub OAuth (Vercel)
+---
+
+This doc describes how the documentation site is protected with GitHub OAuth when deployed on Vercel.
+
+## Overview
+
+- **Edge Middleware** (`middleware.ts`) runs on every request: if there is no valid session cookie, the user is redirected to `/api/auth/login`.
+- **Login** (`/api/auth/login`) redirects to GitHub OAuth.
+- **Callback** (`/api/auth/callback`) exchanges the code for an access token, fetches the GitHub user, creates a signed session (JWT) cookie, and redirects to `/`.
+- **Logout** (`/api/auth/logout`) clears the cookie and redirects to `/`.
+
+By default, any **authenticated GitHub user** can view the docs. You can restrict access to **repository contributors only** by setting `GITHUB_REPO_OWNER` and `GITHUB_REPO_NAME` (see below).
+
+**Disabling auth:** Set `DOCS_AUTH_DISABLED=true` to skip GitHub OAuth entirely. Use this for local development and for Vercel Preview deployments, where the preview URL differs from production and is already protected by Vercel’s deployment protection. Set to `false` or leave unset on production to keep auth.
+
+## Setup on Vercel
+
+### 1. GitHub OAuth App
+
+1. Go to **GitHub** → **Settings** → **Developer settings** → **OAuth Apps** → **New OAuth App** (or use an existing app).
+2. Set:
+   - **Application name**: e.g. `Sift Docs`
+   - **Homepage URL**: your docs URL (e.g. `https://docs.yourdomain.com`)
+   - **Authorization callback URL**: `https://<your-vercel-docs-domain>/api/auth/callback`  
+     Example: `https://sift-docs.vercel.app/api/auth/callback`
+3. After creating the app, note the **Client ID** and generate a **Client Secret**.
+
+### 2. Environment variables (Vercel project)
+
+**Note:** `GITHUB_TOKEN` (used by the milestones script to fetch issues from the repo) is **not** the same as `GITHUB_OAUTH_CLIENT_SECRET`. The token is a Personal Access Token for API access; the OAuth client secret is the secret of your GitHub OAuth App and is only used in the login callback.
+
+In the Vercel project that deploys this docs site, set:
+
+| Variable | Description |
+|----------|-------------|
+| `DOCS_AUTH_DISABLED` | Optional. Set to `true` to disable GitHub OAuth (middleware allows all). Use for **Preview** so preview URLs work without OAuth; set to `false` or leave unset for **Production** to keep auth. |
+| `GITHUB_OAUTH_CLIENT_ID` | GitHub OAuth App Client ID |
+| `GITHUB_OAUTH_CLIENT_SECRET` | GitHub OAuth App Client Secret |
+| `AUTH_SECRET` | Secret for signing the session JWT (e.g. `openssl rand -hex 32`) |
+| `GITHUB_OAUTH_REDIRECT_URI` | **Must match exactly** the Authorization callback URL from your GitHub OAuth App (e.g. `https://sift-docs.vercel.app/api/auth/callback`). Set this for **all environments** (Production and Preview). Without it, preview deployments use `VERCEL_URL` (e.g. `sift-docs-xxx.vercel.app`), so `redirect_uri` does not match the single URL allowed in GitHub and you get “redirect_uri is not associated with this application”. |
+
+**Optional — restrict to repository contributors only:**
+
+| Variable | Description |
+|----------|-------------|
+| `GITHUB_REPO_OWNER` | Repository owner (e.g. `sergeychernov` or org name). If set together with `GITHUB_REPO_NAME`, only users who are **contributors** of this repo can log in; others are redirected to `/api/auth/error?error=access_denied` (error page, no redirect loop). |
+| `GITHUB_REPO_NAME` | Repository name (e.g. `sift`). |
+| `GITHUB_REPO_ACCESS_TOKEN` | Token with repo read (for contributor check). If not set, `GITHUB_TOKEN` is used. Use a PAT with `repo` (or `public_repo` for public repos) or a GitHub App token with **Metadata** (and **Contents: Read** for private repos). |
+
+Redeploy after changing env vars.
+
+### 3. Vercel project settings
+
+- **Build Command**: overridden by `vercel.json` to `yarn generate && docusaurus build`.
+- **Output Directory**: `build` (from `vercel.json`).
+- **Root Directory**: if the repo is a monorepo, set the project’s root to `packages/docs` so that `middleware.ts` and `api/` are at the project root from Vercel’s perspective.
+
+## Restricting to repository contributors
+
+The callback checks contributors only when **both** `GITHUB_REPO_OWNER` and `GITHUB_REPO_NAME` are set. It calls `GET /repos/{owner}/{repo}/contributors` (paginated) using `GITHUB_REPO_ACCESS_TOKEN` or `GITHUB_TOKEN`. If the logged-in user’s login is not in the list, they are redirected to `/api/auth/error?error=access_denied` (error page; no session is created, so no redirect loop).
+
+## Logout
+
+Users can open `/api/auth/logout` to clear the session and be redirected to `/` (then middleware will send them to login again).
+
+You can add a “Log out” link in the navbar or footer that points to `/api/auth/logout`.

@@ -1,0 +1,107 @@
+name: Trigger Vercel Deploy
+
+on:
+  issues:
+    types: [opened, closed, reopened]
+  milestone:
+    types: [created, closed, edited]
+
+concurrency:
+  group: vercel-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Trigger Vercel Deploy Hook
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel active Vercel deployments
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          ACTIVE_IDS=$(curl -sf \
+            -H "Authorization: Bearer ${VERCEL_TOKEN}" \
+            "https://api.vercel.com/v6/deployments?projectId=${VERCEL_PROJECT_ID}&state=BUILDING&state=QUEUED&state=INITIALIZING&limit=20" \
+            | jq -r '.deployments[] | select(.meta.deployHookId != null) | .uid // empty')
+
+          if [ -z "$ACTIVE_IDS" ]; then
+            echo "No active deployments to cancel."
+          else
+            for ID in $ACTIVE_IDS; do
+              echo "Cancelling deployment: $ID"
+              curl -sf -X PATCH \
+                -H "Authorization: Bearer ${VERCEL_TOKEN}" \
+                "https://api.vercel.com/v12/deployments/${ID}/cancel" || true
+            done
+          fi
+
+      - name: Set TRIGGERED_BY_HOOK=1
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          ENV_ID=$(curl -sf \
+            -H "Authorization: Bearer ${VERCEL_TOKEN}" \
+            "https://api.vercel.com/v9/projects/${VERCEL_PROJECT_ID}/env" \
+            | jq -r '.envs[] | select(.key == "TRIGGERED_BY_HOOK") | .id // empty' \
+            | head -1)
+
+          if [ -z "$ENV_ID" ]; then
+            echo "Error: TRIGGERED_BY_HOOK env var not found in Vercel project." >&2
+            echo "Create it in Vercel → Project → Settings → Environment Variables (value: 0, target: Production)." >&2
+            exit 1
+          fi
+
+          curl -sf -X PATCH \
+            -H "Authorization: Bearer ${VERCEL_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d '{"value": "1"}' \
+            "https://api.vercel.com/v10/projects/${VERCEL_PROJECT_ID}/env/${ENV_ID}"
+
+          echo "VERCEL_ENV_ID=${ENV_ID}" >> "$GITHUB_ENV"
+
+      - name: Trigger Vercel Deploy Hook
+        id: trigger
+        run: |
+          DEPLOY_ID=$(curl -sf -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}" \
+            | jq -r '.job.id // empty')
+          echo "deploy_id=${DEPLOY_ID}" >> "$GITHUB_OUTPUT"
+          echo "Deployment triggered: ${DEPLOY_ID:-unknown}"
+
+      - name: Wait for ignored build step to complete
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          DEPLOY_ID="${{ steps.trigger.outputs.deploy_id }}"
+
+          if [ -z "$DEPLOY_ID" ]; then
+            echo "No deployment ID returned by hook, falling back to 60s wait."
+            sleep 60
+            exit 0
+          fi
+
+          echo "Polling deployment ${DEPLOY_ID}..."
+          for i in $(seq 1 30); do
+            sleep 6
+            STATE=$(curl -sf \
+              -H "Authorization: Bearer ${VERCEL_TOKEN}" \
+              "https://api.vercel.com/v13/deployments/${DEPLOY_ID}" \
+              | jq -r '.readyState // .status // empty')
+            echo "[${i}/30] State: ${STATE:-unknown}"
+            case "$STATE" in
+              BUILDING|READY|ERROR|CANCELED) break ;;
+            esac
+          done
+
+      - name: Reset TRIGGERED_BY_HOOK=0
+        if: always()
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          curl -sf -X PATCH \
+            -H "Authorization: Bearer ${VERCEL_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d '{"value": "0"}' \
+            "https://api.vercel.com/v10/projects/${VERCEL_PROJECT_ID}/env/${VERCEL_ENV_ID}"

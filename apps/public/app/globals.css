@@ -1,0 +1,27 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.home {
+  min-height: 100vh;
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 1rem;
+  padding: 2rem;
+}
+
+.home h1 {
+  margin: 0;
+}
+
+.home p {
+  margin: 0;
+  max-width: 42ch;
+}

@@ -1,0 +1,25 @@
+#!/usr/bin/env sh
+set -e
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+if [ -f "$HOME/.nvm/nvm.sh" ] && [ -f ".nvmrc" ]; then
+  . "$HOME/.nvm/nvm.sh"
+  if ! nvm use >/dev/null; then
+    echo "pre-commit: failed to switch Node version using .nvmrc" >&2
+    exit 1
+  fi
+fi
+
+if command -v yarn >/dev/null 2>&1; then
+  YARN_CMD="yarn"
+elif command -v corepack >/dev/null 2>&1; then
+  YARN_CMD="corepack yarn"
+else
+  echo "pre-commit: neither 'yarn' nor 'corepack' is available in PATH" >&2
+  exit 127
+fi
+
+$YARN_CMD typecheck
+$YARN_CMD lint

@@ -1,0 +1,40 @@
+{
+  "name": "reading-monorepo",
+  "private": true,
+  "packageManager": "yarn@4.12.0",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "yarn dev:public",
+    "dev:public": "yarn workspace @reading/public dev",
+    "docs": "yarn docs:dev",
+    "docs:dev": "yarn workspace @reading/docs start",
+    "docs:build": "yarn workspace @reading/docs build",
+    "docs:serve": "yarn workspace @reading/docs serve",
+    "build": "yarn build:all",
+    "build:all": "yarn build:ui && yarn build:public && yarn docs:build",
+    "build:ui": "yarn workspace @reading/ui build",
+    "build:public": "yarn workspace @reading/public build",
+    "start": "yarn start:public",
+    "start:public": "yarn workspace @reading/public start",
+    "typecheck": "yarn workspaces foreach -Apt run typecheck",
+    "lint": "yarn workspaces foreach -Apt run lint",
+    "test": "yarn test:all",
+    "test:all": "yarn test:public",
+    "test:public": "yarn workspace @reading/public test",
+    "storybook": "yarn workspace @reading/ui storybook",
+    "build-storybook": "yarn workspace @reading/ui build-storybook",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "next": "16.1.6",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  }
+}

@@ -1,0 +1,50 @@
+---
+sidebar_position: 4
+---
+
+# Client user roles
+
+Client types in the platform: **club** (or group / MCO — multiclub ownership) and **agency** (including a single agent with multiple clients). A later version may support **individual players**.
+
+Product purpose for clients: tracking payments and controlling obligations (including bonuses), budget management, and income forecasting.
+
+---
+
+## System roles
+
+Roles are split by **workspace** (Club vs Agency) and **access level** (Admin, Standard User, or — for clubs only — Accountants).
+
+### Club Admin
+
+Full access within the club workspace: upload data, create and edit contracts and clauses, manage users, configure settings, view and export. Can also mark payment status.
+
+### Agency Admin
+
+Full access within the agency workspace: same capabilities as Club Admin, scoped to the agency’s data.
+
+### Club Standard User
+
+View-only access to the club workspace. Can see dashboards and reports and export data; cannot upload, edit, or delete data, manage users, or configure settings.
+
+### Agency Standard User
+
+View-only access to the agency workspace. Same as Club Standard User, scoped to the agency.
+
+### Club Accountants
+
+Club users who need to **mark payments** (e.g. confirm paid, update status). In addition to view and export, they can update payment status. They do not create/edit contracts, manage users, or configure settings.
+
+---
+
+## Capability matrix
+
+| Action | Club Admin | Agency Admin | Club Standard User | Agency Standard User | Club Accountants |
+|--------|:----------:|:------------:|:------------------:|:--------------------:|:----------------:|
+| View workspace, players, agents, clauses, dashboards and reports | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Export data (CSV) | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Mark / update payment status | ✓ | ✓ | — | — | ✓ |
+| Upload contract / match data (e.g. CSV) | ✓ | ✓ | — | — | — |
+| Create and edit contracts and clauses | ✓ | ✓ | — | — | — |
+| Delete data | ✓ | ✓ | — | — | — |
+| Manage users | ✓ | ✓ | — | — | — |
+| Configure alerts and settings | ✓ | ✓ | — | — | — |

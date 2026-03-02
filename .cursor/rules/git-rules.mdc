@@ -1,0 +1,13 @@
+---
+description: Git workflow rules - command restrictions and commit message format
+alwaysApply: true
+---
+
+# Git Rules
+
+- **ЗАПРЕЩЕНО**: Никогда не выполняй `git add` — пользователь сам стейджит файлы.
+- **ЗАПРЕЩЕНО**: Никогда не выполняй мутирующие git-команды (`git commit`, `git push`, `git checkout`, `git restore` и т.д.). Допускаются только read-only команды (`git status`, `git log`, `git diff`).
+- **Коммиты**: Если пользователь просит создать коммит — предложи сообщение, но **не выполняй** команду.
+  - Формат: Conventional Commits на русском.
+  - Пример: `feat: добавить сервис расчёта стоимости`
+  - Первая строка — не более 80 символов.

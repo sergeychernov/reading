@@ -1,0 +1,37 @@
+.goal {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 12px;
+  padding: 8px 14px;
+  border-left: 3px solid var(--ifm-color-primary);
+  background-color: rgba(0, 87, 184, 0.08);
+  border-radius: 0 6px 6px 0;
+}
+
+.label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ifm-color-primary);
+  white-space: nowrap;
+}
+
+.text {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--ifm-font-color-base);
+}
+
+:global([data-theme='dark']) .goal {
+  background-color: rgba(100, 168, 255, 0.1);
+}
+
+:global([data-theme='dark']) .label {
+  color: var(--ifm-color-primary-light);
+}
+
+:global([data-theme='dark']) .text {
+  color: var(--ifm-color-primary-lightest);
+}

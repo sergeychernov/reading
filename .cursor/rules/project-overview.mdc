@@ -1,0 +1,30 @@
+---
+description: Project tech stack and monorepo architecture
+alwaysApply: true
+---
+
+# Project Overview
+
+## Tech Stack
+
+- **Runtime**: Node.js >=20.19.0, Yarn 4 (workspaces)
+- **Framework**: Next.js 16 (App Router)
+- **UI**: React 19, Material UI 7, Emotion
+- **Language**: TypeScript (strict), no JavaScript allowed
+- **Testing**: Vitest, Testing Library, Playwright
+- **Components**: Storybook 10
+- **Docs**: Docusaurus 3
+
+## Monorepo Architecture
+
+```
+apps/
+  public/    — Next.js public site (:3000)
+packages/
+  ui/        — Shared MUI component library + Storybook (:6006)
+  docs/      — Docusaurus documentation site (:3003)
+```
+
+- All apps share `@reading/ui` package and `tsconfig.base.json`
+- Next.js apps transpile `@reading/ui` via `transpilePackages`
+- Pre-commit hooks: `typecheck` + `lint` across all workspaces

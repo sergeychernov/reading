@@ -1,0 +1,157 @@
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  line-height: 1.4;
+  min-width: 64px;
+  text-align: center;
+}
+
+.backlog {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.ready {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.progress {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.done {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+/* ── Stage status ────────────────────────────────────────────────────── */
+
+.research {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+/* ── Priority ─────────────────────────────────────────────────────────── */
+
+.low {
+  background-color: #e5e7eb;
+  color: #6b7280;
+}
+
+.medium {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.high {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.critical {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* ── Complexity ───────────────────────────────────────────────────────── */
+
+.trivial {
+  background-color: #e5e7eb;
+  color: #6b7280;
+}
+
+.small {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.moderate {
+  background-color: #e0e7ff;
+  color: #3730a3;
+}
+
+.large {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.epic {
+  background-color: #ede9fe;
+  color: #5b21b6;
+}
+
+/* Dark theme support */
+:global([data-theme='dark']) .backlog {
+  background-color: #374151;
+  color: #d1d5db;
+}
+
+:global([data-theme='dark']) .ready {
+  background-color: #78350f;
+  color: #fde68a;
+}
+
+:global([data-theme='dark']) .progress {
+  background-color: #1e3a5f;
+  color: #93c5fd;
+}
+
+:global([data-theme='dark']) .done {
+  background-color: #064e3b;
+  color: #6ee7b7;
+}
+
+:global([data-theme='dark']) .research {
+  background-color: #78350f;
+  color: #fde68a;
+}
+
+:global([data-theme='dark']) .low {
+  background-color: #374151;
+  color: #9ca3af;
+}
+
+:global([data-theme='dark']) .medium {
+  background-color: #1e3a5f;
+  color: #93c5fd;
+}
+
+:global([data-theme='dark']) .high {
+  background-color: #78350f;
+  color: #fde68a;
+}
+
+:global([data-theme='dark']) .critical {
+  background-color: #7f1d1d;
+  color: #fca5a5;
+}
+
+:global([data-theme='dark']) .trivial {
+  background-color: #374151;
+  color: #9ca3af;
+}
+
+:global([data-theme='dark']) .small {
+  background-color: #064e3b;
+  color: #6ee7b7;
+}
+
+:global([data-theme='dark']) .moderate {
+  background-color: #312e81;
+  color: #c7d2fe;
+}
+
+:global([data-theme='dark']) .large {
+  background-color: #78350f;
+  color: #fde68a;
+}
+
+:global([data-theme='dark']) .epic {
+  background-color: #4c1d95;
+  color: #c4b5fd;
+}

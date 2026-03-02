@@ -1,0 +1,33 @@
+---
+description: Code formatting conventions
+alwaysApply: true
+---
+
+# Formatting Rules
+
+- **Indentation**: Tabs (4 spaces width)
+- **Quotes**: Single quotes for strings
+- **Trailing commas**: Always in multiline structures
+- **Semicolons**: Required
+
+```typescript
+// ✅ Correct
+const config = {
+	name: 'sift',
+	version: '1.0.0',
+	features: [
+		'auth',
+		'dashboard',
+	],
+};
+
+// ❌ Wrong
+const config = {
+  name: "sift",
+  version: "1.0.0",
+  features: [
+    "auth",
+    "dashboard"
+  ]
+}
+```

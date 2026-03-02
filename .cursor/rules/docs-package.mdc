@@ -1,0 +1,19 @@
+---
+description: Docs package (Docusaurus on Vercel) — auth, API routes, env
+alwaysApply: false
+---
+
+# Docs Package (`packages/docs`)
+
+## Auth and deployment (Vercel)
+
+- **Disable auth**: Set `DOCS_AUTH_DISABLED=true` to skip GitHub OAuth — middleware allows all. Use locally and on Vercel Preview; use `false` or unset on production.
+- **OAuth flow**: When auth is enabled, Edge middleware (`middleware.ts`) redirects unauthenticated users to `/api/auth/login`; callback is `api/auth/callback.ts` (exchange code, optional contributor check, set JWT cookie).
+- **Contributor check**: If `GITHUB_REPO_OWNER` and `GITHUB_REPO_NAME` are set (and a repo token is present), only the repo owner and users listed in `GET /repos/{owner}/{repo}/contributors` can log in. Repo owner is always allowed even if not in the list.
+- **Env**: Copy `.env.example` to `.env` and fill for local OAuth testing or when running against Vercel-like config. Do not commit `.env`. When adding or changing auth-related env vars, update `.env.example` and `docs/vercel-github-oauth.mdx`.
+
+## Structure
+
+- `api/` — Vercel serverless routes (auth login/callback/logout).
+- `lib/auth.ts` — JWT session helpers (Edge-compatible; uses dynamic `import('jose')`).
+- `middleware.ts` — Vercel Edge Middleware; protects all routes except `/api/auth/` and static assets.

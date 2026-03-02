@@ -1,0 +1,16 @@
+---
+description: Strict TypeScript typing rules
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# TypeScript Rules
+
+- `strict: true` is enabled — never weaken it
+- `allowJs: false` — all code must be TypeScript
+- Never use `any`. Use `unknown` and narrow the type, or define a proper interface
+- Never use `@ts-ignore`. Use `@ts-expect-error` with a comment explaining why
+- Always type function parameters and return values for exported functions
+- Prefer `interface` over `type` for object shapes (use `type` for unions, intersections, mapped types)
+- Use `as const` for literal values instead of type assertions
+- Avoid non-null assertions (`!`). Use optional chaining or explicit checks

@@ -1,0 +1,22 @@
+---
+description: Documentation and code comments must be in International English
+alwaysApply: true
+---
+
+# Documentation & Comments Language
+
+All documentation and code comments MUST be in **International English**.
+
+## Documentation
+
+Applies to all `.md`/`.mdx` files in `packages/docs/`, READMEs, architecture docs, API docs, user guides.
+
+## Code Comments
+
+Applies to inline (`//`), block (`/* */`), JSDoc (`/** */`), TODO/FIXME comments.
+
+## Exceptions
+
+- Git commit messages (Conventional Commits на русском, see `git-rules` rule)
+- User-facing UI content (strings, error messages for end users)
+- Test fixtures for i18n testing

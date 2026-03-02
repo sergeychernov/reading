@@ -1,0 +1,5 @@
+{
+	"buildCommand": "yarn generate && docusaurus build",
+	"outputDirectory": "build",
+	"framework": null
+}
