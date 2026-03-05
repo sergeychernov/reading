@@ -10,8 +10,9 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "yarn dev:public",
+    "dev": "concurrently --kill-others -n public,pipeline -c cyan,magenta \"yarn dev:public\" \"yarn dev:pipeline\"",
     "dev:public": "yarn workspace @reading/public dev",
+    "dev:pipeline": "yarn workspace @reading/pipeline dev",
     "docs": "yarn docs:dev",
     "docs:dev": "yarn workspace @reading/docs start",
     "docs:build": "yarn workspace @reading/docs build",
@@ -32,6 +33,7 @@
     "prepare": "husky"
   },
   "devDependencies": {
+    "concurrently": "^9.1.0",
     "husky": "^9.1.7",
     "next": "16.1.6",
     "react": "19.2.4",
