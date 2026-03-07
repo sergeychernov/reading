@@ -76,6 +76,7 @@ export function createProcessChapterJob(adapter: LlmAdapter): JobDefinition {
 						term: item.term,
 						meaning: item.meaning,
 						exampleFromBook: item.exampleFromBook,
+						rarity: item.rarity,
 						createdAt: now,
 					})),
 					...extraction.phrasalVerbs.map((item) => ({
@@ -85,6 +86,7 @@ export function createProcessChapterJob(adapter: LlmAdapter): JobDefinition {
 						term: item.term,
 						meaning: item.meaning,
 						exampleFromBook: item.exampleFromBook,
+						rarity: item.rarity,
 						createdAt: now,
 					})),
 					...extraction.rareWords.map((item) => ({
@@ -94,6 +96,7 @@ export function createProcessChapterJob(adapter: LlmAdapter): JobDefinition {
 						term: item.term,
 						meaning: item.meaning,
 						exampleFromBook: item.exampleFromBook,
+						rarity: item.rarity,
 						createdAt: now,
 					})),
 				];
@@ -126,6 +129,13 @@ export function createProcessChapterJob(adapter: LlmAdapter): JobDefinition {
 					itemsSaved: languageItems.length,
 				};
 			} catch (error) {
+				const errorType = error != null ? Object.getPrototypeOf(error as object)?.constructor?.name ?? typeof error : 'null';
+				const errorMessage = error instanceof Error ? (error.stack ?? error.message) : String(error);
+				console.error(`[process-chapter] Chapter ${input.chapterIndex} FAILED [${errorType}]:`, errorMessage, error);
+				context.logger.error(
+					`Chapter ${input.chapterIndex} "${input.chapterTitle}" failed [${errorType}]: ${errorMessage}`,
+				);
+
 				// Mark chapter as failed before re-throwing
 				try {
 					const db = client.db(DB_NAME);

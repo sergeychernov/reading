@@ -51,13 +51,22 @@ export async function GET(
 		}
 
 		// Lightweight chapter data for the UI (no rawText to keep payload small)
-		const chapterStatuses = chapters.map((ch) => ({
-			_id: ch._id.toHexString(),
-			chapterIndex: ch.chapterIndex,
-			title: ch.title,
-			summary: ch.summary,
-			processingStatus: ch.processingStatus,
-		}));
+		const chapterStatuses = chapters.map((ch) => {
+			const body = ch.rawText.startsWith(ch.title)
+				? ch.rawText.slice(ch.title.length).trimStart()
+				: ch.rawText;
+
+			const previewLen = 24;
+			const textPreview = body.length > previewLen ? body.slice(0, previewLen) + '…' : body.slice(0, previewLen);
+			return {
+				_id: ch._id.toHexString(),
+				chapterIndex: ch.chapterIndex,
+				title: ch.title,
+				summary: ch.summary,
+				textPreview,
+				processingStatus: ch.processingStatus,
+			};
+		});
 
 		return NextResponse.json({
 			bookStatus: effectiveStatus,

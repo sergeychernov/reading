@@ -1,7 +1,6 @@
 import type { PipelineConfig } from 'neuroline';
 import { createProcessChapterJob } from './jobs/process-chapter.job';
-import type { LlmAdapter } from '../llm/adapter';
-import { StubAdapter } from '../llm/stub-adapter';
+import { DynamicAdapter } from '../llm/dynamic-adapter';
 
 export interface ChapterExtractionInput {
 	bookId: string;
@@ -15,20 +14,16 @@ export interface ChapterExtractionInput {
  * Pipeline for processing a single chapter.
  * Receives chapter data as input, runs LLM extraction, saves results to MongoDB.
  *
- * One instance of this pipeline is started per chapter by the dispatch-chapters job.
+ * Uses DynamicAdapter which reads the active LLM config from MongoDB on every call,
+ * so admin panel changes take effect without restarting the server.
+ *
+ * computeInputHash returns a unique value each time so neuroline always creates
+ * a new run instead of returning the cached result of a previous identical input.
  */
-export function createChapterExtractionPipeline(
-	adapter?: LlmAdapter,
-): PipelineConfig {
-	const llmAdapter = adapter ?? new StubAdapter();
-
-	return {
-		name: 'chapter-extraction',
-		stages: [
-			{ job: createProcessChapterJob(llmAdapter) },
-		],
-	};
-}
-
-// Default pipeline instance used by the NestJS module
-export const chapterExtractionPipeline = createChapterExtractionPipeline();
+export const chapterExtractionPipeline: PipelineConfig = {
+	name: 'chapter-extraction',
+	stages: [
+		{ job: createProcessChapterJob(new DynamicAdapter()) },
+	],
+	computeInputHash: () => crypto.randomUUID(),
+};

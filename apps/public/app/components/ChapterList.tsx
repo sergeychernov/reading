@@ -14,6 +14,7 @@ interface ChapterData {
 	chapterIndex: number;
 	title: string;
 	summary: string | null;
+	textPreview: string;
 	processingStatus: string;
 }
 
@@ -38,20 +39,23 @@ export function ChapterList({ bookId, chapters }: ChapterListProps) {
 			{chapters.map((chapter) => (
 				<ListItem key={chapter._id} disablePadding divider>
 					<ListItemButton
+						dense
 						onClick={() => router.push(`/books/${bookId}/chapters/${chapter._id}`)}
 					>
 						<ListItemText
+							disableTypography
 							primary={
-								<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-									<Typography variant="body1">
+								<Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1, minWidth: 0 }}>
+									<Typography variant="body2" sx={{ flexShrink: 0 }}>
 										{chapter.chapterIndex + 1}. {chapter.title}
 									</Typography>
+									{chapter.textPreview && (
+										<Typography variant="body2" color="text.secondary" noWrap sx={{ flexGrow: 1 }}>
+											— {chapter.textPreview}
+										</Typography>
+									)}
 									<StatusBadge status={chapter.processingStatus as 'completed' | 'failed' | 'extracting' | 'pending'} />
 								</Box>
-							}
-							secondary={chapter.summary
-								? chapter.summary.slice(0, 150) + (chapter.summary.length > 150 ? '...' : '')
-								: null
 							}
 						/>
 					</ListItemButton>

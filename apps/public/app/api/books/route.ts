@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '../../../auth';
 import { getAllBooks } from '../../../lib/db/books';
-import { uploadAndParseBook } from '../../../lib/processing/pipeline';
+import { uploadAndCreateBook } from '../../../lib/processing/pipeline';
 import { validateEpubFile } from '../../../lib/validation/upload';
 
 export const runtime = 'nodejs';
@@ -54,7 +54,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
 		const buffer = Buffer.from(await file.arrayBuffer());
 
-		const result = await uploadAndParseBook({
+		const result = await uploadAndCreateBook({
 			fileBuffer: buffer,
 			fileName: file.name,
 			audibleUrl,
@@ -72,11 +72,11 @@ export async function POST(request: Request): Promise<NextResponse> {
 				epubBlobUrl: result.epubBlobUrl,
 			}),
 		}).catch((err) => {
-			console.error('Failed to trigger pipeline:', err);
+			console.error(`Failed to trigger pipeline for book ${result.bookId}:`, err);
 		});
 
 		return NextResponse.json(
-			{ bookId: result.bookId, status: 'extracting', chapterCount: result.chapterCount },
+			{ bookId: result.bookId, status: 'parsing' },
 			{ status: 201 },
 		);
 	} catch (error) {

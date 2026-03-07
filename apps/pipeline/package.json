@@ -15,6 +15,7 @@
 		"@nestjs/platform-express": "^10.3.0",
 		"@reading/epub-utils": "workspace:packages/epub-utils",
 		"@vercel/blob": "^2.3.0",
+		"ai": "6.0.116",
 		"dotenv": "^17.3.1",
 		"mongodb": "^6.21.0",
 		"mongoose": "^8.9.0",

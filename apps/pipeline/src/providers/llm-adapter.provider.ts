@@ -1,25 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import type { LlmAdapter } from '../llm/adapter';
-import { StubAdapter } from '../llm/stub-adapter';
+import { DynamicAdapter } from '../llm/dynamic-adapter';
 
 export const LLM_ADAPTER = Symbol('LLM_ADAPTER');
 
 /**
  * NestJS provider for the LLM adapter.
- * Replace StubAdapter with a real implementation when LLM provider is configured.
+ * Returns a DynamicAdapter that reads the active config from MongoDB on every call,
+ * reflecting changes made in the admin panel without a server restart.
  */
 @Injectable()
 export class LlmAdapterProvider {
-	private readonly adapter: LlmAdapter;
-
-	constructor() {
-		// When an LLM provider is configured, swap StubAdapter here:
-		// if (process.env.OPENAI_API_KEY) {
-		//     this.adapter = new OpenAiAdapter();
-		// } else {
-		this.adapter = new StubAdapter();
-		// }
-	}
+	private readonly adapter: LlmAdapter = new DynamicAdapter();
 
 	getAdapter(): LlmAdapter {
 		return this.adapter;

@@ -1,4 +1,5 @@
 import type { JobDefinition, JobContext } from 'neuroline';
+import { readPipelineConfig } from '../pipeline-config';
 
 export interface DispatchChaptersInput {
 	bookId: string;
@@ -13,6 +14,7 @@ export interface DispatchChaptersInput {
 export interface DispatchChaptersOutput {
 	dispatched: number;
 	errors: number;
+	skipped?: boolean;
 }
 
 const PIPELINE_BASE_URL = process.env.PIPELINE_BASE_URL ?? 'http://localhost:3001';
@@ -20,9 +22,9 @@ const PIPELINE_BASE_URL = process.env.PIPELINE_BASE_URL ?? 'http://localhost:300
 /**
  * Fan-out job: starts one chapter-extraction pipeline per chapter via HTTP.
  *
- * Uses Promise.allSettled to fire all requests concurrently.
- * Does NOT wait for chapter pipelines to complete (fire-and-forget).
- * Each POST starts a neuroline pipeline asynchronously and returns immediately.
+ * Checks the `autoDispatchChapters` flag in MongoDB before dispatching.
+ * If disabled, exits early without making any HTTP calls.
+ * Uses Promise.allSettled to fire all requests concurrently (fire-and-forget).
  */
 export const dispatchChaptersJob: JobDefinition = {
 	name: 'dispatch-chapters',
@@ -32,6 +34,16 @@ export const dispatchChaptersJob: JobDefinition = {
 		context: JobContext,
 	): Promise<DispatchChaptersOutput> {
 		const input = rawInput as DispatchChaptersInput;
+
+		const pipelineConfig = await readPipelineConfig();
+
+		if (!pipelineConfig.autoDispatchChapters) {
+			context.logger.info(
+				'autoDispatchChapters is disabled — skipping chapter dispatch',
+			);
+			return { dispatched: 0, errors: 0, skipped: true };
+		}
+
 		const url = `${PIPELINE_BASE_URL}/api/v1/chapter-extraction`;
 
 		context.logger.info(

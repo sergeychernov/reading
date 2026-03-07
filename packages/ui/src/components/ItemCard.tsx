@@ -9,9 +9,12 @@ interface ItemCardProps {
 	meaning: string;
 	example: string;
 	category?: string;
+	/** Rarity 0–10; show "?" when undefined. */
+	rarity?: number;
 }
 
-export function ItemCard({ term, meaning, example, category }: ItemCardProps) {
+export function ItemCard({ term, meaning, example, category, rarity }: ItemCardProps) {
+	const rarityLabel = rarity !== undefined && rarity !== null ? String(rarity) : '?';
 	return (
 		<Card variant="outlined" sx={{ mb: 2 }}>
 			<CardContent>
@@ -19,6 +22,7 @@ export function ItemCard({ term, meaning, example, category }: ItemCardProps) {
 					<Typography variant="h6" component="span">
 						{term}
 					</Typography>
+					<Chip label={`Rarity: ${rarityLabel}`} size="small" variant="outlined" />
 					{category && (
 						<Chip label={category} size="small" variant="outlined" />
 					)}

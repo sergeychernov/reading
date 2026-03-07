@@ -9,6 +9,8 @@ export interface LanguageItemDocument {
 	term: string;
 	meaning: string;
 	exampleFromBook: string;
+	/** Rarity 0–10 from extraction; may be missing in older documents. */
+	rarity?: number;
 	createdAt: Date;
 }
 

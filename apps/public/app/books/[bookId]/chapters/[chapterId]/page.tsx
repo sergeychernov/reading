@@ -1,14 +1,11 @@
 import { notFound } from 'next/navigation';
 import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Link from 'next/link';
 import { getChapterById } from '../../../../../lib/db/chapters';
 import { getBookById } from '../../../../../lib/db/books';
-import { LanguageItemTabs } from '../../../../components/LanguageItemTabs';
+import { ChapterDetailClient } from './ChapterDetailClient';
 
 interface ChapterDetailPageProps {
 	params: Promise<{ bookId: string; chapterId: string }>;
@@ -26,6 +23,12 @@ export default async function ChapterDetailPage({ params }: ChapterDetailPagePro
 		notFound();
 	}
 
+	const body = chapter.rawText.startsWith(chapter.title)
+		? chapter.rawText.slice(chapter.title.length).trimStart()
+		: chapter.rawText;
+	const previewLen = 24;
+	const textPreview = body.length > previewLen ? body.slice(0, previewLen) + '…' : body.slice(0, previewLen);
+
 	return (
 		<Container maxWidth="lg" sx={{ py: 4 }}>
 			<Link href={`/books/${bookId}`}>
@@ -37,28 +40,14 @@ export default async function ChapterDetailPage({ params }: ChapterDetailPagePro
 				</Button>
 			</Link>
 
-			<Typography variant="h4" component="h1" gutterBottom>
-				{chapter.title}
-			</Typography>
-
-			{chapter.summary && (
-				<Paper variant="outlined" sx={{ p: 3, mb: 3 }}>
-					<Typography variant="subtitle2" gutterBottom>
-						Chapter Summary
-					</Typography>
-					<Typography variant="body1">
-						{chapter.summary}
-					</Typography>
-				</Paper>
-			)}
-
-			<Divider sx={{ my: 3 }} />
-
-			<Typography variant="h5" gutterBottom>
-				Language Items
-			</Typography>
-
-			<LanguageItemTabs chapterId={chapterId} bookId={bookId} />
+			<ChapterDetailClient
+				bookId={bookId}
+				chapterId={chapterId}
+				chapterIndex={chapter.chapterIndex}
+				chapterTitle={chapter.title}
+				textPreview={textPreview || null}
+				summary={chapter.summary}
+			/>
 		</Container>
 	);
 }

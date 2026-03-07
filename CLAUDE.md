@@ -36,12 +36,17 @@ The book processing pipeline is built on **neuroline** + **neuroline-nestjs**.
 #### Data flow
 
 ```
-EPUB upload (public) → MongoDB chapters (with rawText)
-                     → fire-and-forget POST to pipeline
+POST /api/books (apps/public):
+  1. Upload EPUB → Vercel Blob
+  2. insertBook in MongoDB (status: 'parsing')
+  3. Fire-and-forget POST → /api/v1/book-processing (pipeline)
 
-book-processing pipeline (2 stages):
-  1. parse-epub     — loads chapters from MongoDB (no EPUB re-parsing)
-  2. dispatch-chapters — fans out: 1 HTTP POST per chapter
+book-processing pipeline (4 stages):
+  1. fetch-epub       — downloads EPUB from Vercel Blob
+  2. parse-epub       — parses EPUB via @reading/epub-utils → metadata + chapters
+  3. save-chapters    — updates book metadata in MongoDB, inserts chapters with rawText,
+                        sets book status to 'extracting'
+  4. dispatch-chapters — fans out: 1 HTTP POST per chapter to chapter-extraction
 
 chapter-extraction pipeline (1 stage, started per chapter):
   1. process-chapter — LLM extraction → save languageItems → update chapter status
@@ -49,8 +54,9 @@ chapter-extraction pipeline (1 stage, started per chapter):
 
 #### Key design decisions
 
-- **No EPUB re-parsing in pipeline** — `apps/public` parses the EPUB during upload and stores chapter text as `rawText` in MongoDB. The pipeline reads from DB only.
-- **`@smoores/epub` is ESM-only** — used only in `packages/epub-utils` via dynamic `import()`. The pipeline does NOT depend on it.
+- **`apps/public` only uploads** — uploads EPUB to Blob and creates `insertBook` record (status: `'parsing'`). No parsing, no chapter creation.
+- **All EPUB parsing in pipeline** — `fetch-epub` downloads from Blob, `parse-epub` calls `@reading/epub-utils`, `save-chapters` writes chapters with `rawText` to MongoDB.
+- **`@smoores/epub` is ESM-only** — used only in `packages/epub-utils` via dynamic `import()`. Always use dynamic import when calling `parseEpub`.
 - **Nested pipelines for fan-out** — neuroline doesn't support dynamic job creation. Each chapter is processed by a separate `chapter-extraction` pipeline started via HTTP self-invocation.
 - **StubAdapter for testing** — `apps/pipeline/src/llm/stub-adapter.ts` returns realistic English-language test data (idioms, phrasal verbs, rare words). Replace with a real LLM adapter when ready.
 
@@ -63,10 +69,11 @@ chapter-extraction pipeline (1 stage, started per chapter):
 
 #### Pipeline environment variables
 
-| Variable | Description |
-|----------|-------------|
-| `MONGODB_URI` | MongoDB Atlas connection string |
-| `PIPELINE_BASE_URL` | Self-invocation URL for chapter dispatch (`http://localhost:3001` in dev) |
+| App | Variable | Description |
+|-----|----------|-------------|
+| public | `PIPELINE_API_URL` | Pipeline base URL (`http://localhost:3001` in dev) |
+| pipeline | `MONGODB_URI` | MongoDB Atlas connection string |
+| pipeline | `PIPELINE_BASE_URL` | Self-invocation URL for chapter dispatch (`http://localhost:3001` in dev) |
 
 #### neuroline specifics
 

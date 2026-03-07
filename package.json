@@ -10,9 +10,10 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently --kill-others -n public,pipeline -c cyan,magenta \"yarn dev:public\" \"yarn dev:pipeline\"",
+    "dev": "concurrently --kill-others -n public,pipeline,admin -c cyan,magenta,yellow \"yarn dev:public\" \"yarn dev:pipeline\" \"yarn dev:admin\"",
     "dev:public": "yarn workspace @reading/public dev",
     "dev:pipeline": "yarn workspace @reading/pipeline dev",
+    "dev:admin": "yarn workspace @reading/admin dev",
     "docs": "yarn docs:dev",
     "docs:dev": "yarn workspace @reading/docs start",
     "docs:build": "yarn workspace @reading/docs build",

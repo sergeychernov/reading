@@ -5,7 +5,7 @@ A web application for a book club with an English-language book database. Users 
 ## Requirements
 
 - Node.js `>=20.19.0` (recommended: use `.nvmrc`, currently `24.11.0`)
-- Yarn `4.12.0` (via `corepack`)
+- Yarn `4.13.0` (via `corepack`)
 - MongoDB Atlas account (or local MongoDB)
 - Vercel Blob storage token
 
@@ -24,18 +24,21 @@ Copy `.env.example` files and fill in the values:
 ```bash
 cp apps/public/.env.example apps/public/.env.local
 cp apps/pipeline/.env.example apps/pipeline/.env
+cp apps/admin/.env.example apps/admin/.env.local
 ```
 
-| Variable | Where | Description |
-|----------|-------|-------------|
-| `MONGODB_URI` | both | MongoDB Atlas connection string |
-| `BLOB_READ_WRITE_TOKEN` | both | Vercel Blob storage token |
+| Variable | App | Description |
+|----------|-----|-------------|
+| `MONGODB_URI` | public, pipeline, admin | MongoDB Atlas connection string |
+| `BLOB_READ_WRITE_TOKEN` | public, pipeline | Vercel Blob storage token |
 | `AUTH_DISABLED` | public | Set to `true` to skip Google OAuth in dev |
 | `AUTH_SECRET` | public | NextAuth secret (`openssl rand -base64 32`) |
 | `GOOGLE_CLIENT_ID` | public | Google OAuth client ID |
 | `GOOGLE_CLIENT_SECRET` | public | Google OAuth client secret |
 | `PIPELINE_API_URL` | public | Pipeline service URL (`http://localhost:3001` for local) |
 | `PIPELINE_BASE_URL` | pipeline | Self-invocation URL (`http://localhost:3001` for local) |
+| `AI_GATEWAY_URL` | pipeline | Vercel AI Gateway base URL (optional when using default gateway) |
+| `AI_GATEWAY_API_KEY` | pipeline | Vercel AI Gateway API key (required when Gateway adapter is selected) |
 
 ## Workspace Layout
 
@@ -43,6 +46,7 @@ cp apps/pipeline/.env.example apps/pipeline/.env
 apps/
   public/       # Next.js app — UI + CRUD API               (:3000)
   pipeline/     # NestJS app — EPUB processing pipelines     (:3001)
+  admin/        # Next.js app — admin panel (LLM config)     (:3002)
 packages/
   ui/           # Shared MUI components + Storybook          (:6006)
   epub-utils/   # Shared EPUB parsing library
@@ -60,12 +64,14 @@ yarn dev
 This starts:
 - **public** — Next.js on [http://localhost:3000](http://localhost:3000)
 - **pipeline** — NestJS on [http://localhost:3001](http://localhost:3001)
+- **admin** — Next.js on [http://localhost:3002](http://localhost:3002)
 
 Run only one service:
 
 ```bash
-yarn dev:public      # Next.js only
+yarn dev:public      # Next.js app only
 yarn dev:pipeline    # NestJS pipeline only
+yarn dev:admin       # Admin panel only
 ```
 
 Run docs or Storybook:
@@ -104,6 +110,26 @@ User uploads EPUB
      ├─ computes book completion from chapter statuses
      └─ returns per-chapter statuses (UI polls every 3s)
 ```
+
+### LLM adapter configuration
+
+The pipeline supports multiple LLM adapters. The active adapter and its settings are
+configured through the **admin panel** ([http://localhost:3002](http://localhost:3002))
+and stored in the `reading.llmConfig` MongoDB collection.
+
+| Adapter | Description |
+|---------|-------------|
+| `stub` | Returns hardcoded test data — no API calls, free to use in development |
+| `gateway` | Uses Vercel AI Gateway (any supported model: Anthropic, OpenAI, etc.). Set `AI_GATEWAY_API_KEY` in the pipeline environment. |
+
+**Gateway settings** (configurable from admin):
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| Model | `anthropic/claude-sonnet-4.6` | Gateway model ID (e.g. `anthropic/claude-sonnet-4.6`, `openai/gpt-4.1`) |
+| Max tokens | `4096` | Maximum tokens in the response |
+
+Prompts are in `apps/pipeline/src/llm/gateway/prompts.ts`.
 
 ### How Next.js connects to Pipeline
 

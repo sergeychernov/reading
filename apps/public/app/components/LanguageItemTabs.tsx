@@ -18,14 +18,17 @@ interface LanguageItem {
 	meaning: string;
 	exampleFromBook: string;
 	category: string;
+	rarity?: number;
 }
 
 interface LanguageItemTabsProps {
 	chapterId: string;
 	bookId: string;
+	/** When this value changes, language items are refetched (e.g. after reprocessing). */
+	refreshTrigger?: number;
 }
 
-export function LanguageItemTabs({ chapterId, bookId }: LanguageItemTabsProps) {
+export function LanguageItemTabs({ chapterId, bookId, refreshTrigger }: LanguageItemTabsProps) {
 	const [activeCategory, setActiveCategory] = useState('idiom');
 	const [items, setItems] = useState<LanguageItem[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -49,7 +52,7 @@ export function LanguageItemTabs({ chapterId, bookId }: LanguageItemTabsProps) {
 		};
 
 		fetchItems();
-	}, [chapterId, bookId, activeCategory]);
+	}, [chapterId, bookId, activeCategory, refreshTrigger]);
 
 	return (
 		<Box>
@@ -74,6 +77,7 @@ export function LanguageItemTabs({ chapterId, bookId }: LanguageItemTabsProps) {
 						term={item.term}
 						meaning={item.meaning}
 						example={item.exampleFromBook}
+						rarity={item.rarity}
 					/>
 				))
 			)}

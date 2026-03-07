@@ -19,13 +19,22 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
 
 	const chapters = await getChaptersByBookId(bookId);
 
-	const serializedChapters = chapters.map((ch) => ({
-		_id: ch._id.toHexString(),
-		chapterIndex: ch.chapterIndex,
-		title: ch.title,
-		summary: ch.summary,
-		processingStatus: ch.processingStatus,
-	}));
+	const serializedChapters = chapters.map((ch) => {
+		const body = ch.rawText.startsWith(ch.title)
+			? ch.rawText.slice(ch.title.length).trimStart()
+			: ch.rawText;
+		const previewLen = 24;
+		const textPreview = body.length > previewLen ? body.slice(0, previewLen) + '…' : body.slice(0, previewLen);
+
+		return {
+			_id: ch._id.toHexString(),
+			chapterIndex: ch.chapterIndex,
+			title: ch.title,
+			summary: ch.summary,
+			textPreview,
+			processingStatus: ch.processingStatus,
+		};
+	});
 
 	return (
 		<Container maxWidth="lg" sx={{ py: 4 }}>

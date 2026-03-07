@@ -5,9 +5,9 @@ alwaysApply: true
 
 # Git Rules
 
-- **ЗАПРЕЩЕНО**: Никогда не выполняй `git add` — пользователь сам стейджит файлы.
-- **ЗАПРЕЩЕНО**: Никогда не выполняй мутирующие git-команды (`git commit`, `git push`, `git checkout`, `git restore` и т.д.). Допускаются только read-only команды (`git status`, `git log`, `git diff`).
-- **Коммиты**: Если пользователь просит создать коммит — предложи сообщение, но **не выполняй** команду.
-  - Формат: Conventional Commits на русском.
-  - Пример: `feat: добавить сервис расчёта стоимости`
-  - Первая строка — не более 80 символов.
+- **FORBIDDEN**: Never run `git add` — the user stages files manually.
+- **FORBIDDEN**: Never run mutating git commands (`git commit`, `git push`, `git checkout`, `git restore`, etc.). Only read-only commands are allowed (`git status`, `git log`, `git diff`).
+- **Commits**: If the user asks to create a commit — propose a message, but **do not run** the command.
+  - Format: Conventional Commits in Russian.
+  - Example: `feat: добавить сервис расчёта стоимости`
+  - First line must not exceed 80 characters.

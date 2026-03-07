@@ -8,9 +8,13 @@ async function collection() {
 	return db.collection<BookDocument>('books');
 }
 
+/** Returns all books except those that failed to parse (for library display). */
 export async function getAllBooks(): Promise<BookDocument[]> {
 	const col = await collection();
-	return col.find().sort({ createdAt: -1 }).toArray();
+	return col
+		.find({ processingStatus: { $ne: 'failed' } })
+		.sort({ createdAt: -1 })
+		.toArray();
 }
 
 export async function getBookById(bookId: string): Promise<BookDocument | null> {

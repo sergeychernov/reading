@@ -12,6 +12,7 @@ interface ChapterData {
 	chapterIndex: number;
 	title: string;
 	summary: string | null;
+	textPreview: string;
 	processingStatus: string;
 }
 

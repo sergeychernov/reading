@@ -1,13 +1,10 @@
 import type { JobDefinition, JobContext } from 'neuroline';
+import type { FetchEpubOutput } from './fetch-epub.job';
+import { parseEpub } from '@reading/epub-utils';
+import type { ParsedBookMetadata, ParsedChapter } from '@reading/epub-utils';
 import { MongoClient, ObjectId } from 'mongodb';
 
-export interface ParseEpubInput {
-	bookId: string;
-	epubBlobUrl: string;
-}
-
 export interface ParseEpubChapter {
-	chapterId: string;
 	index: number;
 	title: string;
 	text: string;
@@ -15,18 +12,29 @@ export interface ParseEpubChapter {
 
 export interface ParseEpubOutput {
 	bookId: string;
+	metadata: ParsedBookMetadata;
 	chapters: ParseEpubChapter[];
 }
 
 const MONGODB_URI = process.env.MONGODB_URI ?? '';
 const DB_NAME = 'reading';
 
+async function markBookFailed(bookId: string, message: string): Promise<void> {
+	const client = new MongoClient(MONGODB_URI);
+	try {
+		await client.connect();
+		await client.db(DB_NAME).collection('books').updateOne(
+			{ _id: new ObjectId(bookId) },
+			{ $set: { processingStatus: 'failed', processingError: message, updatedAt: new Date() } },
+		);
+	} finally {
+		await client.close();
+	}
+}
+
 /**
- * Loads chapter data from MongoDB.
- *
- * Chapter documents (including rawText) are created during the upload flow
- * in apps/public. This job simply reads them — no EPUB re-downloading
- * or re-parsing is needed.
+ * Parses the EPUB file content received from the fetch-epub artifact.
+ * On failure, marks the book as 'failed' in MongoDB before rethrowing.
  */
 export const parseEpubJob: JobDefinition = {
 	name: 'parse-epub',
@@ -35,45 +43,36 @@ export const parseEpubJob: JobDefinition = {
 		_options: unknown,
 		context: JobContext,
 	): Promise<ParseEpubOutput> {
-		const input = rawInput as ParseEpubInput;
-		context.logger.info(`Loading chapters for book ${input.bookId}`);
+		const input = rawInput as FetchEpubOutput;
+		context.logger.info(`Parsing EPUB for book ${input.bookId}`);
 
-		const client = new MongoClient(MONGODB_URI);
 		try {
-			await client.connect();
-			const db = client.db(DB_NAME);
+			const epubBuffer = Buffer.from(input.epubBase64, 'base64');
 
-			const bookOid = new ObjectId(input.bookId);
-
-			const chapterDocs = await db
-				.collection('chapters')
-				.find({ bookId: bookOid })
-				.sort({ chapterIndex: 1 })
-				.toArray();
-
-			if (chapterDocs.length === 0) {
-				throw new Error(
-					`No chapter documents found for book ${input.bookId}`,
-				);
-			}
-
-			const chapters: ParseEpubChapter[] = chapterDocs.map((doc) => ({
-				chapterId: (doc._id as ObjectId).toHexString(),
-				index: doc.chapterIndex as number,
-				title: doc.title as string,
-				text: doc.rawText as string,
-			}));
+			const { metadata, chapters } = await parseEpub(epubBuffer);
 
 			context.logger.info(
-				`Loaded ${chapters.length} chapters from MongoDB`,
+				`Parsed EPUB for book ${input.bookId}: "${metadata.title}" by "${metadata.author}", ${chapters.length} chapters`,
+			);
+
+			const parsedChapters: ParseEpubChapter[] = chapters.map(
+				(ch: ParsedChapter) => ({
+					index: ch.index,
+					title: ch.title,
+					text: ch.text,
+				}),
 			);
 
 			return {
 				bookId: input.bookId,
-				chapters,
+				metadata,
+				chapters: parsedChapters,
 			};
-		} finally {
-			await client.close();
+		} catch (error) {
+			const message = error instanceof Error ? error.message : 'Unknown error during EPUB parsing';
+			context.logger.error(`parse-epub failed for book ${input.bookId}: ${message}`);
+			await markBookFailed(input.bookId, message);
+			throw error;
 		}
 	},
 };
