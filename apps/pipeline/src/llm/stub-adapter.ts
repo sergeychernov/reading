@@ -21,16 +21,19 @@ export class StubAdapter implements LlmAdapter {
 					term: 'break the ice',
 					meaning: 'To initiate conversation in a social setting, reducing tension or awkwardness',
 					exampleFromBook: 'He decided to break the ice by asking about the local cuisine.',
+					rarity: 4,
 				},
 				{
 					term: 'beat around the bush',
 					meaning: 'To avoid talking about the main topic directly',
 					exampleFromBook: 'She kept beating around the bush instead of telling him the real reason she was there.',
+					rarity: 5,
 				},
 				{
 					term: 'once in a blue moon',
 					meaning: 'Very rarely, almost never',
 					exampleFromBook: 'Visitors came to this part of town once in a blue moon.',
+					rarity: 5,
 				},
 			],
 			phrasalVerbs: [
@@ -38,16 +41,19 @@ export class StubAdapter implements LlmAdapter {
 					term: 'run into',
 					meaning: 'To meet someone unexpectedly',
 					exampleFromBook: 'He ran into an old friend at the market square.',
+					rarity: 3,
 				},
 				{
 					term: 'figure out',
 					meaning: 'To understand or solve something after thinking about it',
 					exampleFromBook: 'It took him a while to figure out how the local bus system worked.',
+					rarity: 2,
 				},
 				{
 					term: 'settle in',
 					meaning: 'To become comfortable in a new place or situation',
 					exampleFromBook: 'After a few days, he finally began to settle in.',
+					rarity: 4,
 				},
 			],
 			rareWords: [
@@ -55,16 +61,19 @@ export class StubAdapter implements LlmAdapter {
 					term: 'ephemeral',
 					meaning: 'Lasting for a very short time',
 					exampleFromBook: 'The beauty of the sunset was ephemeral, gone within minutes.',
+					rarity: 7,
 				},
 				{
 					term: 'ubiquitous',
 					meaning: 'Present, appearing, or found everywhere',
 					exampleFromBook: 'Street vendors were ubiquitous in the old quarter of the city.',
+					rarity: 6,
 				},
 				{
 					term: 'serendipity',
 					meaning: 'The occurrence of events by chance in a happy or beneficial way',
 					exampleFromBook: 'It was pure serendipity that he stumbled upon the hidden garden.',
+					rarity: 7,
 				},
 			],
 		};

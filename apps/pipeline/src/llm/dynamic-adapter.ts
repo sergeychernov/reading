@@ -14,20 +14,6 @@ interface LlmConfig {
 	gateway: GatewayConfig;
 }
 
-/** Legacy shape in DB (adapter: 'claude', claude: {...}). */
-interface LegacyLlmConfig {
-	adapter: string;
-	claude?: { model: string; maxTokens: number };
-	gateway?: GatewayConfig;
-}
-
-/** Converts legacy config model id (e.g. claude-sonnet-4-6) to gateway model id. */
-function legacyModelToGatewayId(model: string): string {
-	if (model.includes('/')) return model;
-	const normalized = model.replace(/-(\d)-(\d)(?:-\d+)?$/, '-$1.$2');
-	return `anthropic/${normalized}`;
-}
-
 const MONGODB_URI = process.env.MONGODB_URI ?? '';
 const DB_NAME = 'reading';
 const COLLECTION = 'llmConfig';
@@ -40,22 +26,6 @@ const DEFAULT_CONFIG: LlmConfig = {
 		maxTokens: 4096,
 	},
 };
-
-function normalizeConfig(doc: LegacyLlmConfig | LlmConfig): LlmConfig {
-	if (doc.adapter === 'claude' && doc.claude) {
-		return {
-			adapter: 'gateway',
-			gateway: {
-				model: legacyModelToGatewayId(doc.claude.model),
-				maxTokens: doc.claude.maxTokens,
-			},
-		};
-	}
-	if (doc.adapter === 'gateway' && doc.gateway) {
-		return doc;
-	}
-	return DEFAULT_CONFIG;
-}
 
 async function readLlmConfig(): Promise<LlmConfig> {
 	const client = new MongoClient(MONGODB_URI);
@@ -70,7 +40,10 @@ async function readLlmConfig(): Promise<LlmConfig> {
 			return DEFAULT_CONFIG;
 		}
 		const { _id: _, ...config } = doc;
-		return normalizeConfig(config);
+		if (config.adapter === 'gateway' && config.gateway) {
+			return config;
+		}
+		return DEFAULT_CONFIG;
 	} finally {
 		await client.close();
 	}

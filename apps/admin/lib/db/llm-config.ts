@@ -1,36 +1,21 @@
 import { getDb } from '../mongodb';
-import type { GatewayConfig, LlmConfig } from '../types/llm-config';
+import type { LlmConfig } from '../types/llm-config';
 import { DEFAULT_LLM_CONFIG } from '../types/llm-config';
 
 const COLLECTION = 'llmConfig';
 const SINGLETON_ID = 'singleton';
 
-function legacyModelToGatewayId(model: string): string {
-	if (model.includes('/')) return model;
-	const normalized = model.replace(/-(\d)-(\d)(?:-\d+)?$/, '-$1.$2');
-	return `anthropic/${normalized}`;
-}
-
 export async function getLlmConfig(): Promise<LlmConfig> {
 	const db = await getDb();
 	const doc = await db
-		.collection<LlmConfig & { _id: string; adapter?: string; claude?: { model: string; maxTokens: number }; gateway?: GatewayConfig }>(COLLECTION)
+		.collection<LlmConfig & { _id: string }>(COLLECTION)
 		.findOne({ _id: SINGLETON_ID });
 	if (doc === null) {
 		return DEFAULT_LLM_CONFIG;
 	}
-	const { _id: _, ...raw } = doc;
-	if (raw.adapter === 'claude' && raw.claude) {
-		return {
-			adapter: 'gateway',
-			gateway: {
-				model: legacyModelToGatewayId(raw.claude.model),
-				maxTokens: raw.claude.maxTokens,
-			},
-		};
-	}
-	if (raw.adapter === 'gateway' && raw.gateway) {
-		return raw as LlmConfig;
+	const { _id: _, ...config } = doc;
+	if (config.adapter === 'gateway' && config.gateway) {
+		return config;
 	}
 	return DEFAULT_LLM_CONFIG;
 }
