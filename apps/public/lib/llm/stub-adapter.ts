@@ -1,5 +1,5 @@
 import type { LlmAdapter } from './adapter';
-import type { ChapterExtraction } from './schemas';
+import type { ChapterExtraction } from '@reading/llm-schemas';
 
 /**
  * Stub adapter that returns empty results.

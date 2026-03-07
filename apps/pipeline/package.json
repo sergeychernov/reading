@@ -14,6 +14,7 @@
 		"@nestjs/mongoose": "^10.1.0",
 		"@nestjs/platform-express": "^10.3.0",
 		"@reading/epub-utils": "workspace:packages/epub-utils",
+		"@reading/llm-schemas": "workspace:packages/llm-schemas",
 		"@vercel/blob": "^2.3.0",
 		"ai": "6.0.116",
 		"dotenv": "^17.3.1",

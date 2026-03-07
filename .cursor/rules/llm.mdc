@@ -32,7 +32,7 @@ alwaysApply: false
 
 ## Schemas and types
 
-- **Defined in**: `schemas.ts`.
+- **Canonical definition**: `packages/llm-schemas` (single source of truth). Pipeline re-exports from `apps/pipeline/src/llm/schemas.ts` for local imports; public and other apps import from `@reading/llm-schemas`.
 - **`chapterExtractionSchema`**: Zod schema for extraction result: `summary`, `idioms`, `phrasalVerbs`, `rareWords` (each item: `term`, `meaning`, `exampleFromBook`, `rarity` 0–10). Used for both validation and AI SDK structured output.
 - **Types**: `ChapterExtraction`, `LanguageItemExtracted` — use these in adapters and pipeline; do not duplicate or relax the schema.
 

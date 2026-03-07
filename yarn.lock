@@ -5028,6 +5028,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@reading/llm-schemas@workspace:packages/llm-schemas":
+  version: 0.0.0-use.local
+  resolution: "@reading/llm-schemas@workspace:packages/llm-schemas"
+  dependencies:
+    typescript: "npm:latest"
+    zod: "npm:^4.3.6"
+  languageName: unknown
+  linkType: soft
+
 "@reading/pipeline@workspace:apps/pipeline":
   version: 0.0.0-use.local
   resolution: "@reading/pipeline@workspace:apps/pipeline"
@@ -5037,6 +5046,7 @@ __metadata:
     "@nestjs/mongoose": "npm:^10.1.0"
     "@nestjs/platform-express": "npm:^10.3.0"
     "@reading/epub-utils": "workspace:packages/epub-utils"
+    "@reading/llm-schemas": "workspace:packages/llm-schemas"
     "@vercel/blob": "npm:^2.3.0"
     "@vercel/node": "npm:^5.1.0"
     ai: "npm:6.0.116"
@@ -5063,6 +5073,7 @@ __metadata:
     "@emotion/styled": "npm:11.14.1"
     "@mui/material-nextjs": "npm:7.3.7"
     "@reading/epub-utils": "workspace:packages/epub-utils"
+    "@reading/llm-schemas": "workspace:packages/llm-schemas"
     "@reading/ui": "npm:0.0.0"
     "@smoores/epub": "npm:^0.1.9"
     "@testing-library/dom": "npm:latest"

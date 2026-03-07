@@ -1,4 +1,4 @@
-import type { ChapterExtraction } from './schemas';
+import type { ChapterExtraction } from '@reading/llm-schemas';
 
 /**
  * Abstract interface for LLM-based language extraction.
