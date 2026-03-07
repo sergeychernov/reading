@@ -14,3 +14,4 @@ alwaysApply: false
 - Prefer `interface` over `type` for object shapes (use `type` for unions, intersections, mapped types)
 - Use `as const` for literal values instead of type assertions
 - Avoid non-null assertions (`!`). Use optional chaining or explicit checks
+- Never use dynamic `import()` for workspace packages (`@reading/*`). Always use static `import` at the top of the file. Dynamic import prevents TypeScript from resolving types at build time and breaks Node.js ESM loading of `.ts` source files.

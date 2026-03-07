@@ -1,0 +1,48 @@
+---
+description: LLM adapters, Vercel AI Gateway, extraction schemas (pipeline)
+alwaysApply: false
+---
+
+# LLM (Pipeline)
+
+## Location
+
+- **Code**: `apps/pipeline/src/llm/`
+- **Usage**: Chapter extraction (idioms, phrasal verbs, rare words, summary) in the chapter-extraction pipeline.
+
+## Adapter contract
+
+- **Interface**: `LlmAdapter` in `adapter.ts` — single method `extractFromChapter(chapterText: string): Promise<ChapterExtraction>`.
+- **Runtime choice**: Pipeline uses `DynamicAdapter`, which reads config from MongoDB (`reading.llmConfig`, document `_id: 'singleton'`) on every call and instantiates the concrete adapter. No server restart needed when switching adapter or model in admin.
+- **Implementations**:
+  - **StubAdapter** — returns fixed English test data; used when `adapter: 'stub'` or when no config in DB.
+  - **GatewayAdapter** — single adapter for Vercel AI Gateway. Uses `createGateway` + `generateObject` from `ai`. Model id is the full gateway id (e.g. `anthropic/claude-sonnet-4.6`, `openai/gpt-4.1`). Config: `gateway: { model, maxTokens }`.
+
+## Gateway adapter and Vercel AI Gateway
+
+- **Only `ai` package**: Use `createGateway({ apiKey, baseURL? })` and `gateway(modelId)` from `ai`. Model id format: `provider/model-name` (e.g. `anthropic/claude-sonnet-4.6`). No provider-specific adapters.
+- **Default gateway**: When `AI_GATEWAY_URL` is not set, the SDK uses the default gateway base URL; set `AI_GATEWAY_API_KEY` for auth. Custom baseURL must end with `/v1/ai`.
+- **Options**: `GatewayAdapterOptions`: `model` (required), `maxTokens`, optional `gatewayUrl`, `gatewayApiKey` (override env).
+- **Structured output**: `generateObject` with `chapterExtractionSchema` (Zod); prompts in `gateway/prompts.ts`.
+
+## Config and admin
+
+- **LlmConfig** (MongoDB + admin): `adapter: 'gateway' | 'stub'`, `gateway: { model, maxTokens }`. Legacy `adapter: 'claude'` is normalized to `gateway` with model id converted to `anthropic/...` when reading.
+- **Admin** (`apps/admin`): LlmConfigForm lets you choose Gateway or Stub and pick a model from `GATEWAY_MODELS` (Anthropic, OpenAI, etc.). Model ids are stored as full gateway ids.
+
+## Schemas and types
+
+- **Canonical definition**: `packages/llm-schemas` (single source of truth). Pipeline re-exports from `apps/pipeline/src/llm/schemas.ts` for local imports; public and other apps import from `@reading/llm-schemas`.
+- **`chapterExtractionSchema`**: Zod schema for extraction result: `summary`, `idioms`, `phrasalVerbs`, `rareWords` (each item: `term`, `meaning`, `exampleFromBook`, `rarity` 0–10). Used for both validation and AI SDK structured output.
+- **Types**: `ChapterExtraction`, `LanguageItemExtracted` — use these in adapters and pipeline; do not duplicate or relax the schema.
+
+## Environment variables (pipeline)
+
+| Variable | Description |
+|----------|-------------|
+| `AI_GATEWAY_URL` | Vercel AI Gateway base URL (optional; SDK default used if unset). |
+| `AI_GATEWAY_API_KEY` | API key for Vercel AI Gateway. Required for gateway adapter. |
+
+## Adding a new model
+
+Add an entry to `GATEWAY_MODELS` in `apps/admin/lib/types/llm-config.ts` with the gateway model id (e.g. `google/gemini-2.5-flash`) and label. No pipeline code change needed.

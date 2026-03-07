@@ -10,6 +10,8 @@ import type { NavItem, RenderLinkFn } from "@reading/ui";
 
 const navItems: NavItem[] = [
   { label: "Home", href: "/" },
+  { label: "Books", href: "/books" },
+  { label: "Upload", href: "/upload" },
   {
     label: "About",
     children: [
@@ -17,15 +19,6 @@ const navItems: NavItem[] = [
       { label: "Services", href: "/about/services" },
     ],
   },
-  {
-    label: "Solutions",
-    children: [
-      { label: "Enterprise", href: "/solutions/enterprise" },
-      { label: "SMB", href: "/solutions/smb" },
-      { label: "Startups", href: "/solutions/startups" },
-    ],
-  },
-  { label: "Blog", href: "/blog" },
   { label: "Contact", href: "/contact" },
 ];
 

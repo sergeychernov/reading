@@ -11,3 +11,10 @@ export { BurgerMenu } from "./components/BurgerMenu";
 // Navigation types
 export type { NavItem } from "./types/nav";
 export type { RenderLinkFn } from "./components/HeaderMenu";
+
+// Book club components
+export { StatusBadge } from "./components/StatusBadge";
+export { CategoryTabs } from "./components/CategoryTabs";
+export { FileUploadDropzone } from "./components/FileUploadDropzone";
+export { ItemCard } from "./components/ItemCard";
+export { ProgressIndicator } from "./components/ProgressIndicator";
