@@ -63,10 +63,13 @@ export async function POST(request: Request): Promise<NextResponse> {
 
 		// Fire-and-forget: trigger pipeline processing via NestJS pipeline API
 		const pipelineUrl = process.env.PIPELINE_API_URL ?? 'http://localhost:3001';
+		const pipelineSecret = process.env.PIPELINE_API_SECRET;
+		const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+		if (pipelineSecret) headers['x-internal-secret'] = pipelineSecret;
 
 		fetch(`${pipelineUrl}/api/v1/book-processing`, {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
+			headers,
 			body: JSON.stringify({
 				bookId: result.bookId,
 				epubBlobUrl: result.epubBlobUrl,

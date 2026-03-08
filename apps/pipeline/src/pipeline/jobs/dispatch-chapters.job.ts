@@ -18,6 +18,7 @@ export interface DispatchChaptersOutput {
 }
 
 const PIPELINE_BASE_URL = process.env.PIPELINE_BASE_URL ?? 'http://localhost:3001';
+const PIPELINE_API_SECRET = process.env.PIPELINE_API_SECRET;
 
 /**
  * Fan-out job: starts one chapter-extraction pipeline per chapter via HTTP.
@@ -50,11 +51,14 @@ export const dispatchChaptersJob: JobDefinition = {
 			`Dispatching ${input.chapters.length} chapter pipelines to ${url}`,
 		);
 
+		const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+		if (PIPELINE_API_SECRET) headers['x-internal-secret'] = PIPELINE_API_SECRET;
+
 		const results = await Promise.allSettled(
 			input.chapters.map(async (chapter) => {
 				const response = await fetch(url, {
 					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
+					headers,
 					body: JSON.stringify({
 						bookId: input.bookId,
 						chapterId: chapter.chapterId,

@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
+import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 
 const DRAWER_WIDTH = 240;
@@ -34,6 +35,11 @@ const NAV_ITEMS: NavItem[] = [
 		label: 'Pipeline',
 		href: '/pipeline',
 		icon: <TuneOutlinedIcon />,
+	},
+	{
+		label: 'Users',
+		href: '/users',
+		icon: <PeopleOutlinedIcon />,
 	},
 ];
 

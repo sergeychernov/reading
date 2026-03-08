@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getChapterById, updateChapterStatus } from '../../../../../../../lib/db/chapters';
+import { requireSubscription } from '../../../../../../../lib/auth/require-subscription';
 
 export const runtime = 'nodejs';
 
@@ -8,6 +9,9 @@ interface RouteParams {
 }
 
 export async function POST(_request: Request, { params }: RouteParams): Promise<NextResponse> {
+	const authResult = await requireSubscription();
+	if (authResult instanceof NextResponse) return authResult;
+
 	const { bookId, chapterId } = await params;
 
 	const chapter = await getChapterById(chapterId);
@@ -20,10 +24,13 @@ export async function POST(_request: Request, { params }: RouteParams): Promise<
 	await updateChapterStatus(chapterId, 'pending');
 
 	const pipelineUrl = process.env.PIPELINE_API_URL ?? 'http://localhost:3001';
+	const pipelineSecret = process.env.PIPELINE_API_SECRET;
+	const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+	if (pipelineSecret) headers['x-internal-secret'] = pipelineSecret;
 
 	const pipelineResponse = await fetch(`${pipelineUrl}/api/v1/chapter-extraction`, {
 		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
+		headers,
 		body: JSON.stringify({
 			bookId,
 			chapterId,

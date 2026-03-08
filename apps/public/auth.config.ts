@@ -8,6 +8,7 @@ const authDisabled = process.env.AUTH_DISABLED === 'true';
  * Used by middleware.
  */
 export const authConfig = {
+	session: { strategy: 'jwt' as const },
 	providers: [
 		Google({
 			clientId: process.env.GOOGLE_CLIENT_ID,

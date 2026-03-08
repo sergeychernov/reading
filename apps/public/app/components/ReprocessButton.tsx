@@ -14,7 +14,7 @@ interface ReprocessButtonProps {
 	onDone?: () => void;
 }
 
-type Status = 'idle' | 'loading' | 'processing' | 'done' | 'error';
+type Status = 'idle' | 'loading' | 'processing' | 'done' | 'error' | 'auth_required' | 'subscription_required';
 
 const POLL_INTERVAL_MS = 2000;
 
@@ -69,6 +69,10 @@ export function ReprocessButton({ bookId, chapterId, onDone }: ReprocessButtonPr
 			if (res.ok) {
 				setStatus('processing');
 				startPolling();
+			} else if (res.status === 401) {
+				setStatus('auth_required');
+			} else if (res.status === 403) {
+				setStatus('subscription_required');
 			} else {
 				setStatus('error');
 			}
@@ -83,9 +87,20 @@ export function ReprocessButton({ bookId, chapterId, onDone }: ReprocessButtonPr
 		processing: 'Processing…',
 		done: 'Done',
 		error: 'Error — retry?',
+		auth_required: 'Sign in required',
+		subscription_required: 'Subscription required',
 	};
 
 	const isSpinning = status === 'loading' || status === 'processing';
+	const isAccessDenied = status === 'auth_required' || status === 'subscription_required';
+
+	const color = isAccessDenied
+		? 'warning' as const
+		: status === 'error'
+			? 'error' as const
+			: status === 'done'
+				? 'success' as const
+				: 'primary' as const;
 
 	return (
 		<Tooltip title='Re-run LLM extraction with current adapter settings from admin'>
@@ -93,7 +108,7 @@ export function ReprocessButton({ bookId, chapterId, onDone }: ReprocessButtonPr
 				<Button
 					variant='outlined'
 					size='small'
-					color={status === 'error' ? 'error' : status === 'done' ? 'success' : 'primary'}
+					color={color}
 					disabled={isSpinning || status === 'done'}
 					startIcon={isSpinning ? <CircularProgress size={14} color='inherit' /> : <ReplayIcon />}
 					onClick={handleClick}

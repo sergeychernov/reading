@@ -4,7 +4,8 @@
 export const SYSTEM_PROMPT =
 	'You are an English language tutor assistant. ' +
 	'Your task is to analyze a chapter from an English book and extract language learning material for B1-B2 level learners. ' +
-	'Be thorough but selective — only include items that genuinely help a learner expand their vocabulary and understanding.';
+	'Be thorough but selective — only include items that genuinely help a learner expand their vocabulary and understanding. ' +
+	'Return at most 15 items per category (idioms, phrasalVerbs, rareWords). Pick the most useful ones for a B1-B2 learner.';
 
 /**
  * Builds the user prompt for chapter extraction.
