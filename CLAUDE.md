@@ -72,8 +72,10 @@ chapter-extraction pipeline (1 stage, started per chapter):
 | App | Variable | Description |
 |-----|----------|-------------|
 | public | `PIPELINE_API_URL` | Pipeline base URL (`http://localhost:3001` in dev) |
+| public, admin | `PIPELINE_API_SECRET` | Optional. When set, requests to pipeline must send header `x-internal-secret: <value>`. Set same value in pipeline to enable protection. |
 | pipeline | `MONGODB_URI` | MongoDB Atlas connection string |
 | pipeline | `PIPELINE_BASE_URL` | Self-invocation URL for chapter dispatch (`http://localhost:3001` in dev) |
+| pipeline | `PIPELINE_API_SECRET` | Optional. When set, all `/api/v1/*` requests require header `x-internal-secret` matching this value. Callers (public, admin, self-invocation) must send the same secret. |
 
 #### neuroline specifics
 

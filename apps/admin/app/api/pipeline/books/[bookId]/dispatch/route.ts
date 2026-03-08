@@ -43,12 +43,15 @@ export async function POST(_request: Request, { params }: RouteParams): Promise<
 		}
 
 		const url = `${PIPELINE_API_URL}/api/v1/chapter-extraction`;
+		const pipelineSecret = process.env.PIPELINE_API_SECRET;
+		const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+		if (pipelineSecret) headers['x-internal-secret'] = pipelineSecret;
 
 		const results = await Promise.allSettled(
 			chapters.map(async (chapter) => {
 				const response = await fetch(url, {
 					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
+					headers,
 					body: JSON.stringify({
 						bookId,
 						chapterId: (chapter._id as { toHexString(): string }).toHexString(),

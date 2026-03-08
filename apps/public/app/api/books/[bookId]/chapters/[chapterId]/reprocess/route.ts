@@ -24,10 +24,13 @@ export async function POST(_request: Request, { params }: RouteParams): Promise<
 	await updateChapterStatus(chapterId, 'pending');
 
 	const pipelineUrl = process.env.PIPELINE_API_URL ?? 'http://localhost:3001';
+	const pipelineSecret = process.env.PIPELINE_API_SECRET;
+	const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+	if (pipelineSecret) headers['x-internal-secret'] = pipelineSecret;
 
 	const pipelineResponse = await fetch(`${pipelineUrl}/api/v1/chapter-extraction`, {
 		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
+		headers,
 		body: JSON.stringify({
 			bookId,
 			chapterId,
