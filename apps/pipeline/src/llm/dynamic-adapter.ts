@@ -23,7 +23,7 @@ const DEFAULT_CONFIG: LlmConfig = {
 	adapter: 'stub',
 	gateway: {
 		model: 'anthropic/claude-sonnet-4.6',
-		maxTokens: 4096,
+		maxTokens: 16384,
 	},
 };
 

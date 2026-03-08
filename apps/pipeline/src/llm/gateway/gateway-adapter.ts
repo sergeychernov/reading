@@ -4,6 +4,30 @@ import type { LlmAdapter } from '../adapter';
 import { chapterExtractionSchema, type ChapterExtraction } from '../schemas';
 import { SYSTEM_PROMPT, buildUserPrompt } from './prompts';
 
+/**
+ * Repair function for generateObject: when the model returns stringified
+ * JSON arrays instead of actual arrays, parse them before Zod validation.
+ */
+async function repairJsonText({ text }: { text: string }): Promise<string | null> {
+	try {
+		const parsed = JSON.parse(text);
+		let repaired = false;
+		for (const key of ['idioms', 'phrasalVerbs', 'rareWords'] as const) {
+			if (typeof parsed[key] === 'string') {
+				parsed[key] = JSON.parse(parsed[key]);
+				repaired = true;
+			}
+		}
+		if (repaired) {
+			console.log('[GatewayAdapter] repaired stringified array fields');
+			return JSON.stringify(parsed);
+		}
+	} catch {
+		// nothing to repair if JSON is broken
+	}
+	return null;
+}
+
 const AI_GATEWAY_URL = process.env.AI_GATEWAY_URL ?? '';
 const AI_GATEWAY_API_KEY = process.env.AI_GATEWAY_API_KEY ?? '';
 
@@ -26,7 +50,7 @@ export class GatewayAdapter implements LlmAdapter {
 
 	constructor(options: GatewayAdapterOptions) {
 		this.model = options.model;
-		this.maxTokens = options.maxTokens ?? 4096;
+		this.maxTokens = options.maxTokens ?? 16384;
 		this.gatewayUrl = options.gatewayUrl ?? AI_GATEWAY_URL;
 		this.gatewayApiKey = options.gatewayApiKey ?? AI_GATEWAY_API_KEY;
 	}
@@ -57,6 +81,7 @@ export class GatewayAdapter implements LlmAdapter {
 			system: SYSTEM_PROMPT,
 			prompt: buildUserPrompt(chapterText),
 			maxOutputTokens: this.maxTokens,
+			experimental_repairText: repairJsonText,
 		});
 
 		console.log(
