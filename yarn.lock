@@ -5048,13 +5048,14 @@ __metadata:
     "@reading/epub-utils": "workspace:packages/epub-utils"
     "@reading/llm-schemas": "workspace:packages/llm-schemas"
     "@vercel/blob": "npm:^2.3.0"
+    "@vercel/functions": "npm:^2.0.0"
     "@vercel/node": "npm:^5.1.0"
     ai: "npm:6.0.116"
     dotenv: "npm:^17.3.1"
     mongodb: "npm:^6.21.0"
     mongoose: "npm:^8.9.0"
     neuroline: "npm:^0.9.0"
-    neuroline-nestjs: "npm:^0.7.3"
+    neuroline-nestjs: "npm:^0.7.4"
     reflect-metadata: "npm:^0.2.2"
     rxjs: "npm:^7.8.0"
     ts-node: "npm:^10.9.0"
@@ -6444,7 +6445,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/ms@npm:*":
+"@types/ms@npm:*, @types/ms@npm:2.1.0":
   version: 2.1.0
   resolution: "@types/ms@npm:2.1.0"
   checksum: 10c0/5ce692ffe1549e1b827d99ef8ff71187457e0eb44adbae38fdf7b9a74bae8d20642ee963c14516db1d35fa2652e65f47680fdf679dcbde52bbfadd021f497225
@@ -6777,6 +6778,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vercel/functions@npm:^2.0.0":
+  version: 2.2.13
+  resolution: "@vercel/functions@npm:2.2.13"
+  dependencies:
+    "@vercel/oidc": "npm:2.0.2"
+  peerDependencies:
+    "@aws-sdk/credential-provider-web-identity": "*"
+  peerDependenciesMeta:
+    "@aws-sdk/credential-provider-web-identity":
+      optional: true
+  checksum: 10c0/1eb9f395e448301aef9d33a25eceb191d94700ce8d7f02d1219dd5399123aa8ad499135591f41d8bb448154ebb18d61c7e64c295a31bc9482e0b22785e0b28af
+  languageName: node
+  linkType: hard
+
 "@vercel/nft@npm:0.27.3":
   version: 0.27.3
   resolution: "@vercel/nft@npm:0.27.3"
@@ -6876,6 +6891,16 @@ __metadata:
     typescript: "npm:typescript@5.9.3"
     undici: "npm:5.28.4"
   checksum: 10c0/82086f11541ba6eaa2eee960e64d74e8af6783dbd8b6f4cef9eccad0ddbd8769876ad61a0ae34e7252527e501e15b580ba4a810ebb8166306a24a9a69c4d57da
+  languageName: node
+  linkType: hard
+
+"@vercel/oidc@npm:2.0.2":
+  version: 2.0.2
+  resolution: "@vercel/oidc@npm:2.0.2"
+  dependencies:
+    "@types/ms": "npm:2.1.0"
+    ms: "npm:2.1.3"
+  checksum: 10c0/473baec88175e235777e12ffe912a5a76f1497a1aea121ddd98a885223e0284eae3535a0ac4975e01f72664b4d40bfff40067dc70a7ec241c4482d1d3f6205df
   languageName: node
   linkType: hard
 
@@ -14546,14 +14571,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"neuroline-nestjs@npm:^0.7.3":
-  version: 0.7.3
-  resolution: "neuroline-nestjs@npm:0.7.3"
+"neuroline-nestjs@npm:^0.7.4":
+  version: 0.7.4
+  resolution: "neuroline-nestjs@npm:0.7.4"
   peerDependencies:
     "@nestjs/common": ">=10.0.0"
     "@nestjs/core": ">=10.0.0"
     neuroline: ^0.9.0
-  checksum: 10c0/7d53e6a6e67f2f26d406c817c259ad03c6bdc4efa09f656499ecda99b1a0e9b0acdc639163adf3204327a6d9e4dc0bd51bd33ff0cbeb86f1c859a0e83dc5816c
+  checksum: 10c0/38ac7098b9ff3777511bceca4ddf09b23d7dd4a239ce442584efa7118b117f16b7fc41c5b7b79b6bfded77de64004a91be78339eed1b003a48fa3b34d3a76230
   languageName: node
   linkType: hard
 

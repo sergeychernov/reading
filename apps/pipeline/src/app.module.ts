@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { getModelToken } from '@nestjs/mongoose';
 import { NeurolineModule } from 'neuroline-nestjs';
+import { waitUntil } from '@vercel/functions';
 import { MongoPipelineStorage, PipelineSchema } from 'neuroline/mongo';
 import type { MongoPipelineDocument } from 'neuroline/mongo';
 import type { Model } from 'mongoose';
@@ -24,6 +25,9 @@ const DB_NAME = 'reading';
 			useFactory: (pipelineModel: Model<MongoPipelineDocument>) =>
 				new MongoPipelineStorage(pipelineModel),
 			inject: [getModelToken('Pipeline')],
+			onExecutionStart: process.env.VERCEL
+				? (promise) => waitUntil(promise)
+				: undefined,
 			controllers: [
 				{
 					path: 'api/v1/book-processing',
