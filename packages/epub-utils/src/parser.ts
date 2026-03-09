@@ -1,4 +1,4 @@
-import type { Epub } from '@smoores/epub';
+import type { Epub } from '@smoores/epub' with { 'resolution-mode': 'import' };
 import { extractTextFromXhtml } from './text-extractor';
 
 export interface ParsedChapter {
