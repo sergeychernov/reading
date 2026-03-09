@@ -1,4 +1,9 @@
 {
+	"functions": {
+		"api/index.ts": {
+			"maxDuration": 60
+		}
+	},
 	"rewrites": [
 		{
 			"source": "/(.*)",

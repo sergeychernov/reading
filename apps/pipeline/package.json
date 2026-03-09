@@ -5,6 +5,7 @@
 	"scripts": {
 		"dev": "ts-node-dev -r dotenv/config --transpile-only --project tsconfig.dev.json --respawn src/main.ts",
 		"build": "tsc",
+		"build:vercel": "tsc --project tsconfig.vercel.json",
 		"typecheck": "tsc --noEmit",
 		"lint": "tsc --noEmit"
 	},
