@@ -9,5 +9,6 @@
 			"source": "/(.*)",
 			"destination": "/api"
 		}
-	]
+	],
+	"buildCommand": "yarn workspace @reading/epub-utils build && yarn workspace @reading/llm-schemas build"
 }
