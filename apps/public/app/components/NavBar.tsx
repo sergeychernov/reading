@@ -7,13 +7,16 @@ import Toolbar from '@mui/material/Toolbar';
 import Box from '@mui/material/Box';
 import { AppLogo, HeaderMenu, BurgerMenu } from '@reading/ui';
 import type { NavItem, RenderLinkFn } from '@reading/ui';
+import { useSession } from 'next-auth/react';
 import { AuthButton } from './AuthButton';
 
-const navItems: NavItem[] = [
+const BASE_NAV_ITEMS: NavItem[] = [
 	{ label: 'Home', href: '/' },
 	{ label: 'Books', href: '/books' },
 	{ label: 'Upload', href: '/upload' },
 ];
+
+const PROFILE_NAV_ITEM: NavItem = { label: 'Profile', href: '/profile' };
 
 const renderLink: RenderLinkFn = (href: string, children: ReactNode) => (
 	<Link href={href} style={{ textDecoration: 'none', color: 'inherit' }}>
@@ -28,6 +31,11 @@ const logoIcon = (
 );
 
 export function NavBar() {
+	const { data: session } = useSession();
+	const navItems: NavItem[] = session?.user
+		? [...BASE_NAV_ITEMS, PROFILE_NAV_ITEM]
+		: BASE_NAV_ITEMS;
+
 	return (
 		<AppBar position='static' elevation={0} sx={{ bgcolor: '#0f172a' }}>
 			<Toolbar>

@@ -10,6 +10,8 @@ export const proxy = nextAuth.auth;
 export const config = {
 	matcher: [
 		'/upload/:path*',
+		'/profile/:path*',
 		'/api/books',
+		'/api/profile/:path*',
 	],
 };

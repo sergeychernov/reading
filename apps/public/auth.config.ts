@@ -20,8 +20,12 @@ export const authConfig = {
 			if (authDisabled) return true;
 
 			const isAuthenticated = !!auth?.user;
-			const isProtected = request.nextUrl.pathname.startsWith('/upload')
-				|| (request.nextUrl.pathname === '/api/books' && request.method === 'POST');
+			const { pathname } = request.nextUrl;
+			const isProtected =
+				pathname.startsWith('/upload') ||
+				pathname.startsWith('/profile') ||
+				pathname.startsWith('/api/profile') ||
+				(pathname === '/api/books' && request.method === 'POST');
 
 			if (isProtected && !isAuthenticated) {
 				return false;

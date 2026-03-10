@@ -1,11 +1,30 @@
 export interface GatewayConfig {
 	model: string;
 	maxTokens: number;
+	/** Sampling temperature 0–2. Lower = more deterministic. Default 0.2. */
+	temperature?: number;
 }
 
-export interface LlmConfig {
+export interface LlmAdapterConfig {
 	adapter: 'gateway' | 'stub';
 	gateway: GatewayConfig;
+}
+
+export const LLM_JOB_NAMES = [
+	'extract-summary',
+	'extract-idioms',
+	'extract-phrasal-verbs',
+	'extract-rare-words',
+	'extract-rarity',
+	'extract-meaning-en',
+	'extract-meaning-ru',
+] as const;
+
+export type LlmJobName = (typeof LLM_JOB_NAMES)[number];
+
+export interface LlmConfig {
+	default: LlmAdapterConfig;
+	jobs?: Partial<Record<LlmJobName, LlmAdapterConfig>>;
 }
 
 export interface GatewayModelOption {
@@ -304,9 +323,13 @@ export function getGroupedGatewayModels(): GatewayModelGroupProvider[] {
 }
 
 export const DEFAULT_LLM_CONFIG: LlmConfig = {
-	adapter: 'stub',
-	gateway: {
-		model: 'anthropic/claude-sonnet-4.6',
-		maxTokens: 4096,
+	default: {
+		adapter: 'stub',
+		gateway: {
+			model: 'anthropic/claude-sonnet-4.6',
+			maxTokens: 4096,
+			temperature: 0.2,
+		},
 	},
+	jobs: {},
 };

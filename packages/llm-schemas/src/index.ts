@@ -1,12 +1,25 @@
 import { z } from 'zod';
 
-export const languageItemSchema = z.object({
+export const meaningTranslationsSchema = z.object({
+	en: z.string().describe('Simple English explanation'),
+	ru: z.string().describe('Russian translation'),
+}).describe('Meaning/translation in each supported language');
+
+export const languageItemBaseSchema = z.object({
 	term: z.string().describe('The idiom, phrasal verb, or rare word'),
-	meaning: z.string().describe('Simple English meaning'),
 	exampleFromBook: z.string().describe('The exact sentence from the book containing this term'),
-	rarity: z.number().int().min(0).max(10).describe(
+});
+
+export const rarityScoreSchema = z.number().int().min(0).max(10).describe(
 		'Rarity score 0–10: 0 = extremely common (e.g. "the"), 10 = very rare / obscure',
-	),
+);
+
+export const languageItemScoredSchema = languageItemBaseSchema.extend({
+	rarity: rarityScoreSchema,
+});
+
+export const languageItemSchema = languageItemScoredSchema.extend({
+	meaning: meaningTranslationsSchema,
 });
 
 export const chapterExtractionSchema = z.object({
@@ -16,5 +29,8 @@ export const chapterExtractionSchema = z.object({
 	rareWords: z.array(languageItemSchema).describe('Uncommon vocabulary for B1-B2 learners'),
 });
 
+export type MeaningTranslations = z.infer<typeof meaningTranslationsSchema>;
 export type ChapterExtraction = z.infer<typeof chapterExtractionSchema>;
+export type LanguageItemBase = z.infer<typeof languageItemBaseSchema>;
+export type LanguageItemScored = z.infer<typeof languageItemScoredSchema>;
 export type LanguageItemExtracted = z.infer<typeof languageItemSchema>;
