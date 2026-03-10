@@ -17,16 +17,35 @@ import {
 	Radio,
 	RadioGroup,
 	Select,
+	Switch,
+	Tab,
+	Tabs,
 	TextField,
 	Typography,
 } from '@mui/material';
-import type { LlmConfig } from '../../lib/types/llm-config';
-import { DEFAULT_LLM_CONFIG, getGroupedGatewayModels } from '../../lib/types/llm-config';
+import type { LlmAdapterConfig, LlmConfig, LlmJobName } from '../../lib/types/llm-config';
+import {
+	DEFAULT_LLM_CONFIG,
+	getGroupedGatewayModels,
+	LLM_JOB_NAMES,
+} from '../../lib/types/llm-config';
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
+type ConfigTab = 'default' | LlmJobName;
+
+const JOB_TAB_TITLES: Record<LlmJobName, string> = {
+	'extract-summary': 'Job: extract-summary',
+	'extract-idioms': 'Job: extract-idioms',
+	'extract-phrasal-verbs': 'Job: extract-phrasal-verbs',
+	'extract-rare-words': 'Job: extract-rare-words',
+	'extract-rarity': 'Job: extract-rarity',
+	'extract-meaning-en': 'Job: extract-meaning-en',
+	'extract-meaning-ru': 'Job: extract-meaning-ru',
+};
 
 export function LlmConfigForm() {
 	const [config, setConfig] = useState<LlmConfig>(DEFAULT_LLM_CONFIG);
+	const [activeTab, setActiveTab] = useState<ConfigTab>('default');
 	const [loading, setLoading] = useState(true);
 	const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
 	const groupedModels = useMemo(() => getGroupedGatewayModels(), []);
@@ -52,6 +71,63 @@ export function LlmConfigForm() {
 		}
 	};
 
+	const updateDefaultConfig = (updater: (prev: LlmAdapterConfig) => LlmAdapterConfig) => {
+		setConfig((prev) => ({
+			...prev,
+			default: updater(prev.default),
+		}));
+	};
+
+	const updateJobConfig = (
+		jobName: LlmJobName,
+		updater: (prev: LlmAdapterConfig) => LlmAdapterConfig,
+	) => {
+		setConfig((prev) => ({
+			...prev,
+			jobs: {
+				...(prev.jobs ?? {}),
+				[jobName]: updater(prev.jobs?.[jobName] ?? prev.default),
+			},
+		}));
+	};
+
+	const activeConfig = activeTab === 'default'
+		? config.default
+		: config.jobs?.[activeTab] ?? config.default;
+	const isUsingDefaultForJob = activeTab !== 'default' && !config.jobs?.[activeTab];
+
+	const setUseDefaultForActiveJob = (useDefault: boolean) => {
+		if (activeTab === 'default') {
+			return;
+		}
+		if (useDefault) {
+			setConfig((prev) => {
+				const nextJobs = { ...(prev.jobs ?? {}) };
+				delete nextJobs[activeTab];
+				return {
+					...prev,
+					jobs: nextJobs,
+				};
+			});
+			return;
+		}
+		setConfig((prev) => ({
+			...prev,
+			jobs: {
+				...(prev.jobs ?? {}),
+				[activeTab]: prev.jobs?.[activeTab] ?? prev.default,
+			},
+		}));
+	};
+
+	const updateActiveConfig = (updater: (prev: LlmAdapterConfig) => LlmAdapterConfig) => {
+		if (activeTab === 'default') {
+			updateDefaultConfig(updater);
+			return;
+		}
+		updateJobConfig(activeTab, updater);
+	};
+
 	if (loading) {
 		return (
 			<Box display='flex' justifyContent='center' py={6}>
@@ -60,25 +136,69 @@ export function LlmConfigForm() {
 		);
 	}
 
+	const isGatewayEnabled = activeConfig.adapter === 'gateway';
+
 	return (
 		<Paper variant='outlined' sx={{ p: 4 }}>
 			<Typography variant='h6' gutterBottom>
 				LLM Adapter
 			</Typography>
+			<Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+				Default settings apply to all jobs. Job tabs override defaults only for that job.
+			</Typography>
 
-			<FormControl component='fieldset' sx={{ mb: 3 }}>
+			<Tabs
+				value={activeTab}
+				onChange={(_e, value: ConfigTab) => setActiveTab(value)}
+				variant='scrollable'
+				allowScrollButtonsMobile
+				sx={{ mb: 3 }}
+			>
+				<Tab value='default' label='Default' />
+				{LLM_JOB_NAMES.map((jobName) => (
+					<Tab key={jobName} value={jobName} label={JOB_TAB_TITLES[jobName]} />
+				))}
+			</Tabs>
+
+			{activeTab !== 'default' && (
+				<Box sx={{ mb: 3 }}>
+					<FormControlLabel
+						control={
+							<Switch
+								checked={isUsingDefaultForJob}
+								onChange={(e) => setUseDefaultForActiveJob(e.target.checked)}
+							/>
+						}
+						label='Use default settings for this job'
+					/>
+					{isUsingDefaultForJob && (
+						<Alert severity='info' sx={{ mt: 1 }}>
+							This job now uses the configuration from the Default tab.
+						</Alert>
+					)}
+				</Box>
+			)}
+
+			<FormControl component='fieldset' sx={{ mb: 3 }} disabled={isUsingDefaultForJob}>
 				<FormLabel component='legend'>Adapter</FormLabel>
 				<RadioGroup
-					value={config.adapter}
+					value={activeConfig.adapter}
 					onChange={(e) => {
-						const nextAdapter = e.target.value as LlmConfig['adapter'];
-						setConfig((prev) => ({
+						const nextAdapter = e.target.value as LlmAdapterConfig['adapter'];
+						updateActiveConfig((prev) => ({
 							...prev,
 							adapter: nextAdapter,
 							...(nextAdapter === 'gateway' && {
 								gateway: {
-									model: prev.gateway?.model || DEFAULT_LLM_CONFIG.gateway.model,
-									maxTokens: prev.gateway?.maxTokens ?? DEFAULT_LLM_CONFIG.gateway.maxTokens,
+									model:
+										prev.gateway?.model || DEFAULT_LLM_CONFIG.default.gateway.model,
+									maxTokens:
+										prev.gateway?.maxTokens ??
+										DEFAULT_LLM_CONFIG.default.gateway.maxTokens,
+									temperature:
+										prev.gateway?.temperature ??
+										DEFAULT_LLM_CONFIG.default.gateway.temperature ??
+										0.2,
 								},
 							}),
 						}));
@@ -89,7 +209,7 @@ export function LlmConfigForm() {
 				</RadioGroup>
 			</FormControl>
 
-			{config.adapter === 'gateway' && (
+			{isGatewayEnabled && (
 				<>
 					<Divider sx={{ mb: 3 }} />
 					<Typography variant='subtitle2' color='text.secondary' gutterBottom>
@@ -101,9 +221,10 @@ export function LlmConfigForm() {
 							<Select
 								labelId='model-label'
 								label='Model'
-								value={config.gateway?.model ?? ''}
+								value={activeConfig.gateway?.model ?? ''}
+								disabled={isUsingDefaultForJob}
 								onChange={(e) =>
-									setConfig((prev) => ({
+									updateActiveConfig((prev) => ({
 										...prev,
 										gateway: { ...prev.gateway, model: e.target.value },
 									}))
@@ -136,14 +257,29 @@ export function LlmConfigForm() {
 						<TextField
 							label='Max tokens'
 							type='number'
-							value={config.gateway?.maxTokens ?? 4096}
+							value={activeConfig.gateway?.maxTokens ?? 4096}
+							disabled={isUsingDefaultForJob}
 							onChange={(e) =>
-								setConfig((prev) => ({
+								updateActiveConfig((prev) => ({
 									...prev,
 									gateway: { ...prev.gateway, maxTokens: Number(e.target.value) },
 								}))
 							}
 							slotProps={{ htmlInput: { min: 256, max: 16384, step: 256 } }}
+						/>
+						<TextField
+							label='Temperature'
+							type='number'
+							helperText='0–2. Lower = more deterministic. 0.2 recommended for extraction.'
+							value={activeConfig.gateway?.temperature ?? 0.2}
+							disabled={isUsingDefaultForJob}
+							onChange={(e) =>
+								updateActiveConfig((prev) => ({
+									...prev,
+									gateway: { ...prev.gateway, temperature: Number(e.target.value) },
+								}))
+							}
+							slotProps={{ htmlInput: { min: 0, max: 2, step: 0.1 } }}
 						/>
 					</Box>
 				</>

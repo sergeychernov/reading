@@ -1,4 +1,5 @@
 import type { ObjectId } from 'mongodb';
+import type { MeaningTranslations } from '@reading/llm-schemas';
 import type { LanguageItemCategory } from './processing';
 
 export interface LanguageItemDocument {
@@ -7,7 +8,7 @@ export interface LanguageItemDocument {
 	chapterId: ObjectId;
 	category: LanguageItemCategory;
 	term: string;
-	meaning: string;
+	meaning: MeaningTranslations;
 	exampleFromBook: string;
 	/** Rarity 0–10 from extraction; may be missing in older documents. */
 	rarity?: number;

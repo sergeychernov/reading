@@ -13,16 +13,31 @@ interface ItemCardProps {
 	rarity?: number;
 }
 
+function getRarityBorderColor(rarity: number | undefined): string {
+	if (rarity === undefined || rarity === null) return 'grey.500';
+	if (rarity <= 3) return 'primary.main';
+	if (rarity <= 5) return 'success.main';
+	if (rarity <= 7) return 'warning.main';
+	if (rarity <= 8) return '#ed6c02';
+	return 'error.main';
+}
+
 export function ItemCard({ term, meaning, example, category, rarity }: ItemCardProps) {
-	const rarityLabel = rarity !== undefined && rarity !== null ? String(rarity) : '?';
 	return (
-		<Card variant="outlined" sx={{ mb: 2 }}>
+		<Card
+			variant="outlined"
+			sx={{
+				mb: 2,
+				borderWidth: .5,
+				borderColor: getRarityBorderColor(rarity),
+			}}
+			aria-label={rarity !== undefined && rarity !== null ? `Rarity: ${rarity}` : undefined}
+		>
 			<CardContent>
 				<Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
 					<Typography variant="h6" component="span">
 						{term}
 					</Typography>
-					<Chip label={`Rarity: ${rarityLabel}`} size="small" variant="outlined" />
 					{category && (
 						<Chip label={category} size="small" variant="outlined" />
 					)}

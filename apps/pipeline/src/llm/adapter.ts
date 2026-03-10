@@ -1,13 +1,28 @@
-import type { ChapterExtraction } from './schemas';
+import type {
+	LanguageItemBase,
+	LanguageItemExtracted,
+	LanguageItemScored,
+	MeaningTranslations,
+} from './schemas';
 
 /**
  * Abstract interface for LLM-based language extraction.
- * Implement this interface for each LLM provider (OpenAI, Claude, Gemini, etc.).
+ * Each method handles a single extraction task to reduce model complexity
+ * and improve reliability on large chapters.
  */
 export interface LlmAdapter {
-	/**
-	 * Extracts idioms, phrasal verbs, rare words, and a summary
-	 * from the given chapter text.
-	 */
-	extractFromChapter(chapterText: string): Promise<ChapterExtraction>;
+	extractSummary(chapterText: string): Promise<string>;
+	extractLanguageItems(chapterText: string): Promise<{
+		idioms: LanguageItemBase[];
+		phrasalVerbs: LanguageItemBase[];
+		rareWords: LanguageItemBase[];
+	}>;
+	extractIdioms(chapterText: string): Promise<LanguageItemBase[]>;
+	extractPhrasalVerbs(chapterText: string): Promise<LanguageItemBase[]>;
+	extractRareWords(chapterText: string): Promise<LanguageItemBase[]>;
+	extractRarity(items: LanguageItemBase[]): Promise<LanguageItemScored[]>;
+	translateMeanings(
+		items: LanguageItemScored[],
+		language: keyof MeaningTranslations,
+	): Promise<string[]>;
 }

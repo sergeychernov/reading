@@ -8,6 +8,6 @@ alwaysApply: true
 - **FORBIDDEN**: Never run `git add` — the user stages files manually.
 - **FORBIDDEN**: Never run mutating git commands (`git commit`, `git push`, `git checkout`, `git restore`, etc.). Only read-only commands are allowed (`git status`, `git log`, `git diff`).
 - **Commits**: If the user asks to create a commit — propose a message, but **do not run** the command.
-  - Format: Conventional Commits in Russian.
+  - Format: Conventional Commits in Simple English.
   - Example: `feat: добавить сервис расчёта стоимости`
   - First line must not exceed 80 characters.
