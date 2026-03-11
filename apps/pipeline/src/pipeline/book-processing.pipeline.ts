@@ -1,16 +1,14 @@
 import type { PipelineConfig, SynapseContext } from 'neuroline';
-import { fetchEpubJob } from './jobs/fetch-epub.job';
-import type { FetchEpubOutput } from './jobs/fetch-epub.job';
-import { parseEpubJob } from './jobs/parse-epub.job';
-import type { ParseEpubOutput } from './jobs/parse-epub.job';
-import { saveChaptersJob } from './jobs/save-chapters.job';
-import type { SaveChaptersOutput } from './jobs/save-chapters.job';
-import { dispatchChaptersJob } from './jobs/dispatch-chapters.job';
-
-export interface BookProcessingInput {
-	bookId: string;
-	epubBlobUrl: string;
-}
+import {
+	fetchEpubJob,
+	parseEpubJob,
+	saveChaptersJob,
+	createDispatchChaptersJob,
+	type FetchEpubOutput,
+	type ParseEpubOutput,
+	type SaveChaptersOutput,
+} from '@reading/jobs';
+import { readPipelineConfig } from './pipeline-config';
 
 /**
  * Book processing pipeline — 4 stages:
@@ -61,7 +59,7 @@ export function createBookProcessingPipeline(): PipelineConfig {
 
 			// Stage 4: Conditionally dispatch chapter-extraction pipelines
 			{
-				job: dispatchChaptersJob,
+				job: createDispatchChaptersJob({ readPipelineConfig }),
 				synapses: (ctx: SynapseContext) => {
 					const saveResult = ctx.getArtifact<SaveChaptersOutput>('save-chapters');
 

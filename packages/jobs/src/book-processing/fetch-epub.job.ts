@@ -1,10 +1,6 @@
 import type { JobDefinition, JobContext } from 'neuroline';
 import { MongoClient, ObjectId } from 'mongodb';
-
-export interface FetchEpubInput {
-	bookId: string;
-	epubBlobUrl: string;
-}
+import type { BookProcessingInput } from '../types';
 
 export interface FetchEpubOutput {
 	bookId: string;
@@ -31,10 +27,8 @@ async function markBookFailed(bookId: string, message: string): Promise<void> {
 
 /**
  * Downloads the EPUB file from private Vercel Blob storage.
- * Uses @vercel/blob SDK so that BLOB_READ_WRITE_TOKEN is applied automatically.
- * Returns the raw content as a base64 string so it can be
- * stored as a neuroline artifact and passed to parse-epub.
- * On failure, marks the book as 'failed' in MongoDB before rethrowing.
+ * Uses BLOB_READ_WRITE_TOKEN for Bearer auth. Returns the raw content as base64
+ * for neuroline artifact. On failure, marks the book as 'failed' in MongoDB before rethrowing.
  */
 export const fetchEpubJob: JobDefinition = {
 	name: 'fetch-epub',
@@ -43,7 +37,7 @@ export const fetchEpubJob: JobDefinition = {
 		_options: unknown,
 		context: JobContext,
 	): Promise<FetchEpubOutput> {
-		const input = rawInput as FetchEpubInput;
+		const input = rawInput as BookProcessingInput;
 		context.logger.info(
 			`Fetching EPUB for book ${input.bookId} from ${input.epubBlobUrl}`,
 		);

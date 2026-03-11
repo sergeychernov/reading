@@ -1,27 +1,22 @@
 import type { PipelineConfig, SynapseContext } from 'neuroline';
-import { DynamicAdapter } from '../llm/dynamic-adapter';
-import { createExtractSummaryJob } from './jobs/extract-summary.job';
-import { createExtractIdiomsJob } from './jobs/extract-idioms.job';
-import { createExtractPhrasalVerbsJob } from './jobs/extract-phrasal-verbs.job';
-import { createExtractRareWordsJob } from './jobs/extract-rare-words.job';
-import { createExtractRarityJob, buildExtractRaritySynapses } from './jobs/extract-rarity.job';
 import {
+	createExtractSummaryJob,
+	createExtractIdiomsJob,
+	createExtractPhrasalVerbsJob,
+	createExtractRareWordsJob,
+	createExtractRarityJob,
+	buildExtractRaritySynapses,
 	createExtractMeaningEnJob,
 	buildExtractMeaningEnSynapses,
-} from './jobs/extract-meaning-en.job';
-import {
 	createExtractMeaningRuJob,
 	buildExtractMeaningRuSynapses,
-} from './jobs/extract-meaning-ru.job';
-import { saveChapterResultsJob, buildSaveChapterResultsSynapses } from './jobs/save-chapter-results.job';
+	saveChapterResultsJob,
+	buildSaveChapterResultsSynapses,
+	type ChapterExtractionInput,
+} from '@reading/jobs';
+import { DynamicAdapter } from '../llm/dynamic-adapter';
 
-export interface ChapterExtractionInput {
-	bookId: string;
-	chapterId: string;
-	chapterIndex: number;
-	chapterTitle: string;
-	chapterText: string;
-}
+export type { ChapterExtractionInput };
 
 const adapter = new DynamicAdapter();
 

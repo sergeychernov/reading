@@ -1,7 +1,7 @@
 import type { JobContext, JobDefinition, SynapseContext } from 'neuroline';
-import type { LlmAdapter } from '../../llm/adapter';
-import type { LanguageItemBase, LanguageItemScored } from '../../llm/schemas';
-import type { ChapterExtractionInput } from '../chapter-extraction.pipeline';
+import type { LanguageItemBase, LanguageItemScored } from '@reading/llm-schemas';
+import type { LlmAdapter } from '../types';
+import type { ChapterExtractionInput } from '../types';
 import type { ExtractIdiomsOutput } from './extract-idioms.job';
 import type { ExtractPhrasalVerbsOutput } from './extract-phrasal-verbs.job';
 import type { ExtractRareWordsOutput } from './extract-rare-words.job';

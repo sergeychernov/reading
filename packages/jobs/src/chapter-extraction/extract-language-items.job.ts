@@ -1,7 +1,7 @@
 import type { JobContext, JobDefinition } from 'neuroline';
-import type { LlmAdapter } from '../../llm/adapter';
-import type { LanguageItemBase } from '../../llm/schemas';
-import type { ChapterExtractionInput } from '../chapter-extraction.pipeline';
+import type { LanguageItemBase } from '@reading/llm-schemas';
+import type { LlmAdapter } from '../types';
+import type { ChapterExtractionInput } from '../types';
 
 export interface ExtractLanguageItemsOutput {
 	idioms: LanguageItemBase[];

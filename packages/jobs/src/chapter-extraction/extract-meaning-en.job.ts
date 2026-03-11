@@ -1,6 +1,6 @@
 import type { JobContext, JobDefinition, SynapseContext } from 'neuroline';
-import type { LlmAdapter } from '../../llm/adapter';
-import type { ChapterExtractionInput } from '../chapter-extraction.pipeline';
+import type { LlmAdapter } from '../types';
+import type { ChapterExtractionInput } from '../types';
 import type { ExtractRarityOutput } from './extract-rarity.job';
 
 export interface ExtractMeaningEnInput {

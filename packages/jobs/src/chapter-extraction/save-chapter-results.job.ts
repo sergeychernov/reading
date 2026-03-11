@@ -1,7 +1,7 @@
 import type { JobDefinition, JobContext, SynapseContext } from 'neuroline';
 import { MongoClient, ObjectId } from 'mongodb';
-import type { LanguageItemExtracted } from '../../llm/schemas';
-import type { ChapterExtractionInput } from '../chapter-extraction.pipeline';
+import type { LanguageItemExtracted } from '@reading/llm-schemas';
+import type { ChapterExtractionInput } from '../types';
 import type { ExtractSummaryOutput } from './extract-summary.job';
 import type { ExtractRarityOutput } from './extract-rarity.job';
 import type { ExtractMeaningEnOutput } from './extract-meaning-en.job';

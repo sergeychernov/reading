@@ -4982,11 +4982,16 @@ __metadata:
     "@emotion/react": "npm:11.14.0"
     "@emotion/styled": "npm:11.14.1"
     "@mui/material-nextjs": "npm:7.3.7"
+    "@reading/jobs": "workspace:packages/jobs"
     "@reading/ui": "npm:0.0.0"
     "@types/node": "npm:latest"
     "@types/react": "npm:latest"
     "@types/react-dom": "npm:latest"
     mongodb: "npm:^6"
+    mongoose: "npm:^8.9.0"
+    neuroline: "npm:^0.9.0"
+    neuroline-nextjs: "npm:^0.7.3"
+    neuroline-ui: "npm:^0.6.2"
     next: "npm:16.1.6"
     react: "npm:latest"
     react-dom: "npm:latest"
@@ -5028,6 +5033,18 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@reading/jobs@workspace:packages/jobs":
+  version: 0.0.0-use.local
+  resolution: "@reading/jobs@workspace:packages/jobs"
+  dependencies:
+    "@reading/epub-utils": "workspace:packages/epub-utils"
+    "@reading/llm-schemas": "workspace:packages/llm-schemas"
+    mongodb: "npm:^6.21.0"
+    neuroline: "npm:^0.9.0"
+    typescript: "npm:latest"
+  languageName: unknown
+  linkType: soft
+
 "@reading/llm-schemas@workspace:packages/llm-schemas":
   version: 0.0.0-use.local
   resolution: "@reading/llm-schemas@workspace:packages/llm-schemas"
@@ -5046,6 +5063,7 @@ __metadata:
     "@nestjs/mongoose": "npm:^10.1.0"
     "@nestjs/platform-express": "npm:^10.3.0"
     "@reading/epub-utils": "workspace:packages/epub-utils"
+    "@reading/jobs": "workspace:packages/jobs"
     "@reading/llm-schemas": "workspace:packages/llm-schemas"
     "@vercel/blob": "npm:^2.3.0"
     "@vercel/functions": "npm:^2.0.0"
@@ -13003,7 +13021,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:^4.17.20, lodash@npm:^4.17.21":
+"lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.17.23":
   version: 4.17.23
   resolution: "lodash@npm:4.17.23"
   checksum: 10c0/1264a90469f5bb95d4739c43eb6277d15b6d9e186df4ac68c3620443160fc669e2f14c11e7d8b2ccf078b81d06147c01a8ccced9aab9f9f63d50dcf8cace6bf6
@@ -14579,6 +14597,33 @@ __metadata:
     "@nestjs/core": ">=10.0.0"
     neuroline: ^0.9.0
   checksum: 10c0/38ac7098b9ff3777511bceca4ddf09b23d7dd4a239ce442584efa7118b117f16b7fc41c5b7b79b6bfded77de64004a91be78339eed1b003a48fa3b34d3a76230
+  languageName: node
+  linkType: hard
+
+"neuroline-nextjs@npm:^0.7.3":
+  version: 0.7.3
+  resolution: "neuroline-nextjs@npm:0.7.3"
+  peerDependencies:
+    neuroline: ^0.9.0
+    next: ">=14.0.0"
+  checksum: 10c0/d2372b6eae6b7abdc6440f10c023859f38f978d52239664d40d56356444e9280a8e2e85e486ec1f7cfe156b2bdfd17a092ba59ad9b386103df65b84cc32d5129
+  languageName: node
+  linkType: hard
+
+"neuroline-ui@npm:^0.6.2":
+  version: 0.6.2
+  resolution: "neuroline-ui@npm:0.6.2"
+  dependencies:
+    lodash: "npm:^4.17.23"
+  peerDependencies:
+    "@emotion/react": ^11.11.0
+    "@emotion/styled": ^11.11.0
+    "@mui/icons-material": ^5.15.0
+    "@mui/material": ^5.15.0
+    neuroline: ^0.9.0
+    react: ^18.2.0 || ^19.0.0
+    react-dom: ^18.2.0 || ^19.0.0
+  checksum: 10c0/e29faee61852bc0d5d2d4652ade77746f2c91afcfe83451b720b9be1e2af9428f568b9ff95a9f6a7cd7473536ef7a7d489874007e48efc5e346d5943af9d8984
   languageName: node
   linkType: hard
 

@@ -1,6 +1,6 @@
 import type { JobDefinition, JobContext } from 'neuroline';
-import type { LlmAdapter } from '../../llm/adapter';
-import type { ChapterExtractionInput } from '../chapter-extraction.pipeline';
+import type { LlmAdapter } from '../types';
+import type { ChapterExtractionInput } from '../types';
 
 export interface ExtractSummaryOutput {
 	summary: string;
