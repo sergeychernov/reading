@@ -6,7 +6,7 @@ import type { SerializedBook } from '@reading/data';
 function MetaRow({ label, value }: { label: string; value: string | null }) {
 	const v = value ?? '—';
 	return (
-		<TableRow size='small'>
+		<TableRow>
 			<TableCell sx={{ fontWeight: 500, width: 180 }}>{label}</TableCell>
 			<TableCell>
 				{v.startsWith('http') ? (
