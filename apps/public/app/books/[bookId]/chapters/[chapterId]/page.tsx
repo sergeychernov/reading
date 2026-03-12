@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation';
 import Container from '@mui/material/Container';
 import { getDb, getChapterById, getChaptersByBookId, getBookById } from '@reading/data';
+import { auth } from '../../../../../auth';
+import { getUserByEmail } from '../../../../../lib/db/users';
 import { ChapterDetailClient } from './ChapterDetailClient';
 
 interface ChapterDetailPageProps {
@@ -9,6 +11,11 @@ interface ChapterDetailPageProps {
 
 export default async function ChapterDetailPage({ params }: ChapterDetailPageProps) {
 	const { bookId, chapterId } = await params;
+	const session = await auth();
+	const user = session?.user?.email
+		? await getUserByEmail(session.user.email)
+		: null;
+	const canReprocess = user?.subscription === 'pro';
 
 	const db = await getDb();
 	const [book, chapter, chapters] = await Promise.all([
@@ -39,6 +46,7 @@ export default async function ChapterDetailPage({ params }: ChapterDetailPagePro
 				textPreview={textPreview || null}
 				nextChapterId={nextChapter?._id.toString() ?? null}
 				summary={chapter.summary}
+				canReprocess={canReprocess}
 			/>
 		</Container>
 	);

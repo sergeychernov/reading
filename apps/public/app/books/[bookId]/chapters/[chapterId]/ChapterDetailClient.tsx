@@ -21,6 +21,7 @@ interface ChapterDetailClientProps {
 	textPreview: string | null;
 	nextChapterId: string | null;
 	summary: string | null;
+	canReprocess: boolean;
 }
 
 export function ChapterDetailClient({
@@ -32,6 +33,7 @@ export function ChapterDetailClient({
 	textPreview,
 	nextChapterId,
 	summary,
+	canReprocess,
 }: ChapterDetailClientProps) {
 	const [refreshTrigger, setRefreshTrigger] = useState(0);
 	const [translationLanguage, setTranslationLanguage] = useState<TranslationLanguage>('en');
@@ -58,7 +60,9 @@ export function ChapterDetailClient({
 						</Typography>
 					</Button>
 				</Link>
-				<ReprocessButton bookId={bookId} chapterId={chapterId} onDone={() => setRefreshTrigger((k) => k + 1)} />
+				{canReprocess && (
+					<ReprocessButton bookId={bookId} chapterId={chapterId} onDone={() => setRefreshTrigger((k) => k + 1)} />
+				)}
 			</Box>
 			<Box display='flex' alignItems='flex-start' justifyContent='space-between' gap={1} mb={1}>
 				<Typography
