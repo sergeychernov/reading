@@ -14,10 +14,10 @@ import {
 	TableRow,
 	Typography,
 } from '@mui/material';
-import type { AdminChapterListItem } from '../../lib/types/book';
+import type { SerializedChapter } from '@reading/data';
 
 export function BookChapters({ bookId }: { bookId: string }) {
-	const [chapters, setChapters] = useState<AdminChapterListItem[]>([]);
+	const [chapters, setChapters] = useState<SerializedChapter[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
@@ -30,7 +30,7 @@ export function BookChapters({ bookId }: { bookId: string }) {
 				if (!res.ok) throw new Error(`HTTP ${res.status}`);
 				return res.json();
 			})
-			.then((data: AdminChapterListItem[]) => {
+			.then((data: SerializedChapter[]) => {
 				if (!cancelled) setChapters(data);
 			})
 			.catch((err) => {

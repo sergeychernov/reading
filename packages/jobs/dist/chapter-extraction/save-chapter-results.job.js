@@ -3,8 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.saveChapterResultsJob = void 0;
 exports.buildSaveChapterResultsSynapses = buildSaveChapterResultsSynapses;
 const mongodb_1 = require("mongodb");
-const MONGODB_URI = process.env.MONGODB_URI ?? '';
-const DB_NAME = 'reading';
+const data_1 = require("@reading/data");
 function applyMeaningsByLanguage(items, enMeanings, ruMeanings) {
     return items.map((item, index) => ({
         ...item,
@@ -55,82 +54,71 @@ exports.saveChapterResultsJob = {
         const bookOid = new mongodb_1.ObjectId(input.bookId);
         const chapterOid = new mongodb_1.ObjectId(input.chapterId);
         context.logger.info(`Saving extraction results for chapter ${input.chapterIndex}: "${input.chapterTitle}"`);
-        const client = new mongodb_1.MongoClient(MONGODB_URI);
-        try {
-            await client.connect();
-            const db = client.db(DB_NAME);
-            const now = new Date();
-            const languageItems = [
-                ...input.idioms.map((item) => ({
-                    bookId: bookOid,
-                    chapterId: chapterOid,
-                    category: 'idiom',
-                    term: item.term,
-                    meaning: item.meaning,
-                    exampleFromBook: item.exampleFromBook,
-                    rarity: item.rarity,
-                    createdAt: now,
-                })),
-                ...input.phrasalVerbs.map((item) => ({
-                    bookId: bookOid,
-                    chapterId: chapterOid,
-                    category: 'phrasal_verb',
-                    term: item.term,
-                    meaning: item.meaning,
-                    exampleFromBook: item.exampleFromBook,
-                    rarity: item.rarity,
-                    createdAt: now,
-                })),
-                ...input.rareWords.map((item) => ({
-                    bookId: bookOid,
-                    chapterId: chapterOid,
-                    category: 'rare_word',
-                    term: item.term,
-                    meaning: item.meaning,
-                    exampleFromBook: item.exampleFromBook,
-                    rarity: item.rarity,
-                    createdAt: now,
-                })),
-            ];
-            // Idempotent: clear previous items before inserting (safe for retries)
-            await db.collection('languageItems').deleteMany({ chapterId: chapterOid });
-            if (languageItems.length > 0) {
-                await db.collection('languageItems').insertMany(languageItems);
-            }
-            await db.collection('chapters').updateOne({ _id: chapterOid }, {
-                $set: {
-                    summary: input.summary || null,
-                    processingStatus: 'completed',
-                    updatedAt: new Date(),
-                },
-            });
-            context.logger.info(`Saved ${languageItems.length} language items for chapter ${input.chapterIndex} ` +
-                `(${input.idioms.length} idioms, ${input.phrasalVerbs.length} phrasal verbs, ${input.rareWords.length} rare words)`);
-            return {
-                chapterIndex: input.chapterIndex,
-                itemsSaved: languageItems.length,
-            };
-        }
-        catch (error) {
-            const errorType = error != null
-                ? Object.getPrototypeOf(error)?.constructor?.name ?? typeof error
-                : 'null';
-            const errorMessage = error instanceof Error
-                ? (error.stack ?? error.message)
-                : String(error);
-            console.error(`[save-chapter-results] Chapter ${input.chapterIndex} FAILED [${errorType}]:`, errorMessage, error);
-            context.logger.error(`Chapter ${input.chapterIndex} "${input.chapterTitle}" failed [${errorType}]: ${errorMessage}`);
+        return (0, data_1.withDb)(async (db) => {
             try {
-                const db = client.db(DB_NAME);
-                await db.collection('chapters').updateOne({ _id: chapterOid }, { $set: { processingStatus: 'failed', updatedAt: new Date() } });
+                const now = new Date();
+                const languageItems = [
+                    ...input.idioms.map((item) => ({
+                        bookId: bookOid,
+                        chapterId: chapterOid,
+                        category: 'idiom',
+                        term: item.term,
+                        meaning: item.meaning,
+                        exampleFromBook: item.exampleFromBook,
+                        rarity: item.rarity,
+                        createdAt: now,
+                    })),
+                    ...input.phrasalVerbs.map((item) => ({
+                        bookId: bookOid,
+                        chapterId: chapterOid,
+                        category: 'phrasal_verb',
+                        term: item.term,
+                        meaning: item.meaning,
+                        exampleFromBook: item.exampleFromBook,
+                        rarity: item.rarity,
+                        createdAt: now,
+                    })),
+                    ...input.rareWords.map((item) => ({
+                        bookId: bookOid,
+                        chapterId: chapterOid,
+                        category: 'rare_word',
+                        term: item.term,
+                        meaning: item.meaning,
+                        exampleFromBook: item.exampleFromBook,
+                        rarity: item.rarity,
+                        createdAt: now,
+                    })),
+                ];
+                await db.collection('languageItems').deleteMany({ chapterId: chapterOid });
+                if (languageItems.length > 0) {
+                    await db.collection('languageItems').insertMany(languageItems);
+                }
+                await (0, data_1.updateChapterSummary)(db, input.chapterId, input.summary || '');
+                await (0, data_1.updateChapterStatus)(db, input.chapterId, 'completed');
+                context.logger.info(`Saved ${languageItems.length} language items for chapter ${input.chapterIndex} ` +
+                    `(${input.idioms.length} idioms, ${input.phrasalVerbs.length} phrasal verbs, ${input.rareWords.length} rare words)`);
+                return {
+                    chapterIndex: input.chapterIndex,
+                    itemsSaved: languageItems.length,
+                };
             }
-            catch (updateErr) {
-                context.logger.error(`Failed to mark chapter as failed: ${updateErr}`);
+            catch (error) {
+                const errorType = error != null
+                    ? Object.getPrototypeOf(error)?.constructor?.name ?? typeof error
+                    : 'null';
+                const errorMessage = error instanceof Error
+                    ? (error.stack ?? error.message)
+                    : String(error);
+                console.error(`[save-chapter-results] Chapter ${input.chapterIndex} FAILED [${errorType}]:`, errorMessage, error);
+                context.logger.error(`Chapter ${input.chapterIndex} "${input.chapterTitle}" failed [${errorType}]: ${errorMessage}`);
+                try {
+                    await (0, data_1.updateChapterStatus)(db, input.chapterId, 'failed');
+                }
+                catch (updateErr) {
+                    context.logger.error(`Failed to mark chapter as failed: ${updateErr}`);
+                }
+                throw error;
             }
-            throw error;
-        }
-        finally {
-            await client.close();
-        }
+        });
     },
 };

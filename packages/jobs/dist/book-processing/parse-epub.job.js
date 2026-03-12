@@ -2,19 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseEpubJob = void 0;
 const epub_utils_1 = require("@reading/epub-utils");
-const mongodb_1 = require("mongodb");
-const MONGODB_URI = process.env.MONGODB_URI ?? '';
-const DB_NAME = 'reading';
-async function markBookFailed(bookId, message) {
-    const client = new mongodb_1.MongoClient(MONGODB_URI);
-    try {
-        await client.connect();
-        await client.db(DB_NAME).collection('books').updateOne({ _id: new mongodb_1.ObjectId(bookId) }, { $set: { processingStatus: 'failed', processingError: message, updatedAt: new Date() } });
-    }
-    finally {
-        await client.close();
-    }
-}
+const data_1 = require("@reading/data");
 /**
  * Parses the EPUB file content received from the fetch-epub artifact.
  * On failure, marks the book as 'failed' in MongoDB before rethrowing.
@@ -42,7 +30,7 @@ exports.parseEpubJob = {
         catch (error) {
             const message = error instanceof Error ? error.message : 'Unknown error during EPUB parsing';
             context.logger.error(`parse-epub failed for book ${input.bookId}: ${message}`);
-            await markBookFailed(input.bookId, message);
+            await (0, data_1.withDb)((db) => (0, data_1.markBookFailed)(db, input.bookId, message));
             throw error;
         }
     },

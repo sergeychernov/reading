@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getBookById } from '../../../../lib/db/books';
+import { getDb, getBookById } from '@reading/data';
 
 export async function GET(
 	_request: Request,
@@ -8,7 +8,8 @@ export async function GET(
 	const { bookId } = await params;
 
 	try {
-		const book = await getBookById(bookId);
+		const db = await getDb();
+		const book = await getBookById(db, bookId);
 		if (!book) {
 			return NextResponse.json(
 				{ error: 'Book not found' },

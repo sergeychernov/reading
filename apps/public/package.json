@@ -17,6 +17,7 @@
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",
     "@mui/material-nextjs": "7.3.7",
+    "@reading/data": "workspace:packages/data",
     "@reading/epub-utils": "workspace:packages/epub-utils",
     "@reading/llm-schemas": "workspace:packages/llm-schemas",
     "@reading/ui": "0.0.0",

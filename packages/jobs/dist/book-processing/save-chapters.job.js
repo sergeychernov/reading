@@ -2,8 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.saveChaptersJob = void 0;
 const mongodb_1 = require("mongodb");
-const MONGODB_URI = process.env.MONGODB_URI ?? '';
-const DB_NAME = 'reading';
+const data_1 = require("@reading/data");
 /**
  * Saves parsed EPUB data to MongoDB:
  * - Updates book document with title, author, description
@@ -15,20 +14,14 @@ exports.saveChaptersJob = {
     async execute(rawInput, _options, context) {
         const input = rawInput;
         context.logger.info(`Saving ${input.chapters.length} chapters for book ${input.bookId}`);
-        const client = new mongodb_1.MongoClient(MONGODB_URI);
-        try {
-            await client.connect();
-            const db = client.db(DB_NAME);
+        return (0, data_1.withDb)(async (db) => {
             const bookOid = new mongodb_1.ObjectId(input.bookId);
             const now = new Date();
             try {
-                await db.collection('books').updateOne({ _id: bookOid }, {
-                    $set: {
-                        title: input.metadata.title,
-                        author: input.metadata.author,
-                        description: input.metadata.description,
-                        updatedAt: now,
-                    },
+                await (0, data_1.updateBookMeta)(db, input.bookId, {
+                    title: input.metadata.title,
+                    author: input.metadata.author,
+                    description: input.metadata.description,
                 });
                 const chapterDocs = input.chapters.map((ch) => ({
                     bookId: bookOid,
@@ -41,16 +34,9 @@ exports.saveChaptersJob = {
                     createdAt: now,
                     updatedAt: now,
                 }));
-                const insertResult = await db
-                    .collection('chapters')
-                    .insertMany(chapterDocs);
-                await db.collection('books').updateOne({ _id: bookOid }, {
-                    $set: {
-                        chapterCount: input.chapters.length,
-                        processingStatus: 'extracting',
-                        updatedAt: now,
-                    },
-                });
+                const insertResult = await (0, data_1.insertManyChapters)(db, chapterDocs);
+                await (0, data_1.updateBookChapterCount)(db, input.bookId, input.chapters.length);
+                await (0, data_1.updateBookStatus)(db, input.bookId, 'extracting');
                 const insertedIds = insertResult.insertedIds;
                 const savedChapters = input.chapters.map((ch, i) => ({
                     chapterId: insertedIds[i].toHexString(),
@@ -67,12 +53,9 @@ exports.saveChaptersJob = {
             catch (error) {
                 const message = error instanceof Error ? error.message : 'Unknown error while saving chapters';
                 context.logger.error(`save-chapters failed for book ${input.bookId}: ${message}`);
-                await db.collection('books').updateOne({ _id: bookOid }, { $set: { processingStatus: 'failed', processingError: message, updatedAt: new Date() } });
+                await (0, data_1.markBookFailed)(db, input.bookId, message);
                 throw error;
             }
-        }
-        finally {
-            await client.close();
-        }
+        });
     },
 };

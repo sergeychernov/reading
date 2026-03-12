@@ -1,5 +1,5 @@
 import type { JobDefinition, JobContext } from 'neuroline';
-import { MongoClient, ObjectId } from 'mongodb';
+import { withDb, markBookFailed, downloadEpub } from '@reading/data';
 import type { BookProcessingInput } from '../types';
 
 export interface FetchEpubOutput {
@@ -7,22 +7,6 @@ export interface FetchEpubOutput {
 	epubBlobUrl: string;
 	/** Base64-encoded EPUB file content */
 	epubBase64: string;
-}
-
-const MONGODB_URI = process.env.MONGODB_URI ?? '';
-const DB_NAME = 'reading';
-
-async function markBookFailed(bookId: string, message: string): Promise<void> {
-	const client = new MongoClient(MONGODB_URI);
-	try {
-		await client.connect();
-		await client.db(DB_NAME).collection('books').updateOne(
-			{ _id: new ObjectId(bookId) },
-			{ $set: { processingStatus: 'failed', processingError: message, updatedAt: new Date() } },
-		);
-	} finally {
-		await client.close();
-	}
 }
 
 /**
@@ -43,28 +27,13 @@ export const fetchEpubJob: JobDefinition = {
 		);
 
 		try {
-			const token = process.env.BLOB_READ_WRITE_TOKEN;
-			if (!token) {
-				throw new Error('BLOB_READ_WRITE_TOKEN is not set');
-			}
-
 			context.logger.info(`Fetching EPUB from ${input.epubBlobUrl}`);
 
-			const response = await fetch(input.epubBlobUrl, {
-				headers: { Authorization: `Bearer ${token}` },
-			});
-
-			context.logger.info(`fetch-epub response: ${response.status} ${response.statusText}`);
-
-			if (!response.ok) {
-				throw new Error(`Failed to fetch EPUB: ${response.status} ${response.statusText}`);
-			}
-
-			const arrayBuffer = await response.arrayBuffer();
-			const epubBase64 = Buffer.from(arrayBuffer).toString('base64');
+			const epubBuffer = await downloadEpub(input.epubBlobUrl);
+			const epubBase64 = epubBuffer.toString('base64');
 
 			context.logger.info(
-				`Fetched EPUB for book ${input.bookId} (${arrayBuffer.byteLength} bytes)`,
+				`Fetched EPUB for book ${input.bookId} (${epubBuffer.byteLength} bytes)`,
 			);
 
 			return {
@@ -75,7 +44,7 @@ export const fetchEpubJob: JobDefinition = {
 		} catch (error) {
 			const message = error instanceof Error ? error.message : 'Unknown error during EPUB fetch';
 			context.logger.error(`fetch-epub failed for book ${input.bookId}: ${message}`);
-			await markBookFailed(input.bookId, message);
+			await withDb((db) => markBookFailed(db, input.bookId, message));
 			throw error;
 		}
 	},

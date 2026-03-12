@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from '@mui/material';
-import type { AdminBook } from '../../lib/types/book';
+import type { SerializedBook } from '@reading/data';
 
 function MetaRow({ label, value }: { label: string; value: string | null }) {
 	const v = value ?? '—';
@@ -23,7 +23,7 @@ function MetaRow({ label, value }: { label: string; value: string | null }) {
 	);
 }
 
-export function BookMeta({ book }: { book: AdminBook }) {
+export function BookMeta({ book }: { book: SerializedBook }) {
 	return (
 		<Box sx={{ py: 1, px: 2 }}>
 			<TableContainer component={Paper} variant='outlined' sx={{ maxWidth: 720 }}>

@@ -13,6 +13,8 @@ import { AuthButton } from './AuthButton';
 const BASE_NAV_ITEMS: NavItem[] = [
 	{ label: 'Home', href: '/' },
 	{ label: 'Books', href: '/books' },
+	{ label: 'Series', href: '/series' },
+	{ label: 'Songs', href: '/songs' },
 	{ label: 'Upload', href: '/upload' },
 ];
 

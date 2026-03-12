@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getDb } from '../../../../lib/mongodb';
+import { getDb, getAllBooksAdmin, serializeBook } from '@reading/data';
 
 export const runtime = 'nodejs';
 
@@ -15,34 +15,16 @@ export interface BookListItem {
 export async function GET(): Promise<NextResponse> {
 	try {
 		const db = await getDb();
-		const docs = await db
-			.collection('books')
-			.find(
-				{},
-				{
-					projection: {
-						_id: 1,
-						title: 1,
-						author: 1,
-						processingStatus: 1,
-						chapterCount: 1,
-						createdAt: 1,
-					},
-					sort: { createdAt: -1 },
-					limit: 50,
-				},
-			)
-			.toArray();
+		const docs = await getAllBooksAdmin(db);
+		const serialized = docs.slice(0, 50).map(serializeBook);
 
-		const books: BookListItem[] = docs.map((doc) => ({
-			id: (doc._id as { toHexString(): string }).toHexString(),
-			title: (doc.title as string | null) ?? null,
-			author: (doc.author as string | null) ?? null,
-			processingStatus: (doc.processingStatus as string) ?? 'unknown',
-			chapterCount: (doc.chapterCount as number) ?? 0,
-			createdAt: doc.createdAt instanceof Date
-				? doc.createdAt.toISOString()
-				: String(doc.createdAt ?? ''),
+		const books: BookListItem[] = serialized.map((b) => ({
+			id: b._id,
+			title: b.title || null,
+			author: b.author || null,
+			processingStatus: b.processingStatus,
+			chapterCount: b.chapterCount,
+			createdAt: b.createdAt,
 		}));
 
 		return NextResponse.json(books);

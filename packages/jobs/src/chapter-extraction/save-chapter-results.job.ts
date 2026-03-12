@@ -1,6 +1,7 @@
 import type { JobDefinition, JobContext, SynapseContext } from 'neuroline';
-import { MongoClient, ObjectId } from 'mongodb';
+import { ObjectId } from 'mongodb';
 import type { LanguageItemExtracted } from '@reading/llm-schemas';
+import { withDb, updateChapterStatus, updateChapterSummary } from '@reading/data';
 import type { ChapterExtractionInput } from '../types';
 import type { ExtractSummaryOutput } from './extract-summary.job';
 import type { ExtractRarityOutput } from './extract-rarity.job';
@@ -22,9 +23,6 @@ export interface SaveChapterResultsOutput {
 	chapterIndex: number;
 	itemsSaved: number;
 }
-
-const MONGODB_URI = process.env.MONGODB_URI ?? '';
-const DB_NAME = 'reading';
 
 function applyMeaningsByLanguage(
 	items: ExtractRarityOutput['idioms'],
@@ -101,103 +99,86 @@ export const saveChapterResultsJob: JobDefinition = {
 			`Saving extraction results for chapter ${input.chapterIndex}: "${input.chapterTitle}"`,
 		);
 
-		const client = new MongoClient(MONGODB_URI);
-		try {
-			await client.connect();
-			const db = client.db(DB_NAME);
-
-			const now = new Date();
-
-			const languageItems = [
-				...input.idioms.map((item) => ({
-					bookId: bookOid,
-					chapterId: chapterOid,
-					category: 'idiom' as const,
-					term: item.term,
-					meaning: item.meaning,
-					exampleFromBook: item.exampleFromBook,
-					rarity: item.rarity,
-					createdAt: now,
-				})),
-				...input.phrasalVerbs.map((item) => ({
-					bookId: bookOid,
-					chapterId: chapterOid,
-					category: 'phrasal_verb' as const,
-					term: item.term,
-					meaning: item.meaning,
-					exampleFromBook: item.exampleFromBook,
-					rarity: item.rarity,
-					createdAt: now,
-				})),
-				...input.rareWords.map((item) => ({
-					bookId: bookOid,
-					chapterId: chapterOid,
-					category: 'rare_word' as const,
-					term: item.term,
-					meaning: item.meaning,
-					exampleFromBook: item.exampleFromBook,
-					rarity: item.rarity,
-					createdAt: now,
-				})),
-			];
-
-			// Idempotent: clear previous items before inserting (safe for retries)
-			await db.collection('languageItems').deleteMany({ chapterId: chapterOid });
-
-			if (languageItems.length > 0) {
-				await db.collection('languageItems').insertMany(languageItems);
-			}
-
-			await db.collection('chapters').updateOne(
-				{ _id: chapterOid },
-				{
-					$set: {
-						summary: input.summary || null,
-						processingStatus: 'completed',
-						updatedAt: new Date(),
-					},
-				},
-			);
-
-			context.logger.info(
-				`Saved ${languageItems.length} language items for chapter ${input.chapterIndex} ` +
-				`(${input.idioms.length} idioms, ${input.phrasalVerbs.length} phrasal verbs, ${input.rareWords.length} rare words)`,
-			);
-
-			return {
-				chapterIndex: input.chapterIndex,
-				itemsSaved: languageItems.length,
-			};
-		} catch (error) {
-			const errorType = error != null
-				? Object.getPrototypeOf(error as object)?.constructor?.name ?? typeof error
-				: 'null';
-			const errorMessage = error instanceof Error
-				? (error.stack ?? error.message)
-				: String(error);
-
-			console.error(
-				`[save-chapter-results] Chapter ${input.chapterIndex} FAILED [${errorType}]:`,
-				errorMessage,
-				error,
-			);
-			context.logger.error(
-				`Chapter ${input.chapterIndex} "${input.chapterTitle}" failed [${errorType}]: ${errorMessage}`,
-			);
-
+		return withDb(async (db) => {
 			try {
-				const db = client.db(DB_NAME);
-				await db.collection('chapters').updateOne(
-					{ _id: chapterOid },
-					{ $set: { processingStatus: 'failed', updatedAt: new Date() } },
-				);
-			} catch (updateErr) {
-				context.logger.error(`Failed to mark chapter as failed: ${updateErr}`);
-			}
+				const now = new Date();
 
-			throw error;
-		} finally {
-			await client.close();
-		}
+				const languageItems = [
+					...input.idioms.map((item) => ({
+						bookId: bookOid,
+						chapterId: chapterOid,
+						category: 'idiom' as const,
+						term: item.term,
+						meaning: item.meaning,
+						exampleFromBook: item.exampleFromBook,
+						rarity: item.rarity,
+						createdAt: now,
+					})),
+					...input.phrasalVerbs.map((item) => ({
+						bookId: bookOid,
+						chapterId: chapterOid,
+						category: 'phrasal_verb' as const,
+						term: item.term,
+						meaning: item.meaning,
+						exampleFromBook: item.exampleFromBook,
+						rarity: item.rarity,
+						createdAt: now,
+					})),
+					...input.rareWords.map((item) => ({
+						bookId: bookOid,
+						chapterId: chapterOid,
+						category: 'rare_word' as const,
+						term: item.term,
+						meaning: item.meaning,
+						exampleFromBook: item.exampleFromBook,
+						rarity: item.rarity,
+						createdAt: now,
+					})),
+				];
+
+				await db.collection('languageItems').deleteMany({ chapterId: chapterOid });
+
+				if (languageItems.length > 0) {
+					await db.collection('languageItems').insertMany(languageItems);
+				}
+
+				await updateChapterSummary(db, input.chapterId, input.summary || '');
+				await updateChapterStatus(db, input.chapterId, 'completed');
+
+				context.logger.info(
+					`Saved ${languageItems.length} language items for chapter ${input.chapterIndex} ` +
+					`(${input.idioms.length} idioms, ${input.phrasalVerbs.length} phrasal verbs, ${input.rareWords.length} rare words)`,
+				);
+
+				return {
+					chapterIndex: input.chapterIndex,
+					itemsSaved: languageItems.length,
+				};
+			} catch (error) {
+				const errorType = error != null
+					? Object.getPrototypeOf(error as object)?.constructor?.name ?? typeof error
+					: 'null';
+				const errorMessage = error instanceof Error
+					? (error.stack ?? error.message)
+					: String(error);
+
+				console.error(
+					`[save-chapter-results] Chapter ${input.chapterIndex} FAILED [${errorType}]:`,
+					errorMessage,
+					error,
+				);
+				context.logger.error(
+					`Chapter ${input.chapterIndex} "${input.chapterTitle}" failed [${errorType}]: ${errorMessage}`,
+				);
+
+				try {
+					await updateChapterStatus(db, input.chapterId, 'failed');
+				} catch (updateErr) {
+					context.logger.error(`Failed to mark chapter as failed: ${updateErr}`);
+				}
+
+				throw error;
+			}
+		});
 	},
 };

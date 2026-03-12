@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '../../../auth';
-import { getDb } from '../../../lib/mongodb';
+import { getDb } from '@reading/data';
 import type { TranslationLanguage } from '../../../lib/types/user';
 
 export async function GET(): Promise<NextResponse> {

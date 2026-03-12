@@ -17,6 +17,7 @@
 		"lint": "tsc --noEmit"
 	},
 	"dependencies": {
+		"@reading/data": "workspace:packages/data",
 		"@reading/epub-utils": "workspace:packages/epub-utils",
 		"@reading/llm-schemas": "workspace:packages/llm-schemas",
 		"mongodb": "^6.21.0",

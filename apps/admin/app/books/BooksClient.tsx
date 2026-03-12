@@ -20,12 +20,12 @@ import {
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBulletedOutlined';
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
-import type { AdminBook } from '../../lib/types/book';
+import type { SerializedBook } from '@reading/data';
 import { BookMeta } from './BookMeta';
 import { BookChapters } from './BookChapters';
 
 export function BooksClient() {
-	const [books, setBooks] = useState<AdminBook[]>([]);
+	const [books, setBooks] = useState<SerializedBook[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [fetchError, setFetchError] = useState<string | null>(null);
 	const [expandedMetaId, setExpandedMetaId] = useState<string | null>(null);
@@ -37,7 +37,7 @@ export function BooksClient() {
 		try {
 			const res = await fetch('/api/books');
 			if (!res.ok) throw new Error(`HTTP ${res.status}`);
-			const data = (await res.json()) as AdminBook[];
+			const data = (await res.json()) as SerializedBook[];
 			setBooks(data);
 		} catch (err) {
 			setFetchError(String(err));

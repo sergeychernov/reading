@@ -10,5 +10,5 @@
 			"destination": "/api"
 		}
 	],
-	"buildCommand": "yarn workspace @reading/epub-utils build && yarn workspace @reading/llm-schemas build && yarn workspace @reading/jobs build"
+	"buildCommand": "yarn workspace @reading/epub-utils build && yarn workspace @reading/llm-schemas build && yarn workspace @reading/data build && yarn workspace @reading/jobs build"
 }

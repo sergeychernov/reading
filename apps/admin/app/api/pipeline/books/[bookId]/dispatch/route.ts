@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getDb } from '../../../../../../lib/mongodb';
+import { getDb, getChaptersByBookId } from '@reading/data';
 import { ObjectId } from 'mongodb';
 
 export const runtime = 'nodejs';
@@ -19,21 +19,7 @@ export async function POST(_request: Request, { params }: RouteParams): Promise<
 
 	try {
 		const db = await getDb();
-
-		const chapters = await db
-			.collection('chapters')
-			.find(
-				{ bookId: new ObjectId(bookId) },
-				{
-					projection: {
-						_id: 1,
-						chapterIndex: 1,
-						title: 1,
-						rawText: 1,
-					},
-				},
-			)
-			.toArray();
+		const chapters = await getChaptersByBookId(db, bookId);
 
 		if (chapters.length === 0) {
 			return NextResponse.json(
@@ -54,7 +40,7 @@ export async function POST(_request: Request, { params }: RouteParams): Promise<
 					headers,
 					body: JSON.stringify({
 						bookId,
-						chapterId: (chapter._id as { toHexString(): string }).toHexString(),
+						chapterId: chapter._id.toHexString(),
 						chapterIndex: chapter.chapterIndex,
 						chapterTitle: chapter.title,
 						chapterText: chapter.rawText,

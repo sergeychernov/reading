@@ -9,19 +9,138 @@ body {
 }
 
 .home {
-  min-height: 100vh;
-  display: grid;
-  align-content: center;
-  justify-items: start;
-  gap: 1rem;
-  padding: 2rem;
+	min-height: 100vh;
+	width: min(1120px, 100%);
+	margin: 0 auto;
+	display: grid;
+	gap: 2rem;
+	padding: 2rem 1.25rem 3rem;
+}
+
+.home-hero {
+	display: grid;
+	gap: 0.85rem;
+}
+
+.home-eyebrow {
+	margin: 0;
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: #3f51b5;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+}
+
+.home-lead {
+	font-size: 1.125rem;
+	max-width: 64ch;
+}
+
+.home-cta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.85rem;
+	margin-top: 0.25rem;
+}
+
+.home-cta span {
+	font-weight: 600;
+}
+
+.home-primary-link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 40px;
+	padding: 0 1rem;
+	border-radius: 8px;
+	background: #1976d2;
+	color: #fff;
+	text-decoration: none;
+	font-weight: 600;
+	line-height: 1;
+}
+
+.home-primary-link:hover {
+	background: #1565c0;
+}
+
+.home-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 0.9rem;
+}
+
+.home-card {
+	padding: 1rem;
+	border: 1px solid #e0e0e0;
+	border-radius: 0.75rem;
+	background: #fafafa;
+}
+
+.home-card h2 {
+	margin: 0 0 0.45rem;
+	font-size: 1.05rem;
+}
+
+.home-card p {
+	max-width: 100%;
+}
+
+.home-sections {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.home-sections h2 {
+	margin: 0;
+}
+
+.home-links {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: 0.9rem;
+}
+
+.home-link-card {
+	display: grid;
+	gap: 0.35rem;
+	padding: 1rem;
+	border: 1px solid #d7def7;
+	border-radius: 0.75rem;
+	background: #f4f6ff;
+	color: inherit;
+	text-decoration: none;
+	transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+}
+
+.home-link-card:hover {
+	transform: translateY(-1px);
+	border-color: #3f51b5;
+	box-shadow: 0 8px 20px rgba(63, 81, 181, 0.1);
 }
 
 .home h1 {
-  margin: 0;
+	margin: 0;
+	font-size: clamp(2rem, 4vw, 3rem);
+	line-height: 1.1;
 }
 
 .home p {
-  margin: 0;
-  max-width: 42ch;
+	margin: 0;
+	max-width: 68ch;
+	line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+	.home {
+		padding: 1.5rem 1rem 2rem;
+		gap: 1.5rem;
+	}
+
+	.home-card,
+	.home-link-card {
+		padding: 0.875rem;
+	}
 }

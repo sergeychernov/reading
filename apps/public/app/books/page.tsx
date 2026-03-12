@@ -3,11 +3,12 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Link from 'next/link';
-import { getAllBooks } from '../../lib/db/books';
+import { getDb, getAllBooks } from '@reading/data';
 import { BookGrid } from '../components/BookGrid';
 
 export default async function BooksPage() {
-	const books = await getAllBooks();
+	const db = await getDb();
+	const books = await getAllBooks(db);
 
 	// Serialize ObjectId to string for client components
 	const serializedBooks = books.map((book) => ({

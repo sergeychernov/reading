@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation';
 import Container from '@mui/material/Container';
-import { getChapterById, getChaptersByBookId } from '../../../../../lib/db/chapters';
-import { getBookById } from '../../../../../lib/db/books';
+import { getDb, getChapterById, getChaptersByBookId, getBookById } from '@reading/data';
 import { ChapterDetailClient } from './ChapterDetailClient';
 
 interface ChapterDetailPageProps {
@@ -11,10 +10,11 @@ interface ChapterDetailPageProps {
 export default async function ChapterDetailPage({ params }: ChapterDetailPageProps) {
 	const { bookId, chapterId } = await params;
 
+	const db = await getDb();
 	const [book, chapter, chapters] = await Promise.all([
-		getBookById(bookId),
-		getChapterById(chapterId),
-		getChaptersByBookId(bookId),
+		getBookById(db, bookId),
+		getChapterById(db, chapterId),
+		getChaptersByBookId(db, bookId),
 	]);
 
 	if (!book || !chapter) {

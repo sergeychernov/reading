@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getChapterById, updateChapterStatus } from '../../../../../../../lib/db/chapters';
+import { getDb, getChapterById, updateChapterStatus } from '@reading/data';
 import { requireSubscription } from '../../../../../../../lib/auth/require-subscription';
 
 export const runtime = 'nodejs';
@@ -14,14 +14,15 @@ export async function POST(_request: Request, { params }: RouteParams): Promise<
 
 	const { bookId, chapterId } = await params;
 
-	const chapter = await getChapterById(chapterId);
+	const db = await getDb();
+	const chapter = await getChapterById(db, chapterId);
 	if (!chapter) {
 		return NextResponse.json({ error: 'Chapter not found' }, { status: 404 });
 	}
 
 	// Reset status BEFORE triggering the pipeline so the client polling does not
 	// mistake the previous `completed` state for the new run completing.
-	await updateChapterStatus(chapterId, 'pending');
+	await updateChapterStatus(db, chapterId, 'pending');
 
 	const pipelineUrl = process.env.PIPELINE_API_URL ?? 'http://localhost:3001';
 	const pipelineSecret = process.env.PIPELINE_API_SECRET;
@@ -43,8 +44,7 @@ export async function POST(_request: Request, { params }: RouteParams): Promise<
 	if (!pipelineResponse.ok) {
 		const body = await pipelineResponse.text().catch(() => '');
 		console.error('Pipeline reprocess failed:', pipelineResponse.status, body);
-		// Restore status so the chapter is not stuck as pending
-		await updateChapterStatus(chapterId, chapter.processingStatus);
+		await updateChapterStatus(db, chapterId, chapter.processingStatus);
 		return NextResponse.json({ error: 'Failed to start reprocessing' }, { status: 502 });
 	}
 

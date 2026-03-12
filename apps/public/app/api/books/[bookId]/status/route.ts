@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getBookById, updateBookStatus } from '../../../../../lib/db/books';
-import { getChaptersByBookId, countChaptersByStatus } from '../../../../../lib/db/chapters';
+import { getDb, getBookById, updateBookStatus, getChaptersByBookId, countChaptersByStatus } from '@reading/data';
 
 export async function GET(
 	_request: Request,
@@ -9,7 +8,8 @@ export async function GET(
 	const { bookId } = await params;
 
 	try {
-		const book = await getBookById(bookId);
+		const db = await getDb();
+		const book = await getBookById(db, bookId);
 		if (!book) {
 			return NextResponse.json(
 				{ error: 'Book not found' },
@@ -18,8 +18,8 @@ export async function GET(
 		}
 
 		const [chapterStats, chapters] = await Promise.all([
-			countChaptersByStatus(bookId),
-			getChaptersByBookId(bookId),
+			countChaptersByStatus(db, bookId),
+			getChaptersByBookId(db, bookId),
 		]);
 
 		// Compute effective book status from chapter statuses.
@@ -32,25 +32,22 @@ export async function GET(
 			&& chapterStats.total > 0
 		) {
 			if (chapterStats.completed === chapterStats.total) {
-				// All chapters processed successfully
 				effectiveStatus = 'completed';
-				await updateBookStatus(bookId, 'completed');
+				await updateBookStatus(db, bookId, 'completed');
 			} else if (
 				chapterStats.failed > 0
 				&& chapterStats.completed + chapterStats.failed === chapterStats.total
 			) {
-				// All chapters finished but some failed
 				effectiveStatus = 'failed';
 				await updateBookStatus(
+					db,
 					bookId,
 					'failed',
 					`${chapterStats.failed} of ${chapterStats.total} chapters failed`,
 				);
 			}
-			// Otherwise still extracting (some chapters pending or in progress)
 		}
 
-		// Lightweight chapter data for the UI (no rawText to keep payload small)
 		const chapterStatuses = chapters.map((ch) => {
 			const body = ch.rawText.startsWith(ch.title)
 				? ch.rawText.slice(ch.title.length).trimStart()

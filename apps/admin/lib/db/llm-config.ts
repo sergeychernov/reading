@@ -1,4 +1,4 @@
-import { getDb } from '../mongodb';
+import { getDb } from '@reading/data';
 import type { LlmAdapterConfig, LlmConfig } from '../types/llm-config';
 import { DEFAULT_LLM_CONFIG, LLM_JOB_NAMES } from '../types/llm-config';
 
