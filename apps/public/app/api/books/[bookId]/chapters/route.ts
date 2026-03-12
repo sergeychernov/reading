@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getChaptersByBookId } from '../../../../../lib/db/chapters';
+import { getDb, getChaptersByBookId } from '@reading/data';
 
 export async function GET(
 	_request: Request,
@@ -8,7 +8,8 @@ export async function GET(
 	const { bookId } = await params;
 
 	try {
-		const chapters = await getChaptersByBookId(bookId);
+		const db = await getDb();
+		const chapters = await getChaptersByBookId(db, bookId);
 		return NextResponse.json(chapters);
 	} catch (error) {
 		console.error('Failed to fetch chapters:', error);

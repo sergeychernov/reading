@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { getDb } from '../mongodb';
+import { getDb } from '@reading/data';
 import type { SubscriptionPlan, UserDocument } from '../types/user';
 
 const COLLECTION = 'users';

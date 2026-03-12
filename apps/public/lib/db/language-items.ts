@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
-import { getDb } from '../mongodb';
+import { getDb } from '@reading/data';
+import type { LanguageItemCategory } from '@reading/data';
 import type { LanguageItemDocument, LanguageItemInsert } from '../types/language-item';
-import type { LanguageItemCategory } from '../types/processing';
 
 async function collection() {
 	const db = await getDb();

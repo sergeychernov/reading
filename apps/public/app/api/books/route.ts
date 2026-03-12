@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '../../../auth';
-import { getAllBooks } from '../../../lib/db/books';
+import { getDb, getAllBooks } from '@reading/data';
 import { uploadAndCreateBook } from '../../../lib/processing/pipeline';
 import { validateEpubFile } from '../../../lib/validation/upload';
 
@@ -8,7 +8,8 @@ export const runtime = 'nodejs';
 
 export async function GET(): Promise<NextResponse> {
 	try {
-		const books = await getAllBooks();
+		const db = await getDb();
+		const books = await getAllBooks(db);
 		return NextResponse.json(books);
 	} catch (error) {
 		console.error('Failed to fetch books:', error);

@@ -4982,6 +4982,7 @@ __metadata:
     "@emotion/react": "npm:11.14.0"
     "@emotion/styled": "npm:11.14.1"
     "@mui/material-nextjs": "npm:7.3.7"
+    "@reading/data": "workspace:packages/data"
     "@reading/ui": "npm:0.0.0"
     "@types/node": "npm:latest"
     "@types/react": "npm:latest"
@@ -4992,6 +4993,16 @@ __metadata:
     react-dom: "npm:latest"
     typescript: "npm:latest"
     zod: "npm:^4.3.6"
+  languageName: unknown
+  linkType: soft
+
+"@reading/data@workspace:packages/data":
+  version: 0.0.0-use.local
+  resolution: "@reading/data@workspace:packages/data"
+  dependencies:
+    "@vercel/blob": "npm:^2.3.0"
+    mongodb: "npm:^6.21.0"
+    typescript: "npm:latest"
   languageName: unknown
   linkType: soft
 
@@ -5028,6 +5039,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@reading/jobs@workspace:packages/jobs":
+  version: 0.0.0-use.local
+  resolution: "@reading/jobs@workspace:packages/jobs"
+  dependencies:
+    "@reading/data": "workspace:packages/data"
+    "@reading/epub-utils": "workspace:packages/epub-utils"
+    "@reading/llm-schemas": "workspace:packages/llm-schemas"
+    mongodb: "npm:^6.21.0"
+    neuroline: "npm:^0.9.0"
+    typescript: "npm:latest"
+  languageName: unknown
+  linkType: soft
+
 "@reading/llm-schemas@workspace:packages/llm-schemas":
   version: 0.0.0-use.local
   resolution: "@reading/llm-schemas@workspace:packages/llm-schemas"
@@ -5045,7 +5069,9 @@ __metadata:
     "@nestjs/core": "npm:^10.3.0"
     "@nestjs/mongoose": "npm:^10.1.0"
     "@nestjs/platform-express": "npm:^10.3.0"
+    "@reading/data": "workspace:packages/data"
     "@reading/epub-utils": "workspace:packages/epub-utils"
+    "@reading/jobs": "workspace:packages/jobs"
     "@reading/llm-schemas": "workspace:packages/llm-schemas"
     "@vercel/blob": "npm:^2.3.0"
     "@vercel/functions": "npm:^2.0.0"
@@ -5073,6 +5099,7 @@ __metadata:
     "@emotion/react": "npm:11.14.0"
     "@emotion/styled": "npm:11.14.1"
     "@mui/material-nextjs": "npm:7.3.7"
+    "@reading/data": "workspace:packages/data"
     "@reading/epub-utils": "workspace:packages/epub-utils"
     "@reading/llm-schemas": "workspace:packages/llm-schemas"
     "@reading/ui": "npm:0.0.0"

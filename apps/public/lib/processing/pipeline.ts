@@ -1,6 +1,11 @@
-import { uploadEpub } from '../blob';
-import { insertBook } from '../db/books';
-import type { BookInsert } from '../types/book';
+import {
+	getDb,
+	computeContentHash,
+	insertBook,
+	uploadEpub,
+	updateBookEpubUrl,
+} from '@reading/data';
+import type { BookInsert } from '@reading/data';
 
 interface UploadBookParams {
 	fileBuffer: Buffer;
@@ -16,23 +21,26 @@ interface UploadBookResult {
 
 /**
  * Handles the upload step:
- * 1. Upload EPUB to Vercel Blob
- * 2. Create initial book record in MongoDB (status: 'parsing')
+ * 1. Compute content hash of the EPUB file
+ * 2. Create book record in MongoDB with the hash (unique field)
+ * 3. Upload EPUB to Vercel Blob at books/{_id}/src.epub
+ * 4. Update the book record with the blob URL
  *
  * Parsing, chapter extraction and LLM processing are handled by apps/pipeline.
  */
 export async function uploadAndCreateBook(
 	params: UploadBookParams,
 ): Promise<UploadBookResult> {
-	const epubBlobUrl = await uploadEpub(params.fileName, params.fileBuffer);
+	const contentHash = computeContentHash(params.fileBuffer);
 
 	const now = new Date();
 	const bookData: BookInsert = {
-		title: 'Processing...',
+		contentHash,
+		title: params.fileName,
 		author: '',
 		description: '',
 		coverImageUrl: null,
-		epubBlobUrl,
+		epubBlobUrl: '',
 		audibleUrl: params.audibleUrl,
 		kindleUrl: params.kindleUrl,
 		chapterCount: 0,
@@ -42,7 +50,11 @@ export async function uploadAndCreateBook(
 		updatedAt: now,
 	};
 
-	const bookId = await insertBook(bookData);
+	const db = await getDb();
+	const bookId = await insertBook(db, bookData);
+
+	const epubBlobUrl = await uploadEpub(bookId, params.fileBuffer);
+	await updateBookEpubUrl(db, bookId, epubBlobUrl);
 
 	return { bookId, epubBlobUrl };
 }

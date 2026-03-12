@@ -1,0 +1,105 @@
+import { ObjectId, type Db } from 'mongodb';
+import type { BookDocument, BookInsert, BookProcessingStatus } from './types';
+
+const COLLECTION = 'books';
+
+function col(db: Db) {
+	return db.collection<BookDocument>(COLLECTION);
+}
+
+/** Returns all books except those with processingStatus 'failed', sorted by createdAt DESC. */
+export async function getAllBooks(db: Db): Promise<BookDocument[]> {
+	return col(db)
+		.find({ processingStatus: { $ne: 'failed' } })
+		.sort({ createdAt: -1 })
+		.toArray();
+}
+
+/** Returns all books without filtering, sorted by createdAt DESC. */
+export async function getAllBooksAdmin(db: Db): Promise<BookDocument[]> {
+	return col(db)
+		.find({})
+		.sort({ createdAt: -1 })
+		.toArray();
+}
+
+export async function getBookById(db: Db, bookId: string): Promise<BookDocument | null> {
+	return col(db).findOne({ _id: new ObjectId(bookId) });
+}
+
+export async function insertBook(db: Db, book: BookInsert): Promise<string> {
+	const result = await col(db).insertOne(book as BookDocument);
+	return result.insertedId.toHexString();
+}
+
+export async function updateBookStatus(
+	db: Db,
+	bookId: string,
+	status: BookProcessingStatus,
+	error?: string,
+): Promise<void> {
+	await col(db).updateOne(
+		{ _id: new ObjectId(bookId) },
+		{
+			$set: {
+				processingStatus: status,
+				processingError: error ?? null,
+				updatedAt: new Date(),
+			},
+		},
+	);
+}
+
+export async function updateBookChapterCount(
+	db: Db,
+	bookId: string,
+	chapterCount: number,
+): Promise<void> {
+	await col(db).updateOne(
+		{ _id: new ObjectId(bookId) },
+		{
+			$set: {
+				chapterCount,
+				updatedAt: new Date(),
+			},
+		},
+	);
+}
+
+export async function updateBookMeta(
+	db: Db,
+	bookId: string,
+	meta: { title: string; author: string; description: string },
+): Promise<void> {
+	await col(db).updateOne(
+		{ _id: new ObjectId(bookId) },
+		{
+			$set: {
+				title: meta.title,
+				author: meta.author,
+				description: meta.description,
+				updatedAt: new Date(),
+			},
+		},
+	);
+}
+
+export async function updateBookEpubUrl(
+	db: Db,
+	bookId: string,
+	epubBlobUrl: string,
+): Promise<void> {
+	await col(db).updateOne(
+		{ _id: new ObjectId(bookId) },
+		{ $set: { epubBlobUrl, updatedAt: new Date() } },
+	);
+}
+
+/** Convenience wrapper — marks a book as 'failed' with the given error message. */
+export async function markBookFailed(
+	db: Db,
+	bookId: string,
+	message: string,
+): Promise<void> {
+	await updateBookStatus(db, bookId, 'failed', message);
+}

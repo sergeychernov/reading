@@ -1,6 +1,6 @@
 import type { ObjectId } from 'mongodb';
 import type { MeaningTranslations } from '@reading/llm-schemas';
-import type { LanguageItemCategory } from './processing';
+import type { LanguageItemCategory } from '@reading/data';
 
 export interface LanguageItemDocument {
 	_id: ObjectId;

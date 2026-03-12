@@ -1,4 +1,4 @@
-import { getDb } from '../mongodb';
+import { getDb } from '@reading/data';
 
 const COLLECTION = 'pipelineConfig';
 const SINGLETON_ID = 'singleton';

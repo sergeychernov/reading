@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getLanguageItemsByBook } from '../../../../../lib/db/language-items';
-import type { LanguageItemCategory } from '../../../../../lib/types/processing';
+import type { LanguageItemCategory } from '@reading/data';
 
 const VALID_CATEGORIES = new Set<LanguageItemCategory>(['idiom', 'phrasal_verb', 'rare_word']);
 

@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation';
 import Container from '@mui/material/Container';
-import { getBookById } from '../../../lib/db/books';
-import { getChaptersByBookId } from '../../../lib/db/chapters';
+import { getDb, getBookById, getChaptersByBookId } from '@reading/data';
 import { BookHeader } from '../../components/BookHeader';
 import { BookContent } from '../../components/BookContent';
 
@@ -11,13 +10,14 @@ interface BookDetailPageProps {
 
 export default async function BookDetailPage({ params }: BookDetailPageProps) {
 	const { bookId } = await params;
-	const book = await getBookById(bookId);
+	const db = await getDb();
+	const book = await getBookById(db, bookId);
 
 	if (!book) {
 		notFound();
 	}
 
-	const chapters = await getChaptersByBookId(bookId);
+	const chapters = await getChaptersByBookId(db, bookId);
 
 	const serializedChapters = chapters.map((ch) => {
 		const body = ch.rawText.startsWith(ch.title)
