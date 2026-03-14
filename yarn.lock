@@ -4982,6 +4982,7 @@ __metadata:
     "@emotion/react": "npm:11.14.0"
     "@emotion/styled": "npm:11.14.1"
     "@mui/material-nextjs": "npm:7.3.7"
+    "@reading/book-ingestion": "workspace:packages/book-ingestion"
     "@reading/data": "workspace:packages/data"
     "@reading/ui": "npm:0.0.0"
     "@types/node": "npm:latest"
@@ -4993,6 +4994,15 @@ __metadata:
     react-dom: "npm:latest"
     typescript: "npm:latest"
     zod: "npm:^4.3.6"
+  languageName: unknown
+  linkType: soft
+
+"@reading/book-ingestion@workspace:packages/book-ingestion":
+  version: 0.0.0-use.local
+  resolution: "@reading/book-ingestion@workspace:packages/book-ingestion"
+  dependencies:
+    "@reading/data": "workspace:packages/data"
+    typescript: "npm:latest"
   languageName: unknown
   linkType: soft
 
@@ -5099,6 +5109,7 @@ __metadata:
     "@emotion/react": "npm:11.14.0"
     "@emotion/styled": "npm:11.14.1"
     "@mui/material-nextjs": "npm:7.3.7"
+    "@reading/book-ingestion": "workspace:packages/book-ingestion"
     "@reading/data": "workspace:packages/data"
     "@reading/epub-utils": "workspace:packages/epub-utils"
     "@reading/llm-schemas": "workspace:packages/llm-schemas"

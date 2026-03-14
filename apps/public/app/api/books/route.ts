@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '../../../auth';
 import { getDb, getAllBooks } from '@reading/data';
-import { uploadAndCreateBook } from '../../../lib/processing/pipeline';
-import { validateEpubFile } from '../../../lib/validation/upload';
+import { createUploadedBook, validateEpubFile } from '@reading/book-ingestion';
 
 export const runtime = 'nodejs';
 
@@ -55,7 +54,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
 		const buffer = Buffer.from(await file.arrayBuffer());
 
-		const result = await uploadAndCreateBook({
+		const result = await createUploadedBook({
 			fileBuffer: buffer,
 			fileName: file.name,
 			audibleUrl,

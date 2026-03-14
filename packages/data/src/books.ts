@@ -10,7 +10,7 @@ function col(db: Db) {
 /** Returns books visible in user-facing lists, sorted by createdAt DESC. */
 export async function getAllBooks(db: Db): Promise<BookDocument[]> {
 	return col(db)
-		.find({ processingStatus: { $nin: ['failed', 'uploaded'] } })
+		.find({ processingStatus: { $nin: ['failed', 'uploaded', 'uploading'] } })
 		.sort({ createdAt: -1 })
 		.toArray();
 }

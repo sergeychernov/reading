@@ -1,12 +1,9 @@
+import type { ValidationResult } from './types';
+
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
 const ALLOWED_TYPES = ['application/epub+zip'];
 
-interface ValidationResult {
-	valid: boolean;
-	error?: string;
-}
-
-export function validateEpubFile(file: File): ValidationResult {
+export function validateEpubFile(file: File | null): ValidationResult {
 	if (!file) {
 		return { valid: false, error: 'No file provided' };
 	}
@@ -21,7 +18,7 @@ export function validateEpubFile(file: File): ValidationResult {
 
 	// Content type check (may not always be set correctly by browsers)
 	if (file.type && !ALLOWED_TYPES.includes(file.type)) {
-		// Allow empty type as some browsers don't set it for epub
+		// Allow empty type as some browsers do not set it for EPUB files
 		if (file.type !== '') {
 			return { valid: false, error: 'Invalid file type. Must be an EPUB file' };
 		}
