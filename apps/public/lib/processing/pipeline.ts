@@ -44,7 +44,7 @@ export async function uploadAndCreateBook(
 		audibleUrl: params.audibleUrl,
 		kindleUrl: params.kindleUrl,
 		chapterCount: 0,
-		processingStatus: 'parsing',
+		processingStatus: 'uploading',
 		processingError: null,
 		createdAt: now,
 		updatedAt: now,

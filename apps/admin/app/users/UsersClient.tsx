@@ -20,11 +20,13 @@ import {
 	Typography,
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material';
-import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 import type { SubscriptionPlan, UserDocument } from '../../lib/types/user';
 
+interface UsersClientProps {
+	refreshToken: number;
+}
 
-export function UsersClient() {
+export function UsersClient({ refreshToken }: UsersClientProps) {
 	const [users, setUsers] = useState<UserDocument[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [fetchError, setFetchError] = useState<string | null>(null);
@@ -52,7 +54,7 @@ export function UsersClient() {
 
 	useEffect(() => {
 		fetchUsers();
-	}, []);
+	}, [refreshToken]);
 
 	const handlePlanChange = async (userId: string, plan: SubscriptionPlan) => {
 		setSaving((prev) => ({ ...prev, [userId]: true }));
@@ -105,14 +107,6 @@ export function UsersClient() {
 				<Typography variant='body2' color='text.secondary'>
 					{users.length} user{users.length !== 1 ? 's' : ''} registered
 				</Typography>
-				<Button
-					size='small'
-					startIcon={<RefreshOutlinedIcon />}
-					onClick={fetchUsers}
-					variant='outlined'
-				>
-					Refresh
-				</Button>
 			</Box>
 
 			{users.length === 0 ? (

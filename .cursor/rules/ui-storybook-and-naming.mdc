@@ -1,0 +1,14 @@
+# UI Storybook and Naming Rules
+
+## Storybook Coverage
+
+- Every component exported from `@reading/ui` must have a Storybook story.
+- New components are not complete until their stories are added.
+- If a component is internal and should not have stories, do not export it from `@reading/ui`.
+
+## Naming Conventions
+
+- Use `kebab-case` for folder names in `packages/ui/src`.
+- This naming rule applies to directories, not component file names.
+- Storybook categories can use `Title/Section` naming and are independent from file-system naming.
+- Admin layout stories must use the `Layouts/Admin` section title.

@@ -10,6 +10,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Collapse from "@mui/material/Collapse";
 import Divider from "@mui/material/Divider";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import type { SxProps, Theme } from "@mui/material/styles";
 import type { NavItem } from "../types/nav";
 import type { RenderLinkFn } from "./HeaderMenu";
 
@@ -58,12 +59,14 @@ export interface SideMenuProps {
   drawerWidth?: number;
   /** Slot for the drawer header (logo, title, etc.) */
   header?: ReactNode;
+  /** Slot for the drawer footer (actions like logout, etc.) */
+  footer?: ReactNode;
   /** href of the currently active page, used to highlight the matching nav item */
   activeHref?: string;
   /** Offset from the top edge of the viewport when anchor="top", e.g. to clear a fixed AppBar. Accepts a responsive object like { xs: 56, sm: 64 }. */
   topOffset?: number | string | Record<string, number | string>;
   /** sx forwarded to the root Drawer element, e.g. for responsive display overrides */
-  sx?: object;
+  sx?: SxProps<Theme>;
 }
 
 export function SideMenu({
@@ -75,6 +78,7 @@ export function SideMenu({
   renderLink = defaultRenderLink,
   drawerWidth = 260,
   header,
+  footer,
   activeHref,
   topOffset,
   sx,
@@ -192,22 +196,24 @@ export function SideMenu({
       anchor={anchor}
       open={open}
       onClose={onClose}
-      sx={{
-        width: variant === "permanent" ? drawerWidth : undefined,
-        flexShrink: 0,
-        "& .MuiDrawer-paper": {
-          width: isHorizontal ? "100%" : drawerWidth,
-          boxSizing: "border-box",
-          bgcolor: "#0f172a",
-          color: "white",
-          border: "none",
-          ...(anchor === "top" && {
-            height: "auto",
-            ...(topOffset !== undefined && { top: topOffset }),
-          }),
+      sx={[
+        {
+          width: variant === "permanent" ? drawerWidth : undefined,
+          flexShrink: 0,
+          "& .MuiDrawer-paper": {
+            width: isHorizontal ? "100%" : drawerWidth,
+            boxSizing: "border-box",
+            bgcolor: "#0f172a",
+            color: "white",
+            border: "none",
+            ...(anchor === "top" && {
+              height: "auto",
+              ...(topOffset !== undefined && { top: topOffset }),
+            }),
+          },
         },
-        ...sx,
-      }}
+        ...(Array.isArray(sx) ? sx : sx ? [sx] : []),
+      ]}
     >
       {header && (
         <>
@@ -220,6 +226,14 @@ export function SideMenu({
       <List sx={{ flex: 1, py: 1.5, px: 0.5, overflowY: "auto" }}>
         {renderItems(items)}
       </List>
+      {footer && (
+        <>
+          <Divider sx={{ borderColor: "rgba(0, 0, 0, 0.08)" }} />
+          <Box sx={{ p: 1 }}>
+            {footer}
+          </Box>
+        </>
+      )}
     </Drawer>
   );
 }

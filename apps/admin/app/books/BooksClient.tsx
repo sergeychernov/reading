@@ -4,7 +4,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
 	Alert,
 	Box,
-	Button,
 	CircularProgress,
 	Collapse,
 	IconButton,
@@ -19,12 +18,16 @@ import {
 } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBulletedOutlined';
-import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 import type { SerializedBook } from '@reading/data';
+import { AdminPageContent } from '@reading/ui';
 import { BookMeta } from './BookMeta';
 import { BookChapters } from './BookChapters';
 
-export function BooksClient() {
+interface BooksClientProps {
+	refreshToken: number;
+}
+
+export function BooksClient({ refreshToken }: BooksClientProps) {
 	const [books, setBooks] = useState<SerializedBook[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [fetchError, setFetchError] = useState<string | null>(null);
@@ -48,7 +51,7 @@ export function BooksClient() {
 
 	useEffect(() => {
 		fetchBooks();
-	}, [fetchBooks]);
+	}, [fetchBooks, refreshToken]);
 
 	if (loading) {
 		return (
@@ -67,20 +70,10 @@ export function BooksClient() {
 	}
 
 	return (
-		<Box>
-			<Box display='flex' alignItems='center' justifyContent='space-between' mb={3}>
-				<Typography variant='body2' color='text.secondary'>
-					{books.length} book{books.length !== 1 ? 's' : ''}
-				</Typography>
-				<Button
-					size='small'
-					startIcon={<RefreshOutlinedIcon />}
-					onClick={fetchBooks}
-					variant='outlined'
-				>
-					Refresh
-				</Button>
-			</Box>
+		<AdminPageContent>
+			<Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+				{books.length} book{books.length !== 1 ? 's' : ''}
+			</Typography>
 
 			{books.length === 0 ? (
 				<Alert severity='info'>No books found.</Alert>
@@ -172,6 +165,6 @@ export function BooksClient() {
 				</TableContainer>
 			)}
 
-		</Box>
+		</AdminPageContent>
 	);
 }

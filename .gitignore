@@ -47,3 +47,6 @@ debug-storybook.log
 # docusaurus
 .docusaurus
 .cache-loader
+
+# workspace build outputs
+packages/data/dist/

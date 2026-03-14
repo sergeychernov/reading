@@ -4,6 +4,7 @@ import type { ObjectId } from 'mongodb';
 
 export type BookProcessingStatus =
 	| 'uploading'
+	| 'uploaded'
 	| 'parsing'
 	| 'extracting'
 	| 'completed'

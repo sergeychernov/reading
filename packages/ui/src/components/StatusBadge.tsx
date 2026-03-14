@@ -1,7 +1,7 @@
 import Chip from '@mui/material/Chip';
 import type { ChipProps } from '@mui/material/Chip';
 
-type Status = 'uploading' | 'parsing' | 'extracting' | 'completed' | 'failed' | 'pending';
+type Status = 'uploading' | 'uploaded' | 'parsing' | 'extracting' | 'completed' | 'failed' | 'pending';
 
 interface StatusBadgeProps {
 	status: Status;
@@ -9,6 +9,7 @@ interface StatusBadgeProps {
 
 const statusConfig: Record<Status, { label: string; color: ChipProps['color'] }> = {
 	uploading: { label: 'Uploading', color: 'info' },
+	uploaded: { label: 'Uploaded', color: 'info' },
 	parsing: { label: 'Parsing', color: 'info' },
 	extracting: { label: 'Extracting', color: 'warning' },
 	completed: { label: 'Completed', color: 'success' },

@@ -80,7 +80,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 		});
 
 		return NextResponse.json(
-			{ bookId: result.bookId, status: 'parsing' },
+			{ bookId: result.bookId, status: 'uploaded' },
 			{ status: 201 },
 		);
 	} catch (error) {

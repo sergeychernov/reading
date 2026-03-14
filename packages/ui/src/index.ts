@@ -17,4 +17,11 @@ export { StatusBadge } from "./components/StatusBadge";
 export { CategoryTabs } from "./components/CategoryTabs";
 export { FileUploadDropzone } from "./components/FileUploadDropzone";
 export { ItemCard } from "./components/ItemCard";
+
+// Admin layouts
+export {
+	AdminPageLayout,
+	PageHeader,
+	AdminPageContent,
+} from "./components/layouts/admin";
 export { ProgressIndicator } from "./components/ProgressIndicator";

@@ -1,18 +1,30 @@
-import { Container, Typography, Box } from '@mui/material';
+'use client';
+
+import { useState } from 'react';
+import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
+import { Button } from '@mui/material';
+import { AdminPageLayout, PageHeader } from '@reading/ui';
 import { UsersClient } from './UsersClient';
 
 export default function UsersPage() {
+	const [refreshToken, setRefreshToken] = useState(0);
+
 	return (
-		<Container maxWidth='lg' sx={{ py: 6 }}>
-			<Box mb={4}>
-				<Typography variant='h4' component='h1' gutterBottom>
-					Users
-				</Typography>
-				<Typography variant='body2' color='text.secondary'>
-					Manage user accounts and subscriptions
-				</Typography>
-			</Box>
-			<UsersClient />
-		</Container>
+		<AdminPageLayout maxWidth='xl'>
+			<PageHeader
+				title='Users'
+				subtitle='Manage user accounts and subscriptions'
+			>
+				<Button
+					size='small'
+					variant='outlined'
+					startIcon={<RefreshOutlinedIcon />}
+					onClick={() => setRefreshToken((value) => value + 1)}
+				>
+					Refresh
+				</Button>
+			</PageHeader>
+			<UsersClient refreshToken={refreshToken} />
+		</AdminPageLayout>
 	);
 }

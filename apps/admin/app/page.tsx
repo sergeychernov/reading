@@ -1,18 +1,19 @@
-import { Container, Typography, Box } from '@mui/material';
+import { Box } from '@mui/material';
+import { AdminPageLayout, PageHeader } from '@reading/ui';
 import { LlmConfigForm } from './components/LlmConfigForm';
+import { PipelineSettingsClient } from './components/PipelineSettingsClient/index';
 
 export default function AdminPage() {
 	return (
-		<Container maxWidth='sm' sx={{ py: 6 }}>
-			<Box mb={4}>
-				<Typography variant='h4' component='h1' gutterBottom>
-					LLM Config
-				</Typography>
-				<Typography variant='body2' color='text.secondary'>
-					Language model adapter configuration for chapter extraction
-				</Typography>
-			</Box>
+		<AdminPageLayout maxWidth='xl'>
+			<PageHeader
+				title='LLM Config'
+				subtitle='Language model adapter configuration for chapter extraction'
+			/>
 			<LlmConfigForm />
-		</Container>
+			<Box mt={6}>
+				<PipelineSettingsClient />
+			</Box>
+		</AdminPageLayout>
 	);
 }

@@ -7,10 +7,10 @@ function col(db: Db) {
 	return db.collection<BookDocument>(COLLECTION);
 }
 
-/** Returns all books except those with processingStatus 'failed', sorted by createdAt DESC. */
+/** Returns books visible in user-facing lists, sorted by createdAt DESC. */
 export async function getAllBooks(db: Db): Promise<BookDocument[]> {
 	return col(db)
-		.find({ processingStatus: { $ne: 'failed' } })
+		.find({ processingStatus: { $nin: ['failed', 'uploaded'] } })
 		.sort({ createdAt: -1 })
 		.toArray();
 }
@@ -91,7 +91,14 @@ export async function updateBookEpubUrl(
 ): Promise<void> {
 	await col(db).updateOne(
 		{ _id: new ObjectId(bookId) },
-		{ $set: { epubBlobUrl, updatedAt: new Date() } },
+		{
+			$set: {
+				epubBlobUrl,
+				processingStatus: 'uploaded',
+				processingError: null,
+				updatedAt: new Date(),
+			},
+		},
 	);
 }
 

@@ -183,6 +183,11 @@ export function LlmConfigForm() {
 				<FormLabel component='legend'>Adapter</FormLabel>
 				<RadioGroup
 					value={activeConfig.adapter}
+					row
+					sx={{
+						flexDirection: { xs: 'column', lg: 'row' },
+						gap: { lg: 3 },
+					}}
 					onChange={(e) => {
 						const nextAdapter = e.target.value as LlmAdapterConfig['adapter'];
 						updateActiveConfig((prev) => ({
@@ -215,8 +220,13 @@ export function LlmConfigForm() {
 					<Typography variant='subtitle2' color='text.secondary' gutterBottom>
 						Gateway settings
 					</Typography>
-					<Box display='flex' flexDirection='column' gap={3}>
-						<FormControl fullWidth>
+					<Box
+						display='flex'
+						flexDirection={{ xs: 'column', lg: 'row' }}
+						alignItems='flex-start'
+						gap={3}
+					>
+						<FormControl fullWidth sx={{ flex: { lg: 2 } }}>
 							<InputLabel id='model-label'>Model</InputLabel>
 							<Select
 								labelId='model-label'
@@ -255,8 +265,10 @@ export function LlmConfigForm() {
 							</Select>
 						</FormControl>
 						<TextField
+							fullWidth
 							label='Max tokens'
 							type='number'
+							sx={{ flex: { lg: 1 } }}
 							value={activeConfig.gateway?.maxTokens ?? 4096}
 							disabled={isUsingDefaultForJob}
 							onChange={(e) =>
@@ -268,9 +280,11 @@ export function LlmConfigForm() {
 							slotProps={{ htmlInput: { min: 256, max: 16384, step: 256 } }}
 						/>
 						<TextField
+							fullWidth
 							label='Temperature'
 							type='number'
 							helperText='0–2. Lower = more deterministic. 0.2 recommended for extraction.'
+							sx={{ flex: { lg: 1 } }}
 							value={activeConfig.gateway?.temperature ?? 0.2}
 							disabled={isUsingDefaultForJob}
 							onChange={(e) =>
