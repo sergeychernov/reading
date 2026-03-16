@@ -4984,11 +4984,15 @@ __metadata:
     "@mui/material-nextjs": "npm:7.3.7"
     "@reading/book-ingestion": "workspace:packages/book-ingestion"
     "@reading/data": "workspace:packages/data"
+    "@reading/jobs": "workspace:packages/jobs"
     "@reading/ui": "npm:0.0.0"
     "@types/node": "npm:latest"
     "@types/react": "npm:latest"
     "@types/react-dom": "npm:latest"
     mongodb: "npm:^6"
+    mongoose: "npm:^8"
+    neuroline: "npm:^0.9.0"
+    neuroline-nextjs: "npm:^0.7.0"
     next: "npm:16.1.6"
     react: "npm:latest"
     react-dom: "npm:latest"
@@ -5011,6 +5015,7 @@ __metadata:
   resolution: "@reading/data@workspace:packages/data"
   dependencies:
     "@vercel/blob": "npm:^2.3.0"
+    axios: "npm:^1.7.0"
     mongodb: "npm:^6.21.0"
     typescript: "npm:latest"
   languageName: unknown
@@ -7798,6 +7803,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"asynckit@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "asynckit@npm:0.4.0"
+  checksum: 10c0/d73e2ddf20c4eb9337e1b3df1a0f6159481050a5de457c55b14ea2e5cb6d90bb69e004c9af54737a5ee0917fcf2c9e25de67777bbe58261847846066ba75bc9d
+  languageName: node
+  linkType: hard
+
 "autoprefixer@npm:^10.4.19, autoprefixer@npm:^10.4.23":
   version: 10.4.24
   resolution: "autoprefixer@npm:10.4.24"
@@ -7819,6 +7831,17 @@ __metadata:
   version: 4.11.1
   resolution: "axe-core@npm:4.11.1"
   checksum: 10c0/1e6997454b61c7c9a4d740f395952835dcf87f2c04fd81577217d68634d197d602c224f9e8f17b22815db4c117a2519980cfc8911fc0027c54a6d8ebca47c6a7
+  languageName: node
+  linkType: hard
+
+"axios@npm:^1.7.0":
+  version: 1.13.6
+  resolution: "axios@npm:1.13.6"
+  dependencies:
+    follow-redirects: "npm:^1.15.11"
+    form-data: "npm:^4.0.5"
+    proxy-from-env: "npm:^1.1.0"
+  checksum: 10c0/51fb5af055c3b85662fa97df17d986ae2c37d13bf86d50b6bb36b6b3a2dec6966a1d3a14ab3774b71707b155ae3597ed9b7babdf1a1a863d1a31840cb8e7ec71
   languageName: node
   linkType: hard
 
@@ -8576,6 +8599,15 @@ __metadata:
   version: 1.2.0
   resolution: "combine-promises@npm:1.2.0"
   checksum: 10c0/906ebf056006eff93c11548df0415053b6756145dae1f5a89579e743cb15fceeb0604555791321db4fba5072aa39bb4de6547e9cdf14589fe949b33d1613422c
+  languageName: node
+  linkType: hard
+
+"combined-stream@npm:^1.0.8":
+  version: 1.0.8
+  resolution: "combined-stream@npm:1.0.8"
+  dependencies:
+    delayed-stream: "npm:~1.0.0"
+  checksum: 10c0/0dbb829577e1b1e839fa82b40c07ffaf7de8a09b935cadd355a73652ae70a88b4320db322f6634a4ad93424292fa80973ac6480986247f1734a1137debf271d5
   languageName: node
   linkType: hard
 
@@ -9774,6 +9806,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"delayed-stream@npm:~1.0.0":
+  version: 1.0.0
+  resolution: "delayed-stream@npm:1.0.0"
+  checksum: 10c0/d758899da03392e6712f042bec80aa293bbe9e9ff1b2634baae6a360113e708b91326594c8a486d475c69d6259afb7efacdc3537bfcda1c6c648e390ce601b19
+  languageName: node
+  linkType: hard
+
 "delegates@npm:^1.0.0":
   version: 1.0.0
   resolution: "delegates@npm:1.0.0"
@@ -10246,6 +10285,18 @@ __metadata:
   dependencies:
     es-errors: "npm:^1.3.0"
   checksum: 10c0/65364812ca4daf48eb76e2a3b7a89b3f6a2e62a1c420766ce9f692665a29d94fe41fe88b65f24106f449859549711e4b40d9fb8002d862dfd7eb1c512d10be0c
+  languageName: node
+  linkType: hard
+
+"es-set-tostringtag@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "es-set-tostringtag@npm:2.1.0"
+  dependencies:
+    es-errors: "npm:^1.3.0"
+    get-intrinsic: "npm:^1.2.6"
+    has-tostringtag: "npm:^1.0.2"
+    hasown: "npm:^2.0.2"
+  checksum: 10c0/ef2ca9ce49afe3931cb32e35da4dcb6d86ab02592cfc2ce3e49ced199d9d0bb5085fc7e73e06312213765f5efa47cc1df553a6a5154584b21448e9fb8355b1af
   languageName: node
   linkType: hard
 
@@ -11176,7 +11227,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.0.0":
+"follow-redirects@npm:^1.0.0, follow-redirects@npm:^1.15.11":
   version: 1.15.11
   resolution: "follow-redirects@npm:1.15.11"
   peerDependenciesMeta:
@@ -11200,6 +11251,19 @@ __metadata:
   version: 2.1.4
   resolution: "form-data-encoder@npm:2.1.4"
   checksum: 10c0/4c06ae2b79ad693a59938dc49ebd020ecb58e4584860a90a230f80a68b026483b022ba5e4143cff06ae5ac8fd446a0b500fabc87bbac3d1f62f2757f8dabcaf7
+  languageName: node
+  linkType: hard
+
+"form-data@npm:^4.0.5":
+  version: 4.0.5
+  resolution: "form-data@npm:4.0.5"
+  dependencies:
+    asynckit: "npm:^0.4.0"
+    combined-stream: "npm:^1.0.8"
+    es-set-tostringtag: "npm:^2.1.0"
+    hasown: "npm:^2.0.2"
+    mime-types: "npm:^2.1.12"
+  checksum: 10c0/dd6b767ee0bbd6d84039db12a0fa5a2028160ffbfaba1800695713b46ae974a5f6e08b3356c3195137f8530dcd9dfcb5d5ae1eeff53d0db1e5aad863b619ce3b
   languageName: node
   linkType: hard
 
@@ -11361,7 +11425,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"get-intrinsic@npm:^1.2.4, get-intrinsic@npm:^1.2.5, get-intrinsic@npm:^1.3.0":
+"get-intrinsic@npm:^1.2.4, get-intrinsic@npm:^1.2.5, get-intrinsic@npm:^1.2.6, get-intrinsic@npm:^1.3.0":
   version: 1.3.1
   resolution: "get-intrinsic@npm:1.3.1"
   dependencies:
@@ -11640,10 +11704,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"has-symbols@npm:^1.1.0":
+"has-symbols@npm:^1.0.3, has-symbols@npm:^1.1.0":
   version: 1.1.0
   resolution: "has-symbols@npm:1.1.0"
   checksum: 10c0/dde0a734b17ae51e84b10986e651c664379018d10b91b6b0e9b293eddb32f0f069688c841fb40f19e9611546130153e0a2a48fd7f512891fb000ddfa36f5a20e
+  languageName: node
+  linkType: hard
+
+"has-tostringtag@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "has-tostringtag@npm:1.0.2"
+  dependencies:
+    has-symbols: "npm:^1.0.3"
+  checksum: 10c0/a8b166462192bafe3d9b6e420a1d581d93dd867adb61be223a17a8d6dad147aa77a8be32c961bb2f27b3ef893cae8d36f564ab651f5e9b7938ae86f74027c48c
   languageName: node
   linkType: hard
 
@@ -14150,7 +14223,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mime-types@npm:2.1.35, mime-types@npm:^2.0.0, mime-types@npm:^2.1.27, mime-types@npm:~2.1.24, mime-types@npm:~2.1.34, mime-types@npm:~2.1.35":
+"mime-types@npm:2.1.35, mime-types@npm:^2.0.0, mime-types@npm:^2.1.12, mime-types@npm:^2.1.27, mime-types@npm:~2.1.24, mime-types@npm:~2.1.34, mime-types@npm:~2.1.35":
   version: 2.1.35
   resolution: "mime-types@npm:2.1.35"
   dependencies:
@@ -14486,7 +14559,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongoose@npm:^8.9.0":
+"mongoose@npm:^8, mongoose@npm:^8.9.0":
   version: 8.23.0
   resolution: "mongoose@npm:8.23.0"
   dependencies:
@@ -14617,6 +14690,16 @@ __metadata:
     "@nestjs/core": ">=10.0.0"
     neuroline: ^0.9.0
   checksum: 10c0/38ac7098b9ff3777511bceca4ddf09b23d7dd4a239ce442584efa7118b117f16b7fc41c5b7b79b6bfded77de64004a91be78339eed1b003a48fa3b34d3a76230
+  languageName: node
+  linkType: hard
+
+"neuroline-nextjs@npm:^0.7.0":
+  version: 0.7.3
+  resolution: "neuroline-nextjs@npm:0.7.3"
+  peerDependencies:
+    neuroline: ^0.9.0
+    next: ">=14.0.0"
+  checksum: 10c0/d2372b6eae6b7abdc6440f10c023859f38f978d52239664d40d56356444e9280a8e2e85e486ec1f7cfe156b2bdfd17a092ba59ad9b386103df65b84cc32d5129
   languageName: node
   linkType: hard
 
@@ -16474,6 +16557,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"proxy-from-env@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "proxy-from-env@npm:1.1.0"
+  checksum: 10c0/fe7dd8b1bdbbbea18d1459107729c3e4a2243ca870d26d34c2c1bcd3e4425b7bcc5112362df2d93cc7fb9746f6142b5e272fd1cc5c86ddf8580175186f6ad42b
+  languageName: node
+  linkType: hard
+
 "punycode@npm:^2.1.0, punycode@npm:^2.3.1":
   version: 2.3.1
   resolution: "punycode@npm:2.3.1"
@@ -16801,11 +16891,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "reading-monorepo@workspace:."
   dependencies:
+    "@vercel/blob": "npm:^2.3.0"
     concurrently: "npm:^9.1.0"
+    dotenv: "npm:^17.3.1"
     husky: "npm:^9.1.7"
     next: "npm:16.1.6"
     react: "npm:19.2.4"
     react-dom: "npm:19.2.4"
+    tsx: "npm:^4.19.0"
   languageName: unknown
   linkType: soft
 
@@ -18871,7 +18964,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsx@npm:4.21.0":
+"tsx@npm:4.21.0, tsx@npm:^4.19.0":
   version: 4.21.0
   resolution: "tsx@npm:4.21.0"
   dependencies:

@@ -77,6 +77,7 @@ chapter-extraction pipeline (1 stage, started per chapter):
 |-----|----------|-------------|
 | public | `PIPELINE_API_URL` | Pipeline base URL (`http://localhost:3001` in dev) |
 | public, admin | `PIPELINE_API_SECRET` | Optional. When set, requests to pipeline must send header `x-internal-secret: <value>`. Set same value in pipeline to enable protection. |
+| public, admin | `BLOB_READ_WRITE_TOKEN` | Vercel Blob token. Public uploads EPUBs; admin downloads them for book-processing. **Must be the same value in both** — otherwise admin gets 403 on download. |
 | pipeline | `MONGODB_URI` | MongoDB Atlas connection string |
 | pipeline | `PIPELINE_BASE_URL` | Self-invocation URL for chapter dispatch (`http://localhost:3001` in dev) |
 | pipeline | `PIPELINE_API_SECRET` | Optional. When set, all `/api/v1/*` requests require header `x-internal-secret` matching this value. Callers (public, admin, self-invocation) must send the same secret. |
@@ -86,7 +87,6 @@ chapter-extraction pipeline (1 stage, started per chapter):
 - `JobContext` has `.logger.info()` / `.warn()` / `.error()` (not direct methods)
 - `SynapseContext` has `.pipelineInput` and `.getArtifact<T>(jobName)`
 - Pipeline stage property is `synapses` (plural)
-- `JobDefinition` — use without generics, cast `input` inside `execute` (contravariance issue with typed generics)
 - `MongoPipelineStorage` from `neuroline/mongo` requires `moduleResolution: "Bundler"` for subpath exports
 
 ## Next.js 16 specifics

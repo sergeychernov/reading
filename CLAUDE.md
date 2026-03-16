@@ -82,7 +82,6 @@ chapter-extraction pipeline (1 stage, started per chapter):
 - `JobContext` has `.logger.info()` / `.warn()` / `.error()` (not direct methods)
 - `SynapseContext` has `.pipelineInput` and `.getArtifact<T>(jobName)`
 - Pipeline stage property is `synapses` (plural)
-- `JobDefinition` — use without generics, cast `input` inside `execute` (contravariance issue with typed generics)
 - `MongoPipelineStorage` from `neuroline/mongo` requires `moduleResolution: "Bundler"` for subpath exports
 
 ### Next.js 16 specifics

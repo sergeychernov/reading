@@ -18,6 +18,7 @@
 	},
 	"dependencies": {
 		"@vercel/blob": "^2.3.0",
+		"axios": "^1.7.0",
 		"mongodb": "^6.21.0"
 	},
 	"devDependencies": {

@@ -42,8 +42,11 @@ export {
 export {
 	uploadEpub,
 	downloadEpub,
+	downloadBlob,
 	uploadCoverImage,
+	uploadBookFile,
 	deleteBlob,
+	deleteBookProcessingArtifacts,
 } from './blob';
 
 // Serialization

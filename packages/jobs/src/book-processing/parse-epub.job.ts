@@ -4,10 +4,10 @@ import { parseEpub } from '@reading/epub-utils';
 import type { ParsedBookMetadata, ParsedChapter } from '@reading/epub-utils';
 import { withDb, markBookFailed } from '@reading/data';
 
+/** Raw chapter from parser (index + XHTML content). */
 export interface ParseEpubChapter {
 	index: number;
-	title: string;
-	text: string;
+	content: string;
 }
 
 export interface ParseEpubOutput {
@@ -42,8 +42,7 @@ export const parseEpubJob: JobDefinition = {
 			const parsedChapters: ParseEpubChapter[] = chapters.map(
 				(ch: ParsedChapter) => ({
 					index: ch.index,
-					title: ch.title,
-					text: ch.text,
+					content: ch.content,
 				}),
 			);
 

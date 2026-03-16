@@ -6,6 +6,7 @@ export type BookProcessingStatus =
 	| 'uploading'
 	| 'uploaded'
 	| 'parsing'
+	| 'parsed'
 	| 'extracting'
 	| 'completed'
 	| 'failed';
@@ -38,6 +39,7 @@ export interface BookDocument {
 	chapterCount: number;
 	processingStatus: BookProcessingStatus;
 	processingError: string | null;
+	failed: boolean;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -76,6 +78,7 @@ export interface SerializedBook {
 	chapterCount: number;
 	processingStatus: string;
 	processingError: string | null;
+	failed: boolean;
 	createdAt: string;
 	updatedAt: string;
 }

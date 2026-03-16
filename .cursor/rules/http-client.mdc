@@ -1,0 +1,24 @@
+---
+description: HTTP client choice for outbound requests
+alwaysApply: true
+---
+
+# HTTP Client
+
+Use **axios** for outbound HTTP requests (GET, POST, etc.) from Node.js code.
+
+- **Reason**: Axios respects the `timeout` option (in milliseconds) for the full request lifecycle. Native `fetch` in Node uses undici, which applies its own ~300s limits and can terminate long-running downloads regardless of a custom `AbortController`.
+- **Where**: Any package or app that needs to call external APIs or download binary/text (e.g. `packages/data` blob download, pipeline jobs, server-side API routes).
+- **Avoid**: Do not use native `fetch` for requests that may run longer than a few minutes or when a configurable timeout is required.
+
+```typescript
+// ✅ Prefer
+const response = await axios.get(url, {
+	headers: { Authorization: `Bearer ${token}` },
+	responseType: 'arraybuffer',
+	timeout: 30 * 60 * 1000,
+});
+
+// ❌ Avoid for long or timeout-sensitive requests
+const response = await fetch(url, { signal: controller.signal });
+```

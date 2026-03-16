@@ -37,6 +37,7 @@ export async function createUploadedBook(
 		chapterCount: 0,
 		processingStatus: 'uploading',
 		processingError: null,
+		failed: false,
 		createdAt: now,
 		updatedAt: now,
 	};

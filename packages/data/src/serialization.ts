@@ -19,6 +19,7 @@ export function serializeBook(doc: BookDocument): SerializedBook {
 		chapterCount: doc.chapterCount ?? 0,
 		processingStatus: doc.processingStatus ?? 'unknown',
 		processingError: doc.processingError ?? null,
+		failed: doc.failed ?? false,
 		createdAt: toIso(doc.createdAt),
 		updatedAt: toIso(doc.updatedAt),
 	};

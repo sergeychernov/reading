@@ -49,4 +49,4 @@ debug-storybook.log
 .cache-loader
 
 # workspace build outputs
-packages/data/dist/
+packages/*/dist/
