@@ -1,5 +1,17 @@
-import { Readable } from 'node:stream';
-import { put, del, get, list } from '@vercel/blob';
+import { resolve } from 'node:path';
+import { createStorage } from 'unstorage';
+import fsDriver from 'unstorage/drivers/fs';
+import vercelBlobDriver from 'unstorage/drivers/vercel-blob';
+
+// ── Storage instance ───────────────────────────────────────────────
+
+const vercelDriver = () =>
+	// @ts-expect-error unstorage 1.x types restrict access to "public" but the driver supports "private" at runtime
+	vercelBlobDriver({ access: 'private' });
+
+const storage = process.env.BLOB_READ_WRITE_TOKEN
+	? createStorage({ driver: vercelDriver() })
+	: createStorage({ driver: fsDriver({ base: resolve(process.cwd(), '.blob') }) });
 
 // ── Key helpers ────────────────────────────────────────────────────
 
@@ -17,11 +29,7 @@ export async function uploadEpub(
 	bookId: string,
 	fileBuffer: Buffer,
 ): Promise<void> {
-	await put(epubBlobKey(bookId), fileBuffer, {
-		access: 'private',
-		contentType: 'application/epub+zip',
-		addRandomSuffix: false,
-	});
+	await storage.setItemRaw(epubBlobKey(bookId), fileBuffer);
 }
 
 export async function uploadBookFile(
@@ -30,56 +38,21 @@ export async function uploadBookFile(
 	content: Buffer | string,
 	contentType: string,
 ): Promise<void> {
-	await put(bookFileKey(bookId, filePath), content, {
-		access: 'private',
-		contentType,
-		addRandomSuffix: false,
-	});
+	await storage.setItemRaw(bookFileKey(bookId, filePath), content);
 }
 
 // ── Download ───────────────────────────────────────────────────────
 
 /**
- * Resolves a blob key to its full URL via the list API,
- * then downloads the content. Requires `BLOB_READ_WRITE_TOKEN`.
+ * Downloads a blob by key. Works with both Vercel Blob (production)
+ * and local filesystem (development) via unstorage driver switching.
  */
 export async function downloadBlob(key: string): Promise<Buffer> {
-	const rawToken = process.env.BLOB_READ_WRITE_TOKEN;
-	if (!rawToken) {
-		throw new Error('BLOB_READ_WRITE_TOKEN is not set');
-	}
-	const token = rawToken.trim();
-
-	const url = await resolveKeyToUrl(key);
-
-	let result: Awaited<ReturnType<typeof get>>;
-	try {
-		result = await get(url, { access: 'private', token });
-	} catch (err) {
-		const message = err instanceof Error ? err.message : String(err);
-		if (message.includes('403') || message.includes('Forbidden')) {
-			throw new Error(
-				`Vercel Blob 403: token may be for a different store. key: ${key}. ` +
-					'Ensure BLOB_READ_WRITE_TOKEN is from the same Vercel Blob store that uploaded this file.',
-			);
-		}
-		throw err;
-	}
-
-	if (result === null) {
+	const raw = await storage.getItemRaw(key);
+	if (raw === null || raw === undefined) {
 		throw new Error(`Blob not found for key: ${key}`);
 	}
-	if (result.statusCode === 304 || result.stream === null) {
-		throw new Error('Blob not modified / no stream');
-	}
-
-	// @ts-expect-error Web ReadableStream works with Node Readable.fromWeb at runtime
-	const nodeStream = Readable.fromWeb(result.stream);
-	const chunks: Buffer[] = [];
-	for await (const chunk of nodeStream) {
-		chunks.push(Buffer.from(chunk));
-	}
-	return Buffer.concat(chunks);
+	return toBuffer(raw);
 }
 
 export async function downloadEpub(key: string): Promise<Buffer> {
@@ -89,54 +62,35 @@ export async function downloadEpub(key: string): Promise<Buffer> {
 // ── Delete ─────────────────────────────────────────────────────────
 
 export async function deleteBlob(key: string): Promise<void> {
-	const urls = await listBlobUrlsByPrefix(key);
-	if (urls.length > 0) {
-		await del(urls);
-	}
+	await storage.removeItem(key);
 }
 
 /**
  * Deletes generated parsing artifacts for a book:
  * - books/{bookId}/metadata.json
  * - books/{bookId}/chapters/*
+ * Preserves the source EPUB file.
  */
 export async function deleteBookProcessingArtifacts(bookId: string): Promise<void> {
-	const metadataUrls = await listBlobUrlsByPrefix(`books/${bookId}/metadata.json`);
-	const chapterUrls = await listBlobUrlsByPrefix(`books/${bookId}/chapters/`);
-	const urlsToDelete = [...metadataUrls, ...chapterUrls];
+	const allKeys = await storage.getKeys(bookFileKey(bookId, ''));
+	const artifactKeys = allKeys.filter((k) => {
+		const normalized = k.replace(/:/g, '/');
+		return normalized.includes('metadata.json')
+			|| normalized.includes('chapters/')
+			|| normalized.includes('cover.');
+	});
 
-	if (urlsToDelete.length === 0) {
-		return;
-	}
-
-	await del(urlsToDelete);
+	await Promise.all(artifactKeys.map((k) => storage.removeItem(k)));
 }
 
 // ── Internal helpers ───────────────────────────────────────────────
 
-async function resolveKeyToUrl(key: string): Promise<string> {
-	const page = await list({ prefix: key, limit: 1 });
-	if (page.blobs.length === 0) {
-		throw new Error(`Blob not found for key: ${key}`);
+function toBuffer(data: unknown): Buffer {
+	if (Buffer.isBuffer(data)) return data;
+	if (data instanceof ArrayBuffer) return Buffer.from(data);
+	if (data instanceof Uint8Array) {
+		return Buffer.from(data.buffer, data.byteOffset, data.byteLength);
 	}
-	return page.blobs[0].url;
-}
-
-async function listBlobUrlsByPrefix(prefix: string): Promise<string[]> {
-	const urls: string[] = [];
-	let cursor: string | undefined;
-
-	do {
-		const page = await list({
-			prefix,
-			cursor,
-			limit: 1000,
-		});
-		for (const blob of page.blobs) {
-			urls.push(blob.url);
-		}
-		cursor = page.hasMore ? page.cursor : undefined;
-	} while (cursor);
-
-	return urls;
+	if (typeof data === 'string') return Buffer.from(data, 'utf-8');
+	throw new Error(`Cannot convert ${typeof data} to Buffer`);
 }

@@ -50,3 +50,6 @@ debug-storybook.log
 
 # workspace build outputs
 packages/*/dist/
+
+# local blob storage (dev)
+.blob/
