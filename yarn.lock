@@ -4989,6 +4989,7 @@ __metadata:
     "@types/node": "npm:latest"
     "@types/react": "npm:latest"
     "@types/react-dom": "npm:latest"
+    "@vercel/functions": "npm:^2.0.0"
     mongodb: "npm:^6"
     mongoose: "npm:^8"
     neuroline: "npm:^0.9.0"

@@ -1,4 +1,5 @@
 import { createPipelineRouteHandler } from 'neuroline-nextjs';
+import { waitUntil } from '@vercel/functions';
 import { getNeuroline } from '../../../../lib/neuroline';
 import { bookProcessingPipeline } from '../../../pipelines/book-processing.pipeline';
 
@@ -17,6 +18,9 @@ async function getHandlers() {
 		storage,
 		pipeline: bookProcessingPipeline,
 		enableDebugEndpoints: true,
+		waitUntil: process.env.VERCEL
+			? (promise) => waitUntil(promise)
+			: undefined,
 	});
 
 	return handlers;
