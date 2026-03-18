@@ -41,10 +41,10 @@ export {
 // Blob operations
 export {
 	epubBlobKey,
+	bookFileKey,
 	uploadEpub,
 	downloadEpub,
 	downloadBlob,
-	uploadCoverImage,
 	uploadBookFile,
 	deleteBlob,
 	deleteBookProcessingArtifacts,

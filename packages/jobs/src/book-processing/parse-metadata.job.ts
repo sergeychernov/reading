@@ -6,7 +6,7 @@ import type { ExtractBookOutput } from './extract-book.job';
 
 export interface ParseMetadataInput {
 	bookId: string;
-	metadataUrl: string;
+	metadataKey: string;
 }
 
 export interface ParseMetadataOutput {
@@ -26,7 +26,7 @@ export function buildParseMetadataSynapses(ctx: SynapseContext): ParseMetadataIn
 	}
 	return {
 		bookId: artifact.bookId,
-		metadataUrl: artifact.metadataUrl,
+		metadataKey: artifact.metadataKey,
 	};
 }
 
@@ -37,10 +37,10 @@ export const parseMetadataJob: JobDefinition<ParseMetadataInput, ParseMetadataOu
 		_options: unknown,
 		context: JobContext,
 	): Promise<ParseMetadataOutput> {
-		const { bookId, metadataUrl } = input;
+		const { bookId, metadataKey } = input;
 		context.logger.info(`parse-metadata started for ${bookId}`);
 
-		const buffer = await downloadBlob(metadataUrl);
+		const buffer = await downloadBlob(metadataKey);
 		const raw = JSON.parse(buffer.toString('utf-8')) as RawMetadataEntry[];
 		const metadata = parseMetadataFromRawJson(raw);
 

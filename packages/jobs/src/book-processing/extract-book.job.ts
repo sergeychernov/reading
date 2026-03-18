@@ -4,6 +4,7 @@ import {
 	getBookById,
 	downloadEpub,
 	epubBlobKey,
+	bookFileKey,
 	uploadBookFile,
 	updateBookChapterCount,
 	updateBookStatus,
@@ -21,9 +22,9 @@ export interface ExtractBookOutput {
 	title: string;
 	author: string;
 	chapterCount: number;
-	metadataUrl: string;
-	coverUrl: string | null;
-	chapterUrls: string[];
+	metadataKey: string;
+	coverKey: string | null;
+	chapterKeys: string[];
 }
 
 /**
@@ -66,32 +67,20 @@ export const extractBookJob: JobDefinition<ExtractBookInput, ExtractBookOutput> 
 				`Parsed: "${metadata.title}" by "${metadata.author}", ${chapters.length} chapters`,
 			);
 
-			// Upload metadata as raw getMetadata() result (unchanged)
-			const metadataUrl = await uploadBookFile(
-				bookId,
-				'metadata.json',
-				metadataContent,
-				'application/json',
-			);
+			const metadataKey = bookFileKey(bookId, 'metadata.json');
+			await uploadBookFile(bookId, 'metadata.json', metadataContent, 'application/json');
 			context.logger.info('Uploaded metadata.json');
 
-			// Upload cover image (if present)
-			const coverUrl = await uploadCover(bookId, cover, context);
+			const coverKey = await uploadCover(bookId, cover, context);
 
-			// Upload chapters as raw XHTML
-			const chapterUrls: string[] = [];
+			const chapterKeys: string[] = [];
 			for (const chapter of chapters) {
-				const url = await uploadBookFile(
-					bookId,
-					`chapters/${chapter.index}.xhtml`,
-					chapter.content,
-					'application/xhtml+xml',
-				);
-				chapterUrls.push(url);
+				const chapterPath = `chapters/${chapter.index}.xhtml`;
+				await uploadBookFile(bookId, chapterPath, chapter.content, 'application/xhtml+xml');
+				chapterKeys.push(bookFileKey(bookId, chapterPath));
 			}
-			context.logger.info(`Uploaded ${chapterUrls.length} chapter files`);
+			context.logger.info(`Uploaded ${chapterKeys.length} chapter files`);
 
-			// Update book record in MongoDB (metadata filled by parse-metadata job)
 			await withDb(async (db) => {
 				await updateBookChapterCount(db, bookId, chapters.length);
 				await updateBookStatus(db, bookId, 'parsed');
@@ -104,9 +93,9 @@ export const extractBookJob: JobDefinition<ExtractBookInput, ExtractBookOutput> 
 				title: metadata.title,
 				author: metadata.author,
 				chapterCount: chapters.length,
-				metadataUrl,
-				coverUrl,
-				chapterUrls,
+				metadataKey,
+				coverKey,
+				chapterKeys,
 			};
 		} catch (error) {
 			const message = error instanceof Error
@@ -130,12 +119,8 @@ async function uploadCover(
 	}
 
 	const ext = cover.mediaType.split('/')[1]?.replace('jpeg', 'jpg') ?? 'jpg';
-	const url = await uploadBookFile(
-		bookId,
-		`cover.${ext}`,
-		cover.data,
-		cover.mediaType,
-	);
+	const coverPath = `cover.${ext}`;
+	await uploadBookFile(bookId, coverPath, cover.data, cover.mediaType);
 	context.logger.info(`Uploaded cover image (${cover.mediaType})`);
-	return url;
+	return bookFileKey(bookId, coverPath);
 }
