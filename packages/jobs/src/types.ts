@@ -5,7 +5,6 @@ import type { LanguageItemBase, LanguageItemScored } from '@reading/llm-schemas'
  */
 export interface BookProcessingInput {
 	bookId: string;
-	epubBlobUrl: string;
 }
 
 /**

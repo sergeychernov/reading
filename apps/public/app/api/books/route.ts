@@ -72,7 +72,6 @@ export async function POST(request: Request): Promise<NextResponse> {
 			headers,
 			body: JSON.stringify({
 				bookId: result.bookId,
-				epubBlobUrl: result.epubBlobUrl,
 			}),
 		}).catch((err) => {
 			console.error(`Failed to trigger pipeline for book ${result.bookId}:`, err);

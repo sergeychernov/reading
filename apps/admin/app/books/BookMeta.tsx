@@ -34,7 +34,6 @@ export function BookMeta({ book }: { book: SerializedBook }) {
 						<MetaRow label='author' value={book.author} />
 						<MetaRow label='description' value={book.description || null} />
 						<MetaRow label='coverImageUrl' value={book.coverImageUrl} />
-						<MetaRow label='epubBlobUrl' value={book.epubBlobUrl} />
 						<MetaRow label='audibleUrl' value={book.audibleUrl} />
 						<MetaRow label='kindleUrl' value={book.kindleUrl} />
 						<MetaRow label='chapterCount' value={String(book.chapterCount)} />

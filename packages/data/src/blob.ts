@@ -1,11 +1,15 @@
 import { Readable } from 'node:stream';
 import { put, del, get, list } from '@vercel/blob';
 
+export function epubBlobKey(bookId: string): string {
+	return `books/${bookId}/src.epub`;
+}
+
 export async function uploadEpub(
 	bookId: string,
 	fileBuffer: Buffer,
 ): Promise<string> {
-	const blob = await put(`books/${bookId}/src.epub`, fileBuffer, {
+	const blob = await put(epubBlobKey(bookId), fileBuffer, {
 		access: 'private',
 		contentType: 'application/epub+zip',
 	});

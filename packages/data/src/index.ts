@@ -23,7 +23,7 @@ export {
 	updateBookStatus,
 	updateBookChapterCount,
 	updateBookMeta,
-	updateBookEpubUrl,
+	markBookUploaded,
 	markBookFailed,
 } from './books';
 
@@ -40,6 +40,7 @@ export {
 
 // Blob operations
 export {
+	epubBlobKey,
 	uploadEpub,
 	downloadEpub,
 	downloadBlob,

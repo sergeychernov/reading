@@ -42,7 +42,7 @@ export function createFetchEpubPipeline(): PipelineConfig {
 	};
 }
 
-// Input for this pipeline matches BookProcessingInput: { bookId, epubBlobUrl }
+// Input for this pipeline matches BookProcessingInput: { bookId }
 ```
 
 Jobs that need an **LlmAdapter** (e.g. `createExtractSummaryJob`) receive it when creating the job: pass your adapter (e.g. StubAdapter or GatewayAdapter) so the same job runs with the same LLM config. Jobs that need **pipeline config** (e.g. `createDispatchChaptersJob`) receive a reader: `createDispatchChaptersJob({ readPipelineConfig })`.

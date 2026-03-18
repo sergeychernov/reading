@@ -33,7 +33,6 @@ export interface BookDocument {
 	author: string;
 	description: string;
 	coverImageUrl: string | null;
-	epubBlobUrl: string;
 	audibleUrl: string | null;
 	kindleUrl: string | null;
 	chapterCount: number;
@@ -72,7 +71,6 @@ export interface SerializedBook {
 	author: string;
 	description: string;
 	coverImageUrl: string | null;
-	epubBlobUrl: string;
 	audibleUrl: string | null;
 	kindleUrl: string | null;
 	chapterCount: number;

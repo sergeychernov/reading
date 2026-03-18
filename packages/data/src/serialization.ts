@@ -13,7 +13,6 @@ export function serializeBook(doc: BookDocument): SerializedBook {
 		author: doc.author ?? '',
 		description: doc.description ?? '',
 		coverImageUrl: doc.coverImageUrl ?? null,
-		epubBlobUrl: doc.epubBlobUrl ?? '',
 		audibleUrl: doc.audibleUrl ?? null,
 		kindleUrl: doc.kindleUrl ?? null,
 		chapterCount: doc.chapterCount ?? 0,

@@ -7,7 +7,6 @@ export interface CreateUploadedBookParams {
 
 export interface CreateUploadedBookResult {
 	bookId: string;
-	epubBlobUrl: string;
 }
 
 export interface ValidationResult {

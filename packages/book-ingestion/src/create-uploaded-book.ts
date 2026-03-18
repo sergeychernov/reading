@@ -3,7 +3,7 @@ import {
 	computeContentHash,
 	insertBook,
 	uploadEpub,
-	updateBookEpubUrl,
+	markBookUploaded,
 	markBookFailed,
 } from '@reading/data';
 import type { BookInsert } from '@reading/data';
@@ -11,7 +11,8 @@ import type { CreateUploadedBookParams, CreateUploadedBookResult } from './types
 
 /**
  * Creates a book entry in MongoDB and uploads the EPUB to Blob storage.
- * Leaves the book in `uploaded` status after setting `epubBlobUrl`.
+ * Leaves the book in `uploaded` status. The blob key is derived from bookId,
+ * so no URL is stored in the database.
  */
 export async function createUploadedBook(
 	params: CreateUploadedBookParams,
@@ -31,7 +32,6 @@ export async function createUploadedBook(
 		author: '',
 		description: '',
 		coverImageUrl: null,
-		epubBlobUrl: '',
 		audibleUrl: params.audibleUrl,
 		kindleUrl: params.kindleUrl,
 		chapterCount: 0,
@@ -61,7 +61,7 @@ export async function createUploadedBook(
 			`[book-ingestion] upload started: bookId=${bookId}, timeoutMs=${timeoutMs}, tokenSet=${Boolean(process.env.BLOB_READ_WRITE_TOKEN)}`,
 		);
 
-		const epubBlobUrl = await withTimeout(
+		await withTimeout(
 			uploadEpub(bookId, params.fileBuffer),
 			timeoutMs,
 			`EPUB upload timed out after ${timeoutMs}ms`,
@@ -70,12 +70,12 @@ export async function createUploadedBook(
 			`[book-ingestion] upload completed: bookId=${bookId}, elapsedMs=${Date.now() - startedAt}`,
 		);
 
-		await updateBookEpubUrl(db, bookId, epubBlobUrl);
+		await markBookUploaded(db, bookId);
 		console.info(
-			`[book-ingestion] book updated to uploaded: bookId=${bookId}, elapsedMs=${Date.now() - startedAt}`,
+			`[book-ingestion] book marked uploaded: bookId=${bookId}, elapsedMs=${Date.now() - startedAt}`,
 		);
 
-		return { bookId, epubBlobUrl };
+		return { bookId };
 	} catch (error) {
 		const message =
 			error instanceof Error
@@ -85,7 +85,6 @@ export async function createUploadedBook(
 			`[book-ingestion] upload failed: bookId=${bookId}, elapsedMs=${Date.now() - startedAt}, message="${message}"`,
 		);
 
-		// Prevent records from staying in "uploading" forever on upload failures.
 		try {
 			await markBookFailed(db, bookId, message);
 			console.info(

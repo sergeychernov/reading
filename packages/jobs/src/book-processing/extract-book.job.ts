@@ -3,6 +3,7 @@ import {
 	withDb,
 	getBookById,
 	downloadEpub,
+	epubBlobKey,
 	uploadBookFile,
 	updateBookChapterCount,
 	updateBookStatus,
@@ -51,16 +52,12 @@ export const extractBookJob: JobDefinition<ExtractBookInput, ExtractBookOutput> 
 			if (!book) {
 				throw new Error(`Book ${bookId} not found in database`);
 			}
-			if (!book.epubBlobUrl) {
-				throw new Error(`Book ${bookId} has no epubBlobUrl`);
-			}
 
 			await withDb((db) => updateBookStatus(db, bookId, 'parsing'));
 
-			context.logger.info(
-				`Downloading EPUB from ${book.epubBlobUrl} (BLOB_READ_WRITE_TOKEN set: ${Boolean(process.env.BLOB_READ_WRITE_TOKEN)})`,
-			);
-			const epubBuffer = await downloadEpub(book.epubBlobUrl);
+			const key = epubBlobKey(bookId);
+			context.logger.info(`Downloading EPUB (key: ${key})`);
+			const epubBuffer = await downloadEpub(key);
 			context.logger.info(`Downloaded EPUB: ${epubBuffer.byteLength} bytes`);
 
 			context.logger.info('Parsing EPUB...');

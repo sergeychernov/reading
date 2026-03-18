@@ -88,16 +88,14 @@ export async function updateBookMeta(
 	);
 }
 
-export async function updateBookEpubUrl(
+export async function markBookUploaded(
 	db: Db,
 	bookId: string,
-	epubBlobUrl: string,
 ): Promise<void> {
 	await col(db).updateOne(
 		{ _id: new ObjectId(bookId) },
 		{
 			$set: {
-				epubBlobUrl,
 				processingStatus: 'uploaded',
 				processingError: null,
 				failed: false,

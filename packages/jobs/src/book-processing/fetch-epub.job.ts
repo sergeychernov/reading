@@ -1,18 +1,17 @@
 import type { JobDefinition, JobContext } from 'neuroline';
-import { withDb, markBookFailed, downloadEpub } from '@reading/data';
+import { withDb, markBookFailed, downloadEpub, epubBlobKey } from '@reading/data';
 import type { BookProcessingInput } from '../types';
 
 export interface FetchEpubOutput {
 	bookId: string;
-	epubBlobUrl: string;
 	/** Base64-encoded EPUB file content */
 	epubBase64: string;
 }
 
 /**
- * Downloads the EPUB file from private Vercel Blob storage.
- * Uses BLOB_READ_WRITE_TOKEN for Bearer auth. Returns the raw content as base64
- * for neuroline artifact. On failure, marks the book as 'failed' in MongoDB before rethrowing.
+ * Downloads the EPUB file from Blob storage using a key derived from bookId.
+ * Returns the raw content as base64 for neuroline artifact.
+ * On failure, marks the book as 'failed' in MongoDB before rethrowing.
  */
 export const fetchEpubJob: JobDefinition = {
 	name: 'fetch-epub',
@@ -22,14 +21,11 @@ export const fetchEpubJob: JobDefinition = {
 		context: JobContext,
 	): Promise<FetchEpubOutput> {
 		const input = rawInput as BookProcessingInput;
-		context.logger.info(
-			`Fetching EPUB for book ${input.bookId} from ${input.epubBlobUrl}`,
-		);
+		const key = epubBlobKey(input.bookId);
+		context.logger.info(`Fetching EPUB for book ${input.bookId} (key: ${key})`);
 
 		try {
-			context.logger.info(`Fetching EPUB from ${input.epubBlobUrl}`);
-
-			const epubBuffer = await downloadEpub(input.epubBlobUrl);
+			const epubBuffer = await downloadEpub(key);
 			const epubBase64 = epubBuffer.toString('base64');
 
 			context.logger.info(
@@ -38,7 +34,6 @@ export const fetchEpubJob: JobDefinition = {
 
 			return {
 				bookId: input.bookId,
-				epubBlobUrl: input.epubBlobUrl,
 				epubBase64,
 			};
 		} catch (error) {
