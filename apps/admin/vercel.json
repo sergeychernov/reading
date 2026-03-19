@@ -1,0 +1,3 @@
+{
+	"buildCommand": "yarn workspace @reading/data build && yarn workspace @reading/llm-schemas build && yarn workspace @reading/epub-utils build && yarn workspace @reading/jobs build && yarn workspace @reading/book-ingestion build && next build --webpack"
+}

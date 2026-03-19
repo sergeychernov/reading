@@ -49,4 +49,7 @@ debug-storybook.log
 .cache-loader
 
 # workspace build outputs
-packages/data/dist/
+packages/*/dist/
+
+# local blob storage (dev)
+.blob/

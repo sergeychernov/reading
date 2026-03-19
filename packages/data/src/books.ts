@@ -10,7 +10,10 @@ function col(db: Db) {
 /** Returns books visible in user-facing lists, sorted by createdAt DESC. */
 export async function getAllBooks(db: Db): Promise<BookDocument[]> {
 	return col(db)
-		.find({ processingStatus: { $nin: ['failed', 'uploaded'] } })
+		.find({
+			failed: { $ne: true },
+			processingStatus: { $nin: ['failed', 'uploaded', 'uploading'] },
+		})
 		.sort({ createdAt: -1 })
 		.toArray();
 }
@@ -44,6 +47,7 @@ export async function updateBookStatus(
 			$set: {
 				processingStatus: status,
 				processingError: error ?? null,
+				failed: false,
 				updatedAt: new Date(),
 			},
 		},
@@ -84,29 +88,37 @@ export async function updateBookMeta(
 	);
 }
 
-export async function updateBookEpubUrl(
+export async function markBookUploaded(
 	db: Db,
 	bookId: string,
-	epubBlobUrl: string,
 ): Promise<void> {
 	await col(db).updateOne(
 		{ _id: new ObjectId(bookId) },
 		{
 			$set: {
-				epubBlobUrl,
 				processingStatus: 'uploaded',
 				processingError: null,
+				failed: false,
 				updatedAt: new Date(),
 			},
 		},
 	);
 }
 
-/** Convenience wrapper — marks a book as 'failed' with the given error message. */
+/** Convenience wrapper — marks a book as failed with the given error message. */
 export async function markBookFailed(
 	db: Db,
 	bookId: string,
 	message: string,
 ): Promise<void> {
-	await updateBookStatus(db, bookId, 'failed', message);
+	await col(db).updateOne(
+		{ _id: new ObjectId(bookId) },
+		{
+			$set: {
+				failed: true,
+				processingError: message,
+				updatedAt: new Date(),
+			},
+		},
+	);
 }

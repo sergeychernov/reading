@@ -10,16 +10,20 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently --kill-others -n public,pipeline,admin -c cyan,magenta,yellow \"yarn dev:public\" \"yarn dev:pipeline\" \"yarn dev:admin\"",
+    "dev": "yarn build:libs && concurrently --kill-others -n libs,public,pipeline,admin -c blue,cyan,magenta,yellow \"yarn watch:libs\" \"yarn dev:public\" \"yarn dev:pipeline\" \"yarn dev:admin\"",
     "dev:public": "yarn workspace @reading/public dev",
     "dev:pipeline": "yarn workspace @reading/pipeline dev",
     "dev:admin": "yarn workspace @reading/admin dev",
+    "build:libs": "yarn workspace @reading/data build && yarn workspace @reading/epub-utils build && yarn workspace @reading/llm-schemas build && yarn workspace @reading/book-ingestion build && yarn workspace @reading/jobs build",
+    "watch:libs": "concurrently -n data,epub,llm,ingest,jobs -c blue,green,red,white,gray \"yarn workspace @reading/data watch\" \"yarn workspace @reading/epub-utils watch\" \"yarn workspace @reading/llm-schemas watch\" \"yarn workspace @reading/book-ingestion watch\" \"yarn workspace @reading/jobs watch\"",
     "docs": "yarn docs:dev",
     "docs:dev": "yarn workspace @reading/docs start",
     "docs:build": "yarn workspace @reading/docs build",
     "docs:serve": "yarn workspace @reading/docs serve",
     "build": "yarn build:all",
-    "build:all": "yarn build:ui && yarn build:public && yarn docs:build",
+    "build:all": "yarn build:packages && yarn build:apps",
+    "build:packages": "yarn workspace @reading/data build && yarn workspace @reading/epub-utils build && yarn workspace @reading/llm-schemas build && yarn workspace @reading/ui build && yarn workspace @reading/jobs build && yarn workspace @reading/book-ingestion build && yarn workspace @reading/pipeline build",
+    "build:apps": "yarn workspace @reading/public build && yarn workspace @reading/admin build && yarn workspace @reading/docs build",
     "build:ui": "yarn workspace @reading/ui build",
     "build:public": "yarn workspace @reading/public build",
     "start": "yarn start:public",
@@ -29,15 +33,19 @@
     "test": "yarn test:all",
     "test:all": "yarn test:public",
     "test:public": "yarn workspace @reading/public test",
+    "test:blob": "tsx scripts/test-blob.ts",
     "storybook": "yarn workspace @reading/ui storybook",
     "build-storybook": "yarn workspace @reading/ui build-storybook",
     "prepare": "husky"
   },
   "devDependencies": {
+    "@vercel/blob": "^2.3.0",
     "concurrently": "^9.1.0",
+    "dotenv": "^17.3.1",
     "husky": "^9.1.7",
     "next": "16.1.6",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "tsx": "^4.19.0"
   }
 }

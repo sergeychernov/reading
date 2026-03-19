@@ -23,7 +23,7 @@ export {
 	updateBookStatus,
 	updateBookChapterCount,
 	updateBookMeta,
-	updateBookEpubUrl,
+	markBookUploaded,
 	markBookFailed,
 } from './books';
 
@@ -40,10 +40,14 @@ export {
 
 // Blob operations
 export {
+	epubBlobKey,
+	bookFileKey,
 	uploadEpub,
 	downloadEpub,
-	uploadCoverImage,
+	downloadBlob,
+	uploadBookFile,
 	deleteBlob,
+	deleteBookProcessingArtifacts,
 } from './blob';
 
 // Serialization

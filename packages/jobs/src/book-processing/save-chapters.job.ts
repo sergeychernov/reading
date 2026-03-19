@@ -9,6 +9,7 @@ import {
 	markBookFailed,
 } from '@reading/data';
 import type { ChapterInsert } from '@reading/data';
+import { extractTextFromXhtml, extractChapterTitle } from '@reading/epub-utils';
 import type { ParseEpubOutput } from './parse-epub.job';
 
 export interface SavedChapter {
@@ -52,17 +53,21 @@ export const saveChaptersJob: JobDefinition = {
 					description: input.metadata.description,
 				});
 
-				const chapterDocs: ChapterInsert[] = input.chapters.map((ch) => ({
-					bookId: bookOid,
-					chapterIndex: ch.index,
-					title: ch.title,
-					rawText: ch.text,
-					summary: null,
-					rawTextLength: ch.text.length,
-					processingStatus: 'pending' as const,
-					createdAt: now,
-					updatedAt: now,
-				}));
+				const chapterDocs: ChapterInsert[] = input.chapters.map((ch) => {
+					const text = extractTextFromXhtml(ch.content);
+					const title = extractChapterTitle(ch.content) ?? `Chapter ${ch.index + 1}`;
+					return {
+						bookId: bookOid,
+						chapterIndex: ch.index,
+						title,
+						rawText: text,
+						summary: null,
+						rawTextLength: text.length,
+						processingStatus: 'pending' as const,
+						createdAt: now,
+						updatedAt: now,
+					};
+				});
 
 				const insertResult = await insertManyChapters(db, chapterDocs);
 
@@ -70,12 +75,16 @@ export const saveChaptersJob: JobDefinition = {
 				await updateBookStatus(db, input.bookId, 'extracting');
 
 				const insertedIds = insertResult.insertedIds;
-				const savedChapters: SavedChapter[] = input.chapters.map((ch, i) => ({
-					chapterId: (insertedIds[i] as ObjectId).toHexString(),
-					index: ch.index,
-					title: ch.title,
-					text: ch.text,
-				}));
+				const savedChapters: SavedChapter[] = input.chapters.map((ch, i) => {
+					const text = extractTextFromXhtml(ch.content);
+					const title = extractChapterTitle(ch.content) ?? `Chapter ${ch.index + 1}`;
+					return {
+						chapterId: (insertedIds[i] as ObjectId).toHexString(),
+						index: ch.index,
+						title,
+						text,
+					};
+				});
 
 				context.logger.info(
 					`Saved ${savedChapters.length} chapters for book ${input.bookId}, status set to 'extracting'`,

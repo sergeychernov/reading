@@ -5,6 +5,16 @@ export type {
 	PipelineConfig,
 } from './types';
 
+export { extractBookJob } from './book-processing/extract-book.job';
+export type { ExtractBookInput, ExtractBookOutput } from './book-processing/extract-book.job';
+export {
+	parseMetadataJob,
+	buildParseMetadataSynapses,
+} from './book-processing/parse-metadata.job';
+export type {
+	ParseMetadataInput,
+	ParseMetadataOutput,
+} from './book-processing/parse-metadata.job';
 export { fetchEpubJob } from './book-processing/fetch-epub.job';
 export type { FetchEpubOutput } from './book-processing/fetch-epub.job';
 export { parseEpubJob } from './book-processing/parse-epub.job';

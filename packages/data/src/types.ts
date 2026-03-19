@@ -6,6 +6,7 @@ export type BookProcessingStatus =
 	| 'uploading'
 	| 'uploaded'
 	| 'parsing'
+	| 'parsed'
 	| 'extracting'
 	| 'completed'
 	| 'failed';
@@ -32,12 +33,12 @@ export interface BookDocument {
 	author: string;
 	description: string;
 	coverImageUrl: string | null;
-	epubBlobUrl: string;
 	audibleUrl: string | null;
 	kindleUrl: string | null;
 	chapterCount: number;
 	processingStatus: BookProcessingStatus;
 	processingError: string | null;
+	failed: boolean;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -70,12 +71,12 @@ export interface SerializedBook {
 	author: string;
 	description: string;
 	coverImageUrl: string | null;
-	epubBlobUrl: string;
 	audibleUrl: string | null;
 	kindleUrl: string | null;
 	chapterCount: number;
 	processingStatus: string;
 	processingError: string | null;
+	failed: boolean;
 	createdAt: string;
 	updatedAt: string;
 }

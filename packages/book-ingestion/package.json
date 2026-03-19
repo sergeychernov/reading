@@ -1,5 +1,5 @@
 {
-	"name": "@reading/data",
+	"name": "@reading/book-ingestion",
 	"version": "0.0.0",
 	"private": true,
 	"main": "./dist/index.js",
@@ -18,9 +18,7 @@
 		"lint": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@vercel/blob": "^2.3.0",
-		"axios": "^1.7.0",
-		"mongodb": "^6.21.0"
+		"@reading/data": "workspace:packages/data"
 	},
 	"devDependencies": {
 		"typescript": "latest"
