@@ -39,8 +39,9 @@ export class LocalBlobStorage implements BlobStorage {
 	}
 
 	async list(prefix: string): Promise<string[]> {
-		const dir = this.keyToPath(prefix);
-		return this.walk(dir, prefix);
+		const normalizedPrefix = prefix.endsWith('/') ? prefix : `${prefix}/`;
+		const dir = this.keyToPath(normalizedPrefix);
+		return this.walk(dir, normalizedPrefix);
 	}
 
 	private keyToPath(key: string): string {
