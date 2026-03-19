@@ -10,10 +10,10 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "yarn build:libs && concurrently --kill-others -n libs,public,pipeline,admin -c blue,cyan,magenta,yellow \"yarn watch:libs\" \"yarn dev:public\" \"yarn dev:pipeline\" \"yarn dev:admin\"",
+    "dev": "yarn build:libs && concurrently --kill-others -n libs,public,pipeline,admin -c blue,cyan,magenta,yellow \"yarn watch:libs\" \"yarn dev:public\" \"yarn dev:pipeline\" \"yarn workspace @reading/admin dev\"",
     "dev:public": "yarn workspace @reading/public dev",
     "dev:pipeline": "yarn workspace @reading/pipeline dev",
-    "dev:admin": "yarn workspace @reading/admin dev",
+    "dev:admin": "yarn build:libs && concurrently --kill-others -n libs,admin -c blue,yellow \"yarn watch:libs\" \"yarn workspace @reading/admin dev\"",
     "build:libs": "yarn workspace @reading/data build && yarn workspace @reading/epub-utils build && yarn workspace @reading/llm-schemas build && yarn workspace @reading/book-ingestion build && yarn workspace @reading/jobs build",
     "watch:libs": "concurrently -n data,epub,llm,ingest,jobs -c blue,green,red,white,gray \"yarn workspace @reading/data watch\" \"yarn workspace @reading/epub-utils watch\" \"yarn workspace @reading/llm-schemas watch\" \"yarn workspace @reading/book-ingestion watch\" \"yarn workspace @reading/jobs watch\"",
     "docs": "yarn docs:dev",

@@ -7,6 +7,7 @@ import {
 	bookFileKey,
 	uploadBookFile,
 	updateBookChapterCount,
+	updateBookCoverUrl,
 	updateBookStatus,
 	markBookFailed,
 } from '@reading/data';
@@ -71,7 +72,7 @@ export const extractBookJob: JobDefinition<ExtractBookInput, ExtractBookOutput> 
 			await uploadBookFile(bookId, 'metadata.json', metadataContent, 'application/json');
 			context.logger.info('Uploaded metadata.json');
 
-			const coverKey = await uploadCover(bookId, cover, context);
+			const { coverKey, coverFilename } = await uploadCover(bookId, cover, context);
 
 			const chapterKeys: string[] = [];
 			for (const chapter of chapters) {
@@ -83,6 +84,7 @@ export const extractBookJob: JobDefinition<ExtractBookInput, ExtractBookOutput> 
 
 			await withDb(async (db) => {
 				await updateBookChapterCount(db, bookId, chapters.length);
+				await updateBookCoverUrl(db, bookId, coverFilename);
 				await updateBookStatus(db, bookId, 'parsed');
 			});
 
@@ -108,19 +110,24 @@ export const extractBookJob: JobDefinition<ExtractBookInput, ExtractBookOutput> 
 	},
 };
 
+interface UploadCoverResult {
+	coverKey: string | null;
+	coverFilename: string | null;
+}
+
 async function uploadCover(
 	bookId: string,
 	cover: ParsedCoverImage | null,
 	context: JobContext,
-): Promise<string | null> {
+): Promise<UploadCoverResult> {
 	if (!cover) {
 		context.logger.info('No cover image found in EPUB');
-		return null;
+		return { coverKey: null, coverFilename: null };
 	}
 
 	const ext = cover.mediaType.split('/')[1]?.replace('jpeg', 'jpg') ?? 'jpg';
-	const coverPath = `cover.${ext}`;
-	await uploadBookFile(bookId, coverPath, cover.data, cover.mediaType);
+	const coverFilename = `cover.${ext}`;
+	await uploadBookFile(bookId, coverFilename, cover.data, cover.mediaType);
 	context.logger.info(`Uploaded cover image (${cover.mediaType})`);
-	return bookFileKey(bookId, coverPath);
+	return { coverKey: bookFileKey(bookId, coverFilename), coverFilename };
 }

@@ -1,4 +1,4 @@
-import type { Epub } from '@smoores/epub' with { 'resolution-mode': 'import' };
+import type { Epub } from '@storyteller-platform/epub' with { 'resolution-mode': 'import' };
 
 /** Raw chapter: index and XHTML content. Title/text extraction is done by downstream jobs. */
 export interface ParsedChapter {
@@ -62,7 +62,7 @@ export interface ParseEpubResult {
 export async function parseEpub(
 	buffer: Buffer,
 ): Promise<ParseEpubResult> {
-	const { Epub: EpubClass } = await import('@smoores/epub');
+	const { Epub: EpubClass } = await import('@storyteller-platform/epub');
 	const epub: Epub = await EpubClass.from(buffer);
 
 	const allMetadata = await epub.getMetadata();
@@ -72,7 +72,7 @@ export async function parseEpub(
 		extractCoverImage(epub),
 	]);
 
-	await epub.close();
+	epub.discardAndClose();
 
 	const metadataContent = JSON.stringify(allMetadata, null, 2);
 	return { metadata, metadataContent, chapters, cover };
@@ -132,70 +132,43 @@ export function extractChapterTitle(xhtml: string): string | null {
 	return null;
 }
 
-const COVER_IMAGE_MEDIA_TYPES = new Set([
-	'image/jpeg',
-	'image/png',
-	'image/gif',
-	'image/webp',
-	'image/svg+xml',
-]);
-
 /**
- * Attempts to extract the cover image from the EPUB.
- * Searches manifest for items with properties="cover-image" (EPUB3)
- * or metadata `<meta name="cover" content="id">` (EPUB2).
+ * Extracts the cover image from the EPUB using the library's built-in support.
+ *
+ * Strategy:
+ * 1. epub.getCoverImageItem() — finds manifest item with properties="cover-image" (EPUB3)
+ *    or <meta name="cover" content="id"> pointing to a manifest item (EPUB2).
+ * 2. Fallback: scan manifest for any image item whose id or href contains "cover".
  */
 async function extractCoverImage(epub: Epub): Promise<ParsedCoverImage | null> {
 	try {
-		const allMetadata = await epub.getMetadata();
-
-		const coverMeta = allMetadata.find(
-			(entry) =>
-				(entry.type === 'meta' &&
-					'name' in entry &&
-					(entry as Record<string, unknown>).name === 'cover') ||
-				(entry.type === 'meta' &&
-					entry.value &&
-					typeof entry.value === 'string' &&
-					/cover/i.test(entry.value)),
-		);
-
-		const spineItems = await epub.getSpineItems();
-
-		// Strategy 1: find spine item whose id matches cover metadata
-		if (coverMeta?.value) {
-			const coverId = coverMeta.value;
-			for (const item of spineItems) {
-				if (item.id === coverId) {
-					try {
-						const raw = await epub.readItemContents(item.id);
-						if (raw && raw instanceof Uint8Array) {
-							return {
-								data: Buffer.from(raw),
-								mediaType: 'image/jpeg',
-							};
-						}
-					} catch {
-						// Item might not be an image
-					}
-				}
+		// Strategy 1: use library built-in cover detection (EPUB2 + EPUB3)
+		const coverItem = await epub.getCoverImageItem();
+		if (coverItem) {
+			const raw = await epub.getCoverImage();
+			if (raw) {
+				const mediaType = coverItem.mediaType ?? guessImageMediaType(coverItem.href) ?? 'image/jpeg';
+				return { data: Buffer.from(raw), mediaType };
 			}
 		}
 
-		// Strategy 2: find first image-like spine item (cover pages are usually first)
-		for (const item of spineItems) {
+		// Strategy 2: scan manifest for image items with "cover" in id or href
+		const manifest = await epub.getManifest();
+		for (const item of Object.values(manifest)) {
 			const id = item.id.toLowerCase();
-			if (id.includes('cover') && !id.includes('html')) {
+			const href = item.href.toLowerCase();
+			const mediaType = item.mediaType ?? '';
+			if (
+				IMAGE_MEDIA_TYPES.has(mediaType) &&
+				(id.includes('cover') || href.includes('cover'))
+			) {
 				try {
 					const raw = await epub.readItemContents(item.id);
-					if (raw && raw instanceof Uint8Array) {
-						const mediaType = guessImageMediaType(item.id) ?? 'image/jpeg';
-						if (COVER_IMAGE_MEDIA_TYPES.has(mediaType)) {
-							return { data: Buffer.from(raw), mediaType };
-						}
+					if (raw instanceof Uint8Array) {
+						return { data: Buffer.from(raw), mediaType };
 					}
 				} catch {
-					// Skip
+					// Skip unreadable items
 				}
 			}
 		}
@@ -205,6 +178,14 @@ async function extractCoverImage(epub: Epub): Promise<ParsedCoverImage | null> {
 		return null;
 	}
 }
+
+const IMAGE_MEDIA_TYPES = new Set([
+	'image/jpeg',
+	'image/png',
+	'image/gif',
+	'image/webp',
+	'image/svg+xml',
+]);
 
 function guessImageMediaType(filename: string): string | null {
 	const ext = filename.split('.').pop()?.toLowerCase();
