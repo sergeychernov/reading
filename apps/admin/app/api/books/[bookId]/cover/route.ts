@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { ObjectId } from 'mongodb';
 import { downloadBlob, bookFileKey } from '@reading/data';
 
 export const runtime = 'nodejs';
@@ -9,6 +10,10 @@ interface RouteParams {
 
 export async function GET(_request: Request, { params }: RouteParams): Promise<NextResponse> {
 	const { bookId } = await params;
+
+	if (!ObjectId.isValid(bookId)) {
+		return NextResponse.json({ error: 'Invalid bookId' }, { status: 400 });
+	}
 
 	const extensions = ['jpg', 'png', 'webp', 'gif'];
 	const mediaTypes: Record<string, string> = {
