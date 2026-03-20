@@ -70,6 +70,22 @@ export async function updateBookChapterCount(
 	);
 }
 
+export async function updateBookCoverUrl(
+	db: Db,
+	bookId: string,
+	coverImageUrl: string | null,
+): Promise<void> {
+	await col(db).updateOne(
+		{ _id: new ObjectId(bookId) },
+		{
+			$set: {
+				coverImageUrl,
+				updatedAt: new Date(),
+			},
+		},
+	);
+}
+
 export async function updateBookMeta(
 	db: Db,
 	bookId: string,

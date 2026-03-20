@@ -18,7 +18,7 @@
 		"lint": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@smoores/epub": "^0.1.9",
+		"@storyteller-platform/epub": "^0.4.7",
 		"htmlparser2": "^10.1.0"
 	},
 	"devDependencies": {

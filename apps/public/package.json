@@ -22,7 +22,6 @@
     "@reading/epub-utils": "workspace:packages/epub-utils",
     "@reading/llm-schemas": "workspace:packages/llm-schemas",
     "@reading/ui": "0.0.0",
-    "@smoores/epub": "^0.1.9",
     "@vercel/blob": "^2.3.0",
     "htmlparser2": "^10.1.0",
     "mongodb": "^6",

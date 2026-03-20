@@ -22,6 +22,7 @@ export {
 	insertBook,
 	updateBookStatus,
 	updateBookChapterCount,
+	updateBookCoverUrl,
 	updateBookMeta,
 	markBookUploaded,
 	markBookFailed,
