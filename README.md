@@ -4,7 +4,7 @@ A web application for a book club with an English-language book database. Users 
 
 ## Requirements
 
-- Node.js `>=20.19.0` (recommended: use `.nvmrc`, currently `24.11.0`)
+- Node.js `>=24.0.0` (recommended: use `.nvmrc`, currently `24.11.0`)
 - Yarn `4.13.0` (via `corepack`)
 - MongoDB Atlas account (or local MongoDB)
 - Vercel Blob storage token

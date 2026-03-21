@@ -14,10 +14,12 @@ interface ChapterData {
 	summary: string | null;
 	textPreview: string;
 	processingStatus: string;
+	failed: boolean;
 }
 
 interface StatusResponse {
 	bookStatus: string;
+	bookFailed: boolean;
 	totalChapters: number;
 	completedChapters: number;
 	failedChapters: number;
@@ -27,6 +29,7 @@ interface StatusResponse {
 interface BookContentProps {
 	bookId: string;
 	initialStatus: string;
+	initialBookFailed: boolean;
 	initialChapters: ChapterData[];
 }
 
@@ -37,17 +40,20 @@ interface BookContentProps {
 export function BookContent({
 	bookId,
 	initialStatus,
+	initialBookFailed,
 	initialChapters,
 }: BookContentProps) {
 	const [bookStatus, setBookStatus] = useState(initialStatus);
+	const [bookFailed, setBookFailed] = useState(initialBookFailed);
 	const [chapters, setChapters] = useState<ChapterData[]>(initialChapters);
 	const [completed, setCompleted] = useState(0);
 	const [total, setTotal] = useState(initialChapters.length);
 	const [failed, setFailed] = useState(0);
 
-	const isProcessing = bookStatus === 'uploading'
-		|| bookStatus === 'parsing'
-		|| bookStatus === 'extracting';
+	const isProcessing = !bookFailed
+		&& (bookStatus === 'uploading'
+			|| bookStatus === 'parsing'
+			|| bookStatus === 'extracting');
 
 	const fetchStatus = useCallback(async () => {
 		try {
@@ -57,6 +63,7 @@ export function BookContent({
 			const data = await res.json() as StatusResponse;
 
 			setBookStatus(data.bookStatus);
+			setBookFailed(data.bookFailed);
 			setCompleted(data.completedChapters);
 			setTotal(data.totalChapters);
 			setFailed(data.failedChapters);

@@ -91,7 +91,9 @@ export function BookChapters({ bookId }: { bookId: string }) {
 										{ch.title || '—'}
 									</Typography>
 								</TableCell>
-								<TableCell>{ch.processingStatus}</TableCell>
+								<TableCell>
+									{ch.failed ? `${ch.processingStatus} (error)` : ch.processingStatus}
+								</TableCell>
 							</TableRow>
 						))}
 					</TableBody>

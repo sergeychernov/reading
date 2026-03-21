@@ -8,6 +8,7 @@ interface BookData {
 	author: string;
 	chapterCount: number;
 	processingStatus: string;
+	failed?: boolean;
 }
 
 interface BookGridProps {
@@ -33,6 +34,7 @@ export function BookGrid({ books }: BookGridProps) {
 						author={book.author}
 						chapterCount={book.chapterCount}
 						processingStatus={book.processingStatus}
+						failed={book.failed}
 					/>
 				</Grid>
 			))}

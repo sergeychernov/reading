@@ -1,5 +1,13 @@
 import { NextResponse } from 'next/server';
-import { getDb, getBookById, updateBookStatus, getChaptersByBookId, countChaptersByStatus } from '@reading/data';
+import {
+	getDb,
+	getBookById,
+	updateBookStatus,
+	markBookChapterBatchFailed,
+	getChaptersByBookId,
+	countChaptersByStatus,
+	chapterRawBodyForPreview,
+} from '@reading/data';
 
 export async function GET(
 	_request: Request,
@@ -22,51 +30,48 @@ export async function GET(
 			getChaptersByBookId(db, bookId),
 		]);
 
-		// Compute effective book status from chapter statuses.
-		// Each chapter is processed by an independent chapter-extraction pipeline,
-		// so the book status is derived dynamically rather than set by a single job.
-		let effectiveStatus = book.processingStatus;
-
+		// Derive terminal book status from per-chapter outcomes (see `failed` on book + chapters).
 		if (
 			book.processingStatus === 'extracting'
 			&& chapterStats.total > 0
 		) {
 			if (chapterStats.completed === chapterStats.total) {
-				effectiveStatus = 'completed';
 				await updateBookStatus(db, bookId, 'completed');
 			} else if (
 				chapterStats.failed > 0
 				&& chapterStats.completed + chapterStats.failed === chapterStats.total
 			) {
-				effectiveStatus = 'failed';
-				await updateBookStatus(
+				await markBookChapterBatchFailed(
 					db,
 					bookId,
-					'failed',
 					`${chapterStats.failed} of ${chapterStats.total} chapters failed`,
 				);
 			}
 		}
 
+		const bookOut = await getBookById(db, bookId);
+
 		const chapterStatuses = chapters.map((ch) => {
-			const body = ch.rawText.startsWith(ch.title)
-				? ch.rawText.slice(ch.title.length).trimStart()
-				: ch.rawText;
+			const body = chapterRawBodyForPreview(ch);
 
 			const previewLen = 24;
 			const textPreview = body.length > previewLen ? body.slice(0, previewLen) + '…' : body.slice(0, previewLen);
+			const legacyChapterStatusFailed =
+				(ch.processingStatus as string | undefined) === 'failed';
 			return {
 				_id: ch._id.toHexString(),
 				chapterIndex: ch.chapterIndex,
-				title: ch.title,
-				summary: ch.summary,
+				title: ch.title ?? '',
+				summary: ch.summary ?? null,
 				textPreview,
-				processingStatus: ch.processingStatus,
+				processingStatus: ch.processingStatus ?? 'unknown',
+				failed: ch.failed === true || legacyChapterStatusFailed,
 			};
 		});
 
 		return NextResponse.json({
-			bookStatus: effectiveStatus,
+			bookStatus: bookOut?.processingStatus ?? book.processingStatus,
+			bookFailed: bookOut?.failed ?? false,
 			totalChapters: chapterStats.total,
 			completedChapters: chapterStats.completed,
 			failedChapters: chapterStats.failed,

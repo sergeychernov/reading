@@ -77,3 +77,15 @@ export async function deleteBookProcessingArtifacts(bookId: string): Promise<voi
 
 	await Promise.all(artifactKeys.map((k) => storage.remove(k)));
 }
+
+/**
+ * Removes every stored object under `books/{bookId}/` (EPUB, cover, metadata,
+ * chapter payloads, etc.). Uses per-key deletion so local disk storage works
+ * (directories are not passed to `unlink`).
+ */
+export async function deleteAllBookStorage(bookId: string): Promise<void> {
+	const storage = getBlobStorage();
+	const prefix = bookFileKey(bookId, '');
+	const keys = await storage.list(prefix);
+	await Promise.all(keys.map((k) => storage.remove(k)));
+}

@@ -8,6 +8,10 @@
 		".": {
 			"types": "./src/index.ts",
 			"default": "./dist/index.js"
+		},
+		"./chapters": {
+			"types": "./src/chapters.ts",
+			"default": "./dist/chapters.js"
 		}
 	},
 	"scripts": {

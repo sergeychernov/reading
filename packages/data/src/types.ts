@@ -8,16 +8,14 @@ export type BookProcessingStatus =
 	| 'parsing'
 	| 'parsed'
 	| 'extracting'
-	| 'completed'
-	| 'failed';
+	| 'completed';
 
 // ── Chapter processing status ───────────────────────────────────────
 
 export type ChapterProcessingStatus =
 	| 'pending'
 	| 'extracting'
-	| 'completed'
-	| 'failed';
+	| 'completed';
 
 // ── Language item category ──────────────────────────────────────────
 
@@ -47,20 +45,26 @@ export type BookInsert = Omit<BookDocument, '_id'>;
 
 // ── Chapter document (MongoDB) ──────────────────────────────────────
 
+/**
+ * Chapter row. Core fields are always set at creation; the rest are filled when
+ * XHTML/text is parsed and extraction runs.
+ */
 export interface ChapterDocument {
 	_id: ObjectId;
 	bookId: ObjectId;
 	chapterIndex: number;
-	title: string;
-	rawText: string;
-	summary: string | null;
-	rawTextLength: number;
-	processingStatus: ChapterProcessingStatus;
 	createdAt: Date;
 	updatedAt: Date;
+	title?: string;
+	rawText?: string;
+	summary?: string | null;
+	rawTextLength?: number;
+	processingStatus?: ChapterProcessingStatus;
+	failed: boolean;
 }
 
-export type ChapterInsert = Omit<ChapterDocument, '_id'>;
+/** Insert shape; `_id` is optional — omit to let MongoDB generate it. */
+export type ChapterInsert = Omit<ChapterDocument, '_id'> & { _id?: ObjectId };
 
 // ── Serialized types (JSON-safe, string IDs and ISO dates) ──────────
 
@@ -87,4 +91,5 @@ export interface SerializedChapter {
 	chapterIndex: number;
 	title: string;
 	processingStatus: string;
+	failed: boolean;
 }

@@ -11,7 +11,7 @@ export interface FetchEpubOutput {
 /**
  * Downloads the EPUB file from Blob storage using a key derived from bookId.
  * Returns the raw content as base64 for neuroline artifact.
- * On failure, marks the book as 'failed' in MongoDB before rethrowing.
+ * On failure, sets the book `failed` flag via `markBookFailed` before rethrowing.
  */
 export const fetchEpubJob: JobDefinition = {
 	name: 'fetch-epub',
