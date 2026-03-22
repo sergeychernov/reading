@@ -41,7 +41,7 @@ export function ReprocessButton({ bookId, chapterId, onDone }: ReprocessButtonPr
 			try {
 				const res = await fetch(`/api/books/${bookId}/chapters/${chapterId}`);
 				if (!res.ok) return;
-				const chapter = await res.json() as { processingStatus: string };
+				const chapter = await res.json() as { processingStatus: string; failed?: boolean };
 
 				if (chapter.processingStatus === 'completed') {
 					stopPolling();
@@ -49,7 +49,7 @@ export function ReprocessButton({ bookId, chapterId, onDone }: ReprocessButtonPr
 					router.refresh();
 					onDone?.();
 					setTimeout(() => setStatus('idle'), 2000);
-				} else if (chapter.processingStatus === 'failed') {
+				} else if (chapter.failed === true) {
 					stopPolling();
 					setStatus('error');
 				}

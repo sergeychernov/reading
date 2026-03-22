@@ -81,7 +81,7 @@ export function buildSaveChapterResultsSynapses(ctx: SynapseContext): SaveChapte
 
 /**
  * Saves all extracted language items and chapter summary to MongoDB.
- * Marks chapter as 'completed' on success, 'failed' on error.
+ * Marks chapter as `completed` with `failed: false` on success, or `pending` with `failed: true` on error.
  * Idempotent: clears previous language items before inserting.
  */
 export const saveChapterResultsJob: JobDefinition = {
@@ -143,7 +143,7 @@ export const saveChapterResultsJob: JobDefinition = {
 				}
 
 				await updateChapterSummary(db, input.chapterId, input.summary || '');
-				await updateChapterStatus(db, input.chapterId, 'completed');
+				await updateChapterStatus(db, input.chapterId, 'completed', { failed: false });
 
 				context.logger.info(
 					`Saved ${languageItems.length} language items for chapter ${input.chapterIndex} ` +
@@ -172,7 +172,7 @@ export const saveChapterResultsJob: JobDefinition = {
 				);
 
 				try {
-					await updateChapterStatus(db, input.chapterId, 'failed');
+					await updateChapterStatus(db, input.chapterId, 'pending', { failed: true });
 				} catch (updateErr) {
 					context.logger.error(`Failed to mark chapter as failed: ${updateErr}`);
 				}

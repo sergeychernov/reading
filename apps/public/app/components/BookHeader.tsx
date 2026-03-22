@@ -8,6 +8,8 @@ interface BookHeaderProps {
 	author: string;
 	description: string;
 	processingStatus: string;
+	/** When true, the badge shows failure even if `processingStatus` is e.g. `completed`. */
+	failed?: boolean;
 	audibleUrl: string | null;
 	kindleUrl: string | null;
 }
@@ -17,16 +19,31 @@ export function BookHeader({
 	author,
 	description,
 	processingStatus,
+	failed = false,
 	audibleUrl,
 	kindleUrl,
 }: BookHeaderProps) {
+	const badgeStatus = failed ? 'failed' : processingStatus;
+
 	return (
 		<Box sx={{ mb: 4 }}>
 			<Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
 				<Typography variant="h4" component="h1">
 					{title}
 				</Typography>
-				<StatusBadge status={processingStatus as 'completed' | 'failed' | 'extracting' | 'parsing' | 'uploading' | 'pending'} />
+				<StatusBadge
+					status={
+						badgeStatus as
+							| 'completed'
+							| 'failed'
+							| 'extracting'
+							| 'parsing'
+							| 'pending'
+							| 'uploading'
+							| 'uploaded'
+							| 'parsed'
+					}
+				/>
 			</Box>
 			<Typography variant="h6" color="text.secondary" gutterBottom>
 				{author}

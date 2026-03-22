@@ -25,11 +25,28 @@ export function serializeBook(doc: BookDocument): SerializedBook {
 }
 
 export function serializeChapter(doc: ChapterDocument): SerializedChapter {
+	const legacyStatusFailed =
+		(doc as { processingStatus?: string }).processingStatus === 'failed';
 	return {
 		_id: doc._id.toHexString(),
 		bookId: doc.bookId.toHexString(),
 		chapterIndex: doc.chapterIndex ?? 0,
 		title: doc.title ?? '',
 		processingStatus: doc.processingStatus ?? 'unknown',
+		failed: doc.failed ?? legacyStatusFailed,
 	};
+}
+
+/**
+ * Plain-text body for UI previews: if rawText starts with title, strip that prefix.
+ */
+export function chapterRawBodyForPreview(doc: Pick<ChapterDocument, 'rawText' | 'title'>): string {
+	const rawText = doc.rawText ?? '';
+	const title = doc.title ?? '';
+	if (!rawText) {
+		return '';
+	}
+	return title && rawText.startsWith(title)
+		? rawText.slice(title.length).trimStart()
+		: rawText;
 }

@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Container from '@mui/material/Container';
-import { getDb, getBookById, getChaptersByBookId } from '@reading/data';
+import { getDb, getBookById, getChaptersByBookId, chapterRawBodyForPreview } from '@reading/data';
 import { BookHeader } from '../../components/BookHeader';
 import { BookContent } from '../../components/BookContent';
 
@@ -20,19 +20,20 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
 	const chapters = await getChaptersByBookId(db, bookId);
 
 	const serializedChapters = chapters.map((ch) => {
-		const body = ch.rawText.startsWith(ch.title)
-			? ch.rawText.slice(ch.title.length).trimStart()
-			: ch.rawText;
+		const body = chapterRawBodyForPreview(ch);
 		const previewLen = 24;
 		const textPreview = body.length > previewLen ? body.slice(0, previewLen) + '…' : body.slice(0, previewLen);
+		const legacyChapterStatusFailed =
+			(ch.processingStatus as string | undefined) === 'failed';
 
 		return {
 			_id: ch._id.toHexString(),
 			chapterIndex: ch.chapterIndex,
-			title: ch.title,
-			summary: ch.summary,
+			title: ch.title ?? '',
+			summary: ch.summary ?? null,
 			textPreview,
-			processingStatus: ch.processingStatus,
+			processingStatus: ch.processingStatus ?? 'unknown',
+			failed: ch.failed === true || legacyChapterStatusFailed,
 		};
 	});
 
@@ -43,6 +44,7 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
 				author={book.author}
 				description={book.description}
 				processingStatus={book.processingStatus}
+				failed={book.failed}
 				audibleUrl={book.audibleUrl}
 				kindleUrl={book.kindleUrl}
 			/>
@@ -50,6 +52,7 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
 			<BookContent
 				bookId={bookId}
 				initialStatus={book.processingStatus}
+				initialBookFailed={book.failed}
 				initialChapters={serializedChapters}
 			/>
 		</Container>

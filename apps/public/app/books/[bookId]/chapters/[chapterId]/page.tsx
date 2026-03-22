@@ -1,6 +1,12 @@
 import { notFound } from 'next/navigation';
 import Container from '@mui/material/Container';
-import { getDb, getChapterById, getChaptersByBookId, getBookById } from '@reading/data';
+import {
+	getDb,
+	getChapterById,
+	getChaptersByBookId,
+	getBookById,
+	chapterRawBodyForPreview,
+} from '@reading/data';
 import { auth } from '../../../../../auth';
 import { getUserByEmail } from '../../../../../lib/db/users';
 import { ChapterDetailClient } from './ChapterDetailClient';
@@ -28,12 +34,11 @@ export default async function ChapterDetailPage({ params }: ChapterDetailPagePro
 		notFound();
 	}
 
-	const body = chapter.rawText.startsWith(chapter.title)
-		? chapter.rawText.slice(chapter.title.length).trimStart()
-		: chapter.rawText;
+	const body = chapterRawBodyForPreview(chapter);
 	const previewLen = 24;
 	const textPreview = body.length > previewLen ? body.slice(0, previewLen) + '…' : body.slice(0, previewLen);
 	const nextChapter = chapters.find((item) => item.chapterIndex === chapter.chapterIndex + 1);
+	const chapterTitle = chapter.title ?? `Chapter ${chapter.chapterIndex + 1}`;
 
 	return (
 		<Container maxWidth="lg" sx={{ py: 4 }}>
@@ -42,10 +47,10 @@ export default async function ChapterDetailPage({ params }: ChapterDetailPagePro
 				bookTitle={book.title}
 				chapterId={chapterId}
 				chapterIndex={chapter.chapterIndex}
-				chapterTitle={chapter.title}
+				chapterTitle={chapterTitle}
 				textPreview={textPreview || null}
 				nextChapterId={nextChapter?._id.toString() ?? null}
-				summary={chapter.summary}
+				summary={chapter.summary ?? null}
 				canReprocess={canReprocess}
 			/>
 		</Container>

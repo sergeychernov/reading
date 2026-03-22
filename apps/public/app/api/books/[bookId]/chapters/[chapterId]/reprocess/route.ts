@@ -20,9 +20,19 @@ export async function POST(_request: Request, { params }: RouteParams): Promise<
 		return NextResponse.json({ error: 'Chapter not found' }, { status: 404 });
 	}
 
+	if (!chapter.rawText?.length) {
+		return NextResponse.json(
+			{ error: 'Chapter has no extracted text yet' },
+			{ status: 400 },
+		);
+	}
+
+	const previousStatus = chapter.processingStatus ?? 'pending';
+	const previousFailed = chapter.failed ?? false;
+
 	// Reset status BEFORE triggering the pipeline so the client polling does not
 	// mistake the previous `completed` state for the new run completing.
-	await updateChapterStatus(db, chapterId, 'pending');
+	await updateChapterStatus(db, chapterId, 'pending', { failed: false });
 
 	const pipelineUrl = process.env.PIPELINE_API_URL ?? 'http://localhost:3001';
 	const pipelineSecret = process.env.PIPELINE_API_SECRET;
@@ -36,7 +46,7 @@ export async function POST(_request: Request, { params }: RouteParams): Promise<
 			bookId,
 			chapterId,
 			chapterIndex: chapter.chapterIndex,
-			chapterTitle: chapter.title,
+			chapterTitle: chapter.title ?? `Chapter ${chapter.chapterIndex + 1}`,
 			chapterText: chapter.rawText,
 		}),
 	});
@@ -44,7 +54,7 @@ export async function POST(_request: Request, { params }: RouteParams): Promise<
 	if (!pipelineResponse.ok) {
 		const body = await pipelineResponse.text().catch(() => '');
 		console.error('Pipeline reprocess failed:', pipelineResponse.status, body);
-		await updateChapterStatus(db, chapterId, chapter.processingStatus);
+		await updateChapterStatus(db, chapterId, previousStatus, { failed: previousFailed });
 		return NextResponse.json({ error: 'Failed to start reprocessing' }, { status: 502 });
 	}
 

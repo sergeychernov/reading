@@ -4,7 +4,7 @@
 
 ### Tech Stack
 
-- **Runtime**: Node.js >=20.19.0, Yarn 4 (workspaces)
+- **Runtime**: Node.js >=24.0.0, Yarn 4 (workspaces)
 - **Framework**: Next.js 16 (App Router)
 - **UI**: React 19, Material UI 7, Emotion
 - **Language**: TypeScript (strict), no JavaScript allowed

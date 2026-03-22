@@ -16,6 +16,7 @@ interface ChapterData {
 	summary: string | null;
 	textPreview: string;
 	processingStatus: string;
+	failed: boolean;
 }
 
 interface ChapterListProps {
@@ -36,31 +37,42 @@ export function ChapterList({ bookId, chapters }: ChapterListProps) {
 
 	return (
 		<List disablePadding>
-			{chapters.map((chapter) => (
-				<ListItem key={chapter._id} disablePadding divider>
-					<ListItemButton
-						dense
-						onClick={() => router.push(`/books/${bookId}/chapters/${chapter._id}`)}
-					>
-						<ListItemText
-							disableTypography
-							primary={
-								<Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1, minWidth: 0 }}>
-									<Typography variant="body2" sx={{ flexShrink: 0 }}>
-										{chapter.chapterIndex + 1}. {chapter.title}
-									</Typography>
-									{chapter.textPreview && (
-										<Typography variant="body2" color="text.secondary" noWrap sx={{ flexGrow: 1 }}>
-											— {chapter.textPreview}
+			{chapters.map((chapter) => {
+				const badgeStatus = chapter.failed ? 'failed' : chapter.processingStatus;
+				return (
+					<ListItem key={chapter._id} disablePadding divider>
+						<ListItemButton
+							dense
+							onClick={() => router.push(`/books/${bookId}/chapters/${chapter._id}`)}
+						>
+							<ListItemText
+								disableTypography
+								primary={
+									<Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1, minWidth: 0 }}>
+										<Typography variant="body2" sx={{ flexShrink: 0 }}>
+											{chapter.chapterIndex + 1}. {chapter.title}
 										</Typography>
-									)}
-									<StatusBadge status={chapter.processingStatus as 'completed' | 'failed' | 'extracting' | 'pending'} />
-								</Box>
-							}
-						/>
-					</ListItemButton>
-				</ListItem>
-			))}
+										{chapter.textPreview && (
+											<Typography variant="body2" color="text.secondary" noWrap sx={{ flexGrow: 1 }}>
+												— {chapter.textPreview}
+											</Typography>
+										)}
+										<StatusBadge
+											status={
+												badgeStatus as
+													| 'completed'
+													| 'failed'
+													| 'extracting'
+													| 'pending'
+											}
+										/>
+									</Box>
+								}
+							/>
+						</ListItemButton>
+					</ListItem>
+				);
+			})}
 		</List>
 	);
 }

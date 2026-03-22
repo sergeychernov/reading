@@ -1,13 +1,28 @@
 import { NextResponse } from 'next/server';
+import type { Db } from 'mongodb';
 import { ObjectId } from 'mongodb';
+import { deleteChaptersByBookId } from '@reading/data/chapters';
 import {
+	deleteAllBookStorage,
+	deleteBookById,
 	deleteBookProcessingArtifacts,
+	deleteLanguageItemsByBookId,
 	getBookById,
 	getDb,
+	updateBookChapterCount,
 	updateBookStatus,
 } from '@reading/data';
 
 export const runtime = 'nodejs';
+
+/** If dev bundler serves a stale @reading/data build, the imported helper may be missing. */
+async function deleteChaptersForBook(db: Db, bookId: string): Promise<void> {
+	if (typeof deleteChaptersByBookId === 'function') {
+		await deleteChaptersByBookId(db, bookId);
+		return;
+	}
+	await db.collection('chapters').deleteMany({ bookId: new ObjectId(bookId) });
+}
 
 interface RouteParams {
 	params: Promise<{ bookId: string }>;
@@ -55,22 +70,52 @@ export async function POST(
 			return NextResponse.json({ error: 'Book not found' }, { status: 404 });
 		}
 
-		if (book.processingStatus !== 'parsing') {
-			return NextResponse.json(
-				{ error: 'Revert is allowed only for books with parsing status' },
-				{ status: 400 },
-			);
+		switch (book.processingStatus) {
+			case 'parsing':
+			case 'parsed':
+				await removeBookArtifacts(bookId);
+				await deleteChaptersForBook(db, bookId);
+				await updateBookChapterCount(db, bookId, 0);
+				await updateBookStatus(db, bookId, 'uploaded');
+				return NextResponse.json({
+					ok: true,
+					bookId,
+					processingStatus: 'uploaded',
+					failed: false,
+				});
+			case 'uploading':
+				if (!book.failed) {
+					return NextResponse.json(
+						{
+							error:
+								'Cannot revert while upload is still in progress. Revert is only allowed after the upload has failed.',
+						},
+						{ status: 400 },
+					);
+				}
+				// Same cleanup as `uploaded` (failed upload leaves status `uploading`).
+				// falls through
+			case 'uploaded':
+				await deleteLanguageItemsByBookId(db, bookId);
+				await deleteChaptersForBook(db, bookId);
+				await deleteAllBookStorage(bookId);
+				await deleteBookById(db, bookId);
+				return NextResponse.json({
+					ok: true,
+					bookId,
+					deleted: true,
+					failed: false,
+				});
+			default:
+				return NextResponse.json(
+					{
+						error:
+							'Revert is allowed only for books with status parsing, parsed, uploaded, or uploading (failed upload only)',
+					},
+					{ status: 400 },
+				);
 		}
 
-		await removeBookArtifacts(bookId);
-		await updateBookStatus(db, bookId, 'uploaded');
-
-		return NextResponse.json({
-			ok: true,
-			bookId,
-			processingStatus: 'uploaded',
-			failed: false,
-		});
 	} catch (error) {
 		console.error(`Failed to revert book ${bookId}:`, error);
 		return NextResponse.json({ error: 'Failed to revert book' }, { status: 500 });

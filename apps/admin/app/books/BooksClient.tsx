@@ -215,22 +215,23 @@ export function BooksClient({ refreshToken }: BooksClientProps) {
 																sx={{ color: 'error.main' }}
 															/>
 														</Box>
-														<IconButton
-															size='small'
-															title='revert'
-															disabled={
-																processingBookId !== null ||
-																revertingBookId !== null
-															}
-															onClick={(e) => {
-																e.stopPropagation();
-																handleRevert(book._id);
-															}}
-														>
-															<ReplayOutlinedIcon fontSize='small' />
-														</IconButton>
+														
 													</>
 												)}
+												<IconButton
+													size='small'
+													title='revert'
+													disabled={
+														processingBookId !== null ||
+														revertingBookId !== null
+													}
+													onClick={(e) => {
+														e.stopPropagation();
+														handleRevert(book._id);
+													}}
+												>
+													<ReplayOutlinedIcon fontSize='small' />
+												</IconButton>
 												{book.processingStatus === 'uploaded' && (
 													<Button
 														size='small'

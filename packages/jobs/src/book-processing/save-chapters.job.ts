@@ -3,6 +3,7 @@ import { ObjectId } from 'mongodb';
 import {
 	withDb,
 	updateBookMeta,
+	deleteChaptersByBookId,
 	insertManyChapters,
 	updateBookChapterCount,
 	updateBookStatus,
@@ -64,11 +65,14 @@ export const saveChaptersJob: JobDefinition = {
 						summary: null,
 						rawTextLength: text.length,
 						processingStatus: 'pending' as const,
+						failed: false,
 						createdAt: now,
 						updatedAt: now,
 					};
 				});
 
+				// Replace any existing rows (e.g. placeholders from extract-book) so we never double-insert.
+				await deleteChaptersByBookId(db, input.bookId);
 				const insertResult = await insertManyChapters(db, chapterDocs);
 
 				await updateBookChapterCount(db, input.bookId, input.chapters.length);

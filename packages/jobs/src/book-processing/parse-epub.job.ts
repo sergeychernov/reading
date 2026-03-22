@@ -18,7 +18,7 @@ export interface ParseEpubOutput {
 
 /**
  * Parses the EPUB file content received from the fetch-epub artifact.
- * On failure, marks the book as 'failed' in MongoDB before rethrowing.
+ * On failure, sets the book `failed` flag via `markBookFailed` before rethrowing.
  */
 export const parseEpubJob: JobDefinition = {
 	name: 'parse-epub',

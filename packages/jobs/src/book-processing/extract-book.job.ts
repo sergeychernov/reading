@@ -1,4 +1,5 @@
 import type { JobDefinition, JobContext } from 'neuroline';
+import { ObjectId } from 'mongodb';
 import {
 	withDb,
 	getBookById,
@@ -6,11 +7,13 @@ import {
 	epubBlobKey,
 	bookFileKey,
 	uploadBookFile,
+	insertManyChapters,
 	updateBookChapterCount,
 	updateBookCoverUrl,
 	updateBookStatus,
 	markBookFailed,
 } from '@reading/data';
+import type { ChapterInsert } from '@reading/data';
 import { parseEpub } from '@reading/epub-utils';
 import type { ParsedCoverImage } from '@reading/epub-utils';
 
@@ -83,6 +86,20 @@ export const extractBookJob: JobDefinition<ExtractBookInput, ExtractBookOutput> 
 			context.logger.info(`Uploaded ${chapterKeys.length} chapter files`);
 
 			await withDb(async (db) => {
+				const bookOid = new ObjectId(bookId);
+				const now = new Date();
+				const chapterDocs: ChapterInsert[] = chapters.map((ch) => ({
+					_id: new ObjectId(),
+					bookId: bookOid,
+					chapterIndex: ch.index,
+					processingStatus: 'pending' as const,
+					failed: false,
+					createdAt: now,
+					updatedAt: now,
+				}));
+				await insertManyChapters(db, chapterDocs);
+				context.logger.info(`Inserted ${chapterDocs.length} chapter placeholder documents`);
+
 				await updateBookChapterCount(db, bookId, chapters.length);
 				await updateBookCoverUrl(db, bookId, coverFilename);
 				await updateBookStatus(db, bookId, 'parsed');

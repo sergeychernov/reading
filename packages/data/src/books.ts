@@ -12,7 +12,7 @@ export async function getAllBooks(db: Db): Promise<BookDocument[]> {
 	return col(db)
 		.find({
 			failed: { $ne: true },
-			processingStatus: { $nin: ['failed', 'uploaded', 'uploading'] },
+			processingStatus: { $nin: ['uploaded', 'uploading'] },
 		})
 		.sort({ createdAt: -1 })
 		.toArray();
@@ -28,6 +28,10 @@ export async function getAllBooksAdmin(db: Db): Promise<BookDocument[]> {
 
 export async function getBookById(db: Db, bookId: string): Promise<BookDocument | null> {
 	return col(db).findOne({ _id: new ObjectId(bookId) });
+}
+
+export async function deleteBookById(db: Db, bookId: string): Promise<void> {
+	await col(db).deleteOne({ _id: new ObjectId(bookId) });
 }
 
 export async function insertBook(db: Db, book: BookInsert): Promise<string> {
@@ -131,6 +135,28 @@ export async function markBookFailed(
 		{ _id: new ObjectId(bookId) },
 		{
 			$set: {
+				failed: true,
+				processingError: message,
+				updatedAt: new Date(),
+			},
+		},
+	);
+}
+
+/**
+ * All chapter extraction runs finished, but at least one chapter failed.
+ * Terminal outcome: `processingStatus` becomes `completed`, `failed` is set.
+ */
+export async function markBookChapterBatchFailed(
+	db: Db,
+	bookId: string,
+	message: string,
+): Promise<void> {
+	await col(db).updateOne(
+		{ _id: new ObjectId(bookId) },
+		{
+			$set: {
+				processingStatus: 'completed',
 				failed: true,
 				processingError: message,
 				updatedAt: new Date(),

@@ -14,6 +14,7 @@ interface BookCardProps {
 	author: string;
 	chapterCount: number;
 	processingStatus: string;
+	failed?: boolean;
 }
 
 export function BookCard({
@@ -22,8 +23,10 @@ export function BookCard({
 	author,
 	chapterCount,
 	processingStatus,
+	failed = false,
 }: BookCardProps) {
 	const router = useRouter();
+	const badgeStatus = failed ? 'failed' : processingStatus;
 
 	return (
 		<Card variant="outlined">
@@ -39,7 +42,19 @@ export function BookCard({
 						<Typography variant="caption" color="text.secondary">
 							{chapterCount} chapters
 						</Typography>
-						<StatusBadge status={processingStatus as 'completed' | 'failed' | 'extracting' | 'parsing' | 'uploading' | 'pending'} />
+						<StatusBadge
+							status={
+								badgeStatus as
+									| 'completed'
+									| 'failed'
+									| 'extracting'
+									| 'parsing'
+									| 'pending'
+									| 'uploading'
+									| 'uploaded'
+									| 'parsed'
+							}
+						/>
 					</Box>
 				</CardContent>
 			</CardActionArea>

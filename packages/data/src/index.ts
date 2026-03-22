@@ -19,6 +19,7 @@ export {
 	getAllBooks,
 	getAllBooksAdmin,
 	getBookById,
+	deleteBookById,
 	insertBook,
 	updateBookStatus,
 	updateBookChapterCount,
@@ -26,6 +27,7 @@ export {
 	updateBookMeta,
 	markBookUploaded,
 	markBookFailed,
+	markBookChapterBatchFailed,
 } from './books';
 
 // Chapter operations
@@ -37,7 +39,11 @@ export {
 	updateChapterSummary,
 	countChaptersByStatus,
 	getPendingChapters,
+	deleteChaptersByBookId,
 } from './chapters';
+
+// Language items (MongoDB collection used by pipeline / public app)
+export { deleteLanguageItemsByBookId } from './language-items';
 
 // Blob operations
 export {
@@ -49,10 +55,15 @@ export {
 	uploadBookFile,
 	deleteBlob,
 	deleteBookProcessingArtifacts,
+	deleteAllBookStorage,
 } from './blob';
 
 // Serialization
-export { serializeBook, serializeChapter } from './serialization';
+export {
+	serializeBook,
+	serializeChapter,
+	chapterRawBodyForPreview,
+} from './serialization';
 
 // Utilities
 export { computeContentHash } from './hash';
