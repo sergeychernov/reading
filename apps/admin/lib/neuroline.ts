@@ -26,19 +26,20 @@ export async function getNeuroline() {
 	const manager = new PipelineManager({
 		storage,
 		logger: {
-		info: (msg, data) => {
-			//persistNeurolineLog('info', msg, data);
-			if (process.env.NODE_ENV !== 'production') console.log(msg, data);
+			info: (msg, data) => {
+				//persistNeurolineLog('info', msg, data);
+				if (process.env.NODE_ENV !== 'production') console.log(msg, data);
+			},
+			warn: (msg, data) => {
+				//persistNeurolineLog('warn', msg, data);
+				console.warn(msg, data);
+			},
+			error: (msg, data) => {
+				//persistNeurolineLog('error', msg, data);
+				console.error(msg, data);
+			},
 		},
-		warn: (msg, data) => {
-			//persistNeurolineLog('warn', msg, data);
-			console.warn(msg, data);
-		},
-		error: (msg, data) => {
-			//persistNeurolineLog('error', msg, data);
-			console.error(msg, data);
-		},
-	}, });
+	});
 
 	cached = { manager, storage };
 	return cached;
