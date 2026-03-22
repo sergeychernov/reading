@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { getDb, getAllBooks } from '@reading/data';
 import { BookGrid } from '../components/BookGrid';
 
+export const dynamic = 'force-dynamic';
+
 export default async function BooksPage() {
 	const db = await getDb();
 	const books = await getAllBooks(db);
