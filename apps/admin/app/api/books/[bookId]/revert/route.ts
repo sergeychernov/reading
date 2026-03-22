@@ -83,6 +83,18 @@ export async function POST(
 					processingStatus: 'uploaded',
 					failed: false,
 				});
+			case 'uploading':
+				if (!book.failed) {
+					return NextResponse.json(
+						{
+							error:
+								'Cannot revert while upload is still in progress. Revert is only allowed after the upload has failed.',
+						},
+						{ status: 400 },
+					);
+				}
+				// Same cleanup as `uploaded` (failed upload leaves status `uploading`).
+				// falls through
 			case 'uploaded':
 				await deleteLanguageItemsByBookId(db, bookId);
 				await deleteChaptersForBook(db, bookId);
@@ -98,7 +110,7 @@ export async function POST(
 				return NextResponse.json(
 					{
 						error:
-							'Revert is allowed only for books with status parsing, parsed, or uploaded',
+							'Revert is allowed only for books with status parsing, parsed, uploaded, or uploading (failed upload only)',
 					},
 					{ status: 400 },
 				);
