@@ -71,7 +71,7 @@ export async function GET(
 
 		return NextResponse.json({
 			bookStatus: bookOut?.processingStatus ?? book.processingStatus,
-			bookFailed: bookOut?.failed ?? false,
+			bookFailed: bookOut?.failed ?? book.failed,
 			totalChapters: chapterStats.total,
 			completedChapters: chapterStats.completed,
 			failedChapters: chapterStats.failed,
