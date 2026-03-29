@@ -1,5 +1,6 @@
 export type {
 	BookProcessingInput,
+	ChapterProcessingInput,
 	ChapterExtractionInput,
 	LlmAdapter,
 	PipelineConfig,
@@ -28,6 +29,20 @@ export type {
 	DispatchChaptersOutput,
 	DispatchChaptersOptions,
 } from './book-processing/dispatch-chapters.job';
+
+export {
+	startChapterProcessingJob,
+} from './chapter-processing/start-chapter-processing.job';
+export type {
+	StartChapterProcessingOutput,
+} from './chapter-processing/start-chapter-processing.job';
+export { extractChapterJob } from './chapter-processing/extract-chapter.job';
+export type { ExtractChapterOutput } from './chapter-processing/extract-chapter.job';
+export { completeChapterProcessingJob } from './chapter-processing/complete-chapter-processing.job';
+export type {
+	CompleteChapterProcessingInput,
+	CompleteChapterProcessingOutput,
+} from './chapter-processing/complete-chapter-processing.job';
 
 export { createExtractSummaryJob } from './chapter-extraction/extract-summary.job';
 export type { ExtractSummaryOutput } from './chapter-extraction/extract-summary.job';

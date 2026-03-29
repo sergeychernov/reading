@@ -14,6 +14,6 @@ export const appTheme = createTheme({
     }
   },
   shape: {
-    borderRadius: 12
+    borderRadius: 1
   }
 });

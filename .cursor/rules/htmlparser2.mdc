@@ -1,0 +1,47 @@
+---
+description: HTML and XHTML parsing in Node — prefer htmlparser2 over regex
+alwaysApply: true
+---
+
+# HTML / XHTML parsing (Node.js)
+
+Use **htmlparser2** (and **`DomUtils`** from the same ecosystem) to parse HTML or XHTML in server-side code. **Do not** use regular expressions to walk tags, attributes, or document structure — regex is brittle for nested markup and easy to get wrong on attribute order, namespaces, and EPUB quirks.
+
+## When this applies
+
+- EPUB chapter XHTML, fragments from blobs, or any non-trivial markup extraction in Node (e.g. `@reading/jobs`, `@reading/epub-utils`).
+- Classifying pages (cover / TOC / body), reading `<meta>`, `<title>`, headings, or plain text from subtrees.
+
+## Preferred APIs
+
+- **`parseDocument(data, { xmlMode: true })`** for full XHTML documents (EPUB content documents).
+- **`DomUtils.findOne` / `DomUtils.findAll`** with predicates on `Element` nodes (tag name, attributes).
+- **`DomUtils.textContent(node)`** for visible text inside an element or subtree.
+- **`DomUtils.getInnerHTML`** / **`getElementsByTagName`** when you need legacy-style helpers.
+
+For **streaming** or very large inputs without building a full DOM, use **`Parser`** from `htmlparser2` with callbacks (see `packages/epub-utils/src/text-extractor.ts`).
+
+## Dependencies
+
+- Add **`htmlparser2`** (and **`domhandler`** for `Document` / `Element` types) to the package that performs parsing; align versions with `packages/epub-utils` where practical.
+
+## Avoid
+
+- Regex for structural HTML/XML extraction (`<body>...</body>`, heading lists, meta tags).
+- **`jsdom`** unless you need a full browser DOM — it is heavier than needed for pipeline-style parsing.
+
+```typescript
+// ✅ Prefer: DOM from htmlparser2 + DomUtils
+import { parseDocument, DomUtils } from 'htmlparser2';
+import type { Document, Element } from 'domhandler';
+
+const doc = parseDocument(xhtml, { xmlMode: true });
+const body = DomUtils.findOne(
+	(el): el is Element => DomUtils.isTag(el) && el.name === 'body',
+	doc,
+	true,
+);
+
+// ❌ Avoid: regex as a “parser” for structure
+const inner = xhtml.match(/<body\b[^>]*>([\s\S]*?)<\/body>/i);
+```

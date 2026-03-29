@@ -5182,8 +5182,9 @@ __metadata:
     "@vercel/functions": "npm:^2.0.0"
     mongodb: "npm:^6"
     mongoose: "npm:^8"
-    neuroline: "npm:^0.9.0"
-    neuroline-nextjs: "npm:^0.7.0"
+    neuroline: "npm:^0.10.0"
+    neuroline-nextjs: "npm:^0.8.0"
+    neuroline-ui: "npm:^0.6.0"
     next: "npm:16.1.6"
     react: "npm:latest"
     react-dom: "npm:latest"
@@ -5252,8 +5253,10 @@ __metadata:
     "@reading/data": "workspace:packages/data"
     "@reading/epub-utils": "workspace:packages/epub-utils"
     "@reading/llm-schemas": "workspace:packages/llm-schemas"
+    domhandler: "npm:^5.0.3"
+    htmlparser2: "npm:^10.1.0"
     mongodb: "npm:^6.21.0"
-    neuroline: "npm:^0.9.0"
+    neuroline: "npm:^0.10.0"
     typescript: "npm:latest"
   languageName: unknown
   linkType: soft
@@ -5286,8 +5289,8 @@ __metadata:
     dotenv: "npm:^17.3.1"
     mongodb: "npm:^6.21.0"
     mongoose: "npm:^8.9.0"
-    neuroline: "npm:^0.9.0"
-    neuroline-nestjs: "npm:^0.7.4"
+    neuroline: "npm:^0.10.0"
+    neuroline-nestjs: "npm:^0.8.0"
     reflect-metadata: "npm:^0.2.2"
     rxjs: "npm:^7.8.0"
     ts-node: "npm:^10.9.0"
@@ -13350,7 +13353,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:^4.17.20, lodash@npm:^4.17.21":
+"lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.17.23":
   version: 4.17.23
   resolution: "lodash@npm:4.17.23"
   checksum: 10c0/1264a90469f5bb95d4739c43eb6277d15b6d9e186df4ac68c3620443160fc669e2f14c11e7d8b2ccf078b81d06147c01a8ccced9aab9f9f63d50dcf8cace6bf6
@@ -14927,30 +14930,47 @@ __metadata:
   languageName: node
   linkType: hard
 
-"neuroline-nestjs@npm:^0.7.4":
-  version: 0.7.4
-  resolution: "neuroline-nestjs@npm:0.7.4"
+"neuroline-nestjs@npm:^0.8.0":
+  version: 0.8.0
+  resolution: "neuroline-nestjs@npm:0.8.0"
   peerDependencies:
     "@nestjs/common": ">=10.0.0"
     "@nestjs/core": ">=10.0.0"
-    neuroline: ^0.9.0
-  checksum: 10c0/38ac7098b9ff3777511bceca4ddf09b23d7dd4a239ce442584efa7118b117f16b7fc41c5b7b79b6bfded77de64004a91be78339eed1b003a48fa3b34d3a76230
+    neuroline: ^0.10.0
+  checksum: 10c0/6f39bdfc80b9802046f2ea192ccdcfa423151e8b32100be2ad02096d2fb099f4b047fcaf848117e4712316ef8e409cde4edf82061aad42bd606a6a1e4a352806
   languageName: node
   linkType: hard
 
-"neuroline-nextjs@npm:^0.7.0":
-  version: 0.7.3
-  resolution: "neuroline-nextjs@npm:0.7.3"
+"neuroline-nextjs@npm:^0.8.0":
+  version: 0.8.0
+  resolution: "neuroline-nextjs@npm:0.8.0"
   peerDependencies:
-    neuroline: ^0.9.0
+    neuroline: ^0.10.0
     next: ">=14.0.0"
-  checksum: 10c0/d2372b6eae6b7abdc6440f10c023859f38f978d52239664d40d56356444e9280a8e2e85e486ec1f7cfe156b2bdfd17a092ba59ad9b386103df65b84cc32d5129
+  checksum: 10c0/2076b0a4c0ab4aca26a2306cb4ee05d5d06c0adf20c57d8a07397d0c158aad9e78494ee4b06f154c2b5c048f22b4c6ad65c8f9d77a348980b43422a00475e987
   languageName: node
   linkType: hard
 
-"neuroline@npm:^0.9.0":
-  version: 0.9.3
-  resolution: "neuroline@npm:0.9.3"
+"neuroline-ui@npm:^0.6.0":
+  version: 0.6.5
+  resolution: "neuroline-ui@npm:0.6.5"
+  dependencies:
+    lodash: "npm:^4.17.23"
+  peerDependencies:
+    "@emotion/react": ^11.11.0
+    "@emotion/styled": ^11.11.0
+    "@mui/icons-material": ^5.15.0
+    "@mui/material": ^5.15.0
+    neuroline: ^0.10.0
+    react: ^18.2.0 || ^19.0.0
+    react-dom: ^18.2.0 || ^19.0.0
+  checksum: 10c0/9851569c81cd83edd281429e34dfb13c90d29b633c61412cfcfebf16af69e48a7bd58e1a1aa42718a21b400659712fd0c9bc4d5ec20b3f76c06a34dc9662b2ea
+  languageName: node
+  linkType: hard
+
+"neuroline@npm:^0.10.0":
+  version: 0.10.0
+  resolution: "neuroline@npm:0.10.0"
   peerDependencies:
     "@emotion/react": ^11.11.0
     "@emotion/styled": ^11.11.0
@@ -14971,7 +14991,7 @@ __metadata:
       optional: true
     react:
       optional: true
-  checksum: 10c0/ecef09dd1cf33ae95cb31f606bafcff1109660fc41006c003ca072a39d5e96aba3991c75ac45d9feedbb92ceb6fe5135fb5bc4ed7a2fc17cebeb1fe1fd19098b
+  checksum: 10c0/bfec4b52b95236ef72314700744aa602fe3ac97538961759ff4dc4ec8124c84dbccfbe46992b42b9a9f3f1e8ce3a6b96a96198d70847e48f9e3563813e8193f0
   languageName: node
   linkType: hard
 

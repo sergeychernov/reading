@@ -5,11 +5,14 @@ export type {
 	BookProcessingStatus,
 	ChapterDocument,
 	ChapterInsert,
+	ChapterKind,
 	ChapterProcessingStatus,
 	LanguageItemCategory,
 	SerializedBook,
 	SerializedChapter,
 } from './types';
+
+export type { ChapterExtractFields } from './chapters';
 
 // Connection
 export { DB_NAME, getClientPromise, getDb, withDb } from './connection';
@@ -36,6 +39,9 @@ export {
 	getChapterById,
 	insertManyChapters,
 	updateChapterStatus,
+	setChapterPipelineId,
+	updateChapterExtractFields,
+	completeChapterProcessing,
 	updateChapterSummary,
 	countChaptersByStatus,
 	getPendingChapters,

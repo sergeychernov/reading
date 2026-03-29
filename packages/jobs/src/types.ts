@@ -8,6 +8,14 @@ export interface BookProcessingInput {
 }
 
 /**
+ * Input for the chapter-processing pipeline (per-chapter XHTML in Blob).
+ * `bookId` and `chapterIndex` are read from MongoDB by jobs using `chapterId`.
+ */
+export interface ChapterProcessingInput {
+	chapterId: string;
+}
+
+/**
  * Input for the chapter-extraction pipeline and jobs that take chapter context.
  */
 export interface ChapterExtractionInput {
