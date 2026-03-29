@@ -1,5 +1,5 @@
 import type { JobContext, JobDefinition, SynapseContext } from 'neuroline';
-import type { LanguageItemBase, LanguageItemScored } from '@reading/llm-schemas';
+import type { LanguageItemBase, LanguageItemScored, RareWordItem } from '@reading/llm-schemas';
 import type { LlmAdapter } from '../types';
 import type { ChapterExtractionInput } from '../types';
 import type { ExtractIdiomsOutput } from './extract-idioms.job';
@@ -11,7 +11,7 @@ export interface ExtractRarityInput {
 	chapterTitle: string;
 	idioms: LanguageItemBase[];
 	phrasalVerbs: LanguageItemBase[];
-	rareWords: LanguageItemBase[];
+	rareWords: RareWordItem[];
 }
 
 export interface ExtractRarityOutput {

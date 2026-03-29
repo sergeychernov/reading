@@ -5175,11 +5175,13 @@ __metadata:
     "@reading/book-ingestion": "workspace:packages/book-ingestion"
     "@reading/data": "workspace:packages/data"
     "@reading/jobs": "workspace:packages/jobs"
+    "@reading/llm-schemas": "workspace:packages/llm-schemas"
     "@reading/ui": "npm:0.0.0"
     "@types/node": "npm:latest"
     "@types/react": "npm:latest"
     "@types/react-dom": "npm:latest"
     "@vercel/functions": "npm:^2.0.0"
+    ai: "npm:6.0.116"
     mongodb: "npm:^6"
     mongoose: "npm:^8"
     neuroline: "npm:^0.10.0"
@@ -5253,11 +5255,13 @@ __metadata:
     "@reading/data": "workspace:packages/data"
     "@reading/epub-utils": "workspace:packages/epub-utils"
     "@reading/llm-schemas": "workspace:packages/llm-schemas"
+    ai: "npm:6.0.116"
     domhandler: "npm:^5.0.3"
     htmlparser2: "npm:^10.1.0"
     mongodb: "npm:^6.21.0"
     neuroline: "npm:^0.10.0"
     typescript: "npm:latest"
+    zod: "npm:^4.3.6"
   languageName: unknown
   linkType: soft
 

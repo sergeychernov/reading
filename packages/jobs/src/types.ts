@@ -1,4 +1,4 @@
-import type { LanguageItemBase, LanguageItemScored } from '@reading/llm-schemas';
+import type { LanguageItemBase, LanguageItemScored, RareWordItem } from '@reading/llm-schemas';
 
 /**
  * Input for the book-processing pipeline (and fetch-epub job).
@@ -32,14 +32,9 @@ export interface ChapterExtractionInput {
  */
 export interface LlmAdapter {
 	extractSummary(chapterText: string): Promise<string>;
-	extractLanguageItems(chapterText: string): Promise<{
-		idioms: LanguageItemBase[];
-		phrasalVerbs: LanguageItemBase[];
-		rareWords: LanguageItemBase[];
-	}>;
 	extractIdioms(chapterText: string): Promise<LanguageItemBase[]>;
 	extractPhrasalVerbs(chapterText: string): Promise<LanguageItemBase[]>;
-	extractRareWords(chapterText: string): Promise<LanguageItemBase[]>;
+	extractRareWords(chapterText: string): Promise<RareWordItem[]>;
 	extractRarity(items: LanguageItemBase[]): Promise<LanguageItemScored[]>;
 	translateMeanings(
 		items: LanguageItemScored[],
