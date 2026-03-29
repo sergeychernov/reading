@@ -10,6 +10,32 @@ export const languageItemBaseSchema = z.object({
 	exampleFromBook: z.string().describe('The exact sentence from the book containing this term'),
 });
 
+export const idiomItemSchema = z.object({
+	term: z.string().describe('The idiomatic expression in canonical form (e.g. "break the ice", "once in a blue moon")'),
+	exampleFromBook: z.string().describe('The exact sentence from the book containing this idiom'),
+});
+
+export const phrasalVerbItemSchema = z.object({
+	term: z.string().describe('The phrasal verb in base infinitive form (e.g. "give up", "run into", "look forward to")'),
+	exampleFromBook: z.string().describe('The exact sentence from the book containing this phrasal verb'),
+});
+
+export const partOfSpeechSchema = z.enum([
+	'noun',
+	'verb',
+	'adjective',
+	'adverb',
+	'preposition',
+	'conjunction',
+	'interjection',
+]).describe('Part of speech of the word');
+
+export const rareWordItemSchema = z.object({
+	term: z.string().describe('The uncommon single word in base dictionary form (e.g. "wither", "ephemeral")'),
+	partOfSpeech: partOfSpeechSchema,
+	exampleFromBook: z.string().describe('The exact sentence from the book containing this word'),
+});
+
 export const rarityScoreSchema = z.number().int().min(0).max(10).describe(
 		'Rarity score 0–10: 0 = extremely common (e.g. "the"), 10 = very rare / obscure',
 );
@@ -29,6 +55,8 @@ export const chapterExtractionSchema = z.object({
 	rareWords: z.array(languageItemSchema).describe('Uncommon vocabulary for B1-B2 learners'),
 });
 
+export type PartOfSpeech = z.infer<typeof partOfSpeechSchema>;
+export type RareWordItem = z.infer<typeof rareWordItemSchema>;
 export type MeaningTranslations = z.infer<typeof meaningTranslationsSchema>;
 export type ChapterExtraction = z.infer<typeof chapterExtractionSchema>;
 export type LanguageItemBase = z.infer<typeof languageItemBaseSchema>;

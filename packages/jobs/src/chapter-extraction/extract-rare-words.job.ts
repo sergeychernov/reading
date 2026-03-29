@@ -1,10 +1,10 @@
 import type { JobDefinition, JobContext } from 'neuroline';
-import type { LanguageItemBase } from '@reading/llm-schemas';
+import type { RareWordItem } from '@reading/llm-schemas';
 import type { LlmAdapter } from '../types';
 import type { ChapterExtractionInput } from '../types';
 
 export interface ExtractRareWordsOutput {
-	rareWords: LanguageItemBase[];
+	rareWords: RareWordItem[];
 }
 
 export function createExtractRareWordsJob(adapter: LlmAdapter): JobDefinition {

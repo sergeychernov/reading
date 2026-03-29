@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
 import { CategoryTabs, ItemCard } from '@reading/ui';
-import type { MeaningTranslations } from '@reading/llm-schemas';
+import type { MeaningTranslations, PartOfSpeech } from '@reading/llm-schemas';
 import type { TranslationLanguage } from '../../lib/types/user';
 
 const CATEGORIES = [
@@ -21,6 +21,7 @@ interface LanguageItem {
 	exampleFromBook: string;
 	category: string;
 	rarity?: number;
+	partOfSpeech?: PartOfSpeech;
 }
 
 function resolveMeaning(meaning: MeaningTranslations | string, lang: TranslationLanguage): string {
@@ -134,6 +135,7 @@ export function LanguageItemTabs({
 						meaning={resolveMeaning(item.meaning, translationLanguage)}
 						example={item.exampleFromBook}
 						rarity={item.rarity}
+						partOfSpeech={item.partOfSpeech}
 					/>
 				))
 			)}

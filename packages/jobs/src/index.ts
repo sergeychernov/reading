@@ -1,9 +1,14 @@
 export type {
 	BookProcessingInput,
+	ChapterProcessingInput,
 	ChapterExtractionInput,
 	LlmAdapter,
 	PipelineConfig,
 } from './types';
+
+export { StubAdapter } from './adapters/stub-adapter';
+export { GatewayAdapter } from './adapters/gateway-adapter';
+export type { GatewayAdapterOptions } from './adapters/gateway-adapter';
 
 export { extractBookJob } from './book-processing/extract-book.job';
 export type { ExtractBookInput, ExtractBookOutput } from './book-processing/extract-book.job';
@@ -28,6 +33,43 @@ export type {
 	DispatchChaptersOutput,
 	DispatchChaptersOptions,
 } from './book-processing/dispatch-chapters.job';
+
+export {
+	startChapterProcessingJob,
+} from './chapter-processing/start-chapter-processing.job';
+export type {
+	StartChapterProcessingOutput,
+} from './chapter-processing/start-chapter-processing.job';
+export { extractChapterJob } from './chapter-processing/extract-chapter.job';
+export type { ExtractChapterOutput } from './chapter-processing/extract-chapter.job';
+export { completeChapterProcessingJob } from './chapter-processing/complete-chapter-processing.job';
+export type {
+	CompleteChapterProcessingInput,
+	CompleteChapterProcessingOutput,
+} from './chapter-processing/complete-chapter-processing.job';
+export { createExtractIdiomsFromBlobJob } from './chapter-processing/extract-idioms.job';
+export type {
+	ExtractIdiomsFromBlobInput,
+	ExtractIdiomsFromBlobOutput,
+} from './chapter-processing/extract-idioms.job';
+export { createExtractPhrasalVerbsFromBlobJob } from './chapter-processing/extract-phrasal-verbs.job';
+export type {
+	ExtractPhrasalVerbsFromBlobInput,
+	ExtractPhrasalVerbsFromBlobOutput,
+} from './chapter-processing/extract-phrasal-verbs.job';
+export { createExtractRareWordsFromBlobJob } from './chapter-processing/extract-rare-words.job';
+export type {
+	ExtractRareWordsFromBlobInput,
+	ExtractRareWordsFromBlobOutput,
+} from './chapter-processing/extract-rare-words.job';
+export {
+	saveLanguageItemsJob,
+	buildSaveLanguageItemsSynapses,
+} from './chapter-processing/save-language-items.job';
+export type {
+	SaveLanguageItemsInput,
+	SaveLanguageItemsOutput,
+} from './chapter-processing/save-language-items.job';
 
 export { createExtractSummaryJob } from './chapter-extraction/extract-summary.job';
 export type { ExtractSummaryOutput } from './chapter-extraction/extract-summary.job';
@@ -66,5 +108,3 @@ export type {
 	SaveChapterResultsInput,
 	SaveChapterResultsOutput,
 } from './chapter-extraction/save-chapter-results.job';
-export { createExtractLanguageItemsJob } from './chapter-extraction/extract-language-items.job';
-export type { ExtractLanguageItemsOutput } from './chapter-extraction/extract-language-items.job';

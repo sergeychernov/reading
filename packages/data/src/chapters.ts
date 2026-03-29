@@ -1,5 +1,10 @@
 import { ObjectId, type Db, type Filter, type InsertManyResult } from 'mongodb';
-import type { ChapterDocument, ChapterInsert, ChapterProcessingStatus } from './types';
+import type {
+	ChapterDocument,
+	ChapterInsert,
+	ChapterKind,
+	ChapterProcessingStatus,
+} from './types';
 
 const COLLECTION = 'chapters';
 
@@ -34,6 +39,14 @@ export interface UpdateChapterStatusOptions {
 	failed?: boolean;
 }
 
+/** Fields produced by XHTML extract / classification (persisted before status becomes `completed`). */
+export interface ChapterExtractFields {
+	chapterKind: ChapterKind;
+	title: string;
+	chapterTextCharCount: number;
+	chapterTextWordCount: number;
+}
+
 export async function updateChapterStatus(
 	db: Db,
 	chapterId: string,
@@ -50,6 +63,55 @@ export async function updateChapterStatus(
 	await col(db).updateOne(
 		{ _id: new ObjectId(chapterId) },
 		{ $set },
+	);
+}
+
+export async function setChapterPipelineId(
+	db: Db,
+	chapterId: string,
+	pipelineId: string,
+): Promise<void> {
+	await col(db).updateOne(
+		{ _id: new ObjectId(chapterId) },
+		{
+			$set: {
+				pipelineId,
+				updatedAt: new Date(),
+			},
+		},
+	);
+}
+
+export async function updateChapterExtractFields(
+	db: Db,
+	chapterId: string,
+	fields: ChapterExtractFields,
+): Promise<void> {
+	await col(db).updateOne(
+		{ _id: new ObjectId(chapterId) },
+		{
+			$set: {
+				chapterKind: fields.chapterKind,
+				title: fields.title,
+				chapterTextCharCount: fields.chapterTextCharCount,
+				chapterTextWordCount: fields.chapterTextWordCount,
+				updatedAt: new Date(),
+			},
+		},
+	);
+}
+
+/** Marks chapter processing as finished after extract fields are already stored. */
+export async function completeChapterProcessing(db: Db, chapterId: string): Promise<void> {
+	await col(db).updateOne(
+		{ _id: new ObjectId(chapterId) },
+		{
+			$set: {
+				processingStatus: 'completed',
+				failed: false,
+				updatedAt: new Date(),
+			},
+		},
 	);
 }
 

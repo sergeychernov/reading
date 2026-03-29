@@ -1,0 +1,32 @@
+---
+description: Route vs pipeline responsibility boundaries
+alwaysApply: true
+---
+
+# Route vs pipeline boundaries
+
+Use this rule for all HTTP endpoints that start, restart, or observe pipelines.
+
+## Route layer responsibilities
+
+- Parse and validate transport input (params, query, body, headers).
+- Enforce auth, access checks, and basic ownership checks.
+- Return HTTP responses and status codes.
+- Call pipeline start/retry/status/result endpoints.
+- Handle pipeline deduplication policy at transport level (for example `isNew: false` -> retry from a chosen job).
+- Do not persist domain processing states in route if that state belongs to pipeline execution.
+
+## Pipeline layer responsibilities
+
+- Own domain state transitions caused by processing flow.
+- Write business-side effects to storage (MongoDB, blobs, derived artifacts).
+- Set and clear processing flags (`processingStatus`, `failed`) and store `pipelineId` when needed.
+- Keep transitions deterministic and idempotent for restart/retry scenarios.
+- Encapsulate failure fallback inside jobs (for example mark entity as retryable/failed before rethrow).
+
+## Practical policy
+
+- If a change must happen exactly because a pipeline job started/finished/failed, put it into jobs.
+- If a change must happen before pipeline execution is allowed, keep it in route validation.
+- Route may trigger retry/restart orchestration, but final business state is still pipeline-owned.
+- Prefer explicit start/complete jobs when state transitions are important and must be auditable.

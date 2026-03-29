@@ -1,8 +1,7 @@
 import { MongoClient } from 'mongodb';
-import type { LlmAdapter } from './adapter';
-import type { LanguageItemBase, LanguageItemScored, MeaningTranslations } from './schemas';
-import { StubAdapter } from './stub-adapter';
-import { GatewayAdapter } from './gateway/gateway-adapter';
+import type { LlmAdapter } from '@reading/jobs';
+import { StubAdapter, GatewayAdapter } from '@reading/jobs';
+import type { LanguageItemBase, LanguageItemScored, MeaningTranslations, RareWordItem } from '@reading/llm-schemas';
 
 interface GatewayConfig {
 	model: string;
@@ -22,7 +21,6 @@ interface LlmAdapterConfig {
 
 type LlmJobName =
 	| 'extract-summary'
-	| 'extract-language-items'
 	| 'extract-idioms'
 	| 'extract-phrasal-verbs'
 	| 'extract-rare-words'
@@ -142,14 +140,6 @@ export class DynamicAdapter implements LlmAdapter {
 		return (await this.getAdapter('extract-summary')).extractSummary(chapterText);
 	}
 
-	async extractLanguageItems(chapterText: string): Promise<{
-		idioms: LanguageItemBase[];
-		phrasalVerbs: LanguageItemBase[];
-		rareWords: LanguageItemBase[];
-	}> {
-		return (await this.getAdapter('extract-language-items')).extractLanguageItems(chapterText);
-	}
-
 	async extractIdioms(chapterText: string): Promise<LanguageItemBase[]> {
 		return (await this.getAdapter('extract-idioms')).extractIdioms(chapterText);
 	}
@@ -158,7 +148,7 @@ export class DynamicAdapter implements LlmAdapter {
 		return (await this.getAdapter('extract-phrasal-verbs')).extractPhrasalVerbs(chapterText);
 	}
 
-	async extractRareWords(chapterText: string): Promise<LanguageItemBase[]> {
+	async extractRareWords(chapterText: string): Promise<RareWordItem[]> {
 		return (await this.getAdapter('extract-rare-words')).extractRareWords(chapterText);
 	}
 

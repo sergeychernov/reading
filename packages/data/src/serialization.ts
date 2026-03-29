@@ -31,7 +31,11 @@ export function serializeChapter(doc: ChapterDocument): SerializedChapter {
 		_id: doc._id.toHexString(),
 		bookId: doc.bookId.toHexString(),
 		chapterIndex: doc.chapterIndex ?? 0,
+		pipelineId: doc.pipelineId,
+		chapterKind: doc.chapterKind,
 		title: doc.title ?? '',
+		chapterTextCharCount: doc.chapterTextCharCount,
+		chapterTextWordCount: doc.chapterTextWordCount,
 		processingStatus: doc.processingStatus ?? 'unknown',
 		failed: doc.failed ?? legacyStatusFailed,
 	};

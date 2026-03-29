@@ -3,6 +3,7 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
 import Box from '@mui/material/Box';
+import type { PartOfSpeech } from '@reading/llm-schemas';
 
 interface ItemCardProps {
 	term: string;
@@ -11,6 +12,26 @@ interface ItemCardProps {
 	category?: string;
 	/** Rarity 0–10; show "?" when undefined. */
 	rarity?: number;
+	partOfSpeech?: PartOfSpeech;
+}
+
+function getPartOfSpeechColors(pos: PartOfSpeech): { color: string; bgcolor: string } {
+	switch (pos) {
+		case 'noun':
+			return { color: '#1565c0', bgcolor: '#e3f2fd' };
+		case 'verb':
+			return { color: '#c62828', bgcolor: '#ffebee' };
+		case 'adjective':
+			return { color: '#6a1b9a', bgcolor: '#f3e5f5' };
+		case 'adverb':
+			return { color: '#00695c', bgcolor: '#e0f2f1' };
+		case 'preposition':
+			return { color: '#e65100', bgcolor: '#fff3e0' };
+		case 'conjunction':
+			return { color: '#4527a0', bgcolor: '#ede7f6' };
+		case 'interjection':
+			return { color: '#ad1457', bgcolor: '#fce4ec' };
+	}
 }
 
 function getRarityBorderColor(rarity: number | undefined): string {
@@ -22,7 +43,7 @@ function getRarityBorderColor(rarity: number | undefined): string {
 	return 'error.main';
 }
 
-export function ItemCard({ term, meaning, example, category, rarity }: ItemCardProps) {
+export function ItemCard({ term, meaning, example, category, rarity, partOfSpeech }: ItemCardProps) {
 	return (
 		<Card
 			variant="outlined"
@@ -38,6 +59,16 @@ export function ItemCard({ term, meaning, example, category, rarity }: ItemCardP
 					<Typography variant="h6" component="span">
 						{term}
 					</Typography>
+					{partOfSpeech && (
+						<Chip
+							label={partOfSpeech}
+							size="small"
+							sx={{
+								fontStyle: 'italic',
+								...getPartOfSpeechColors(partOfSpeech),
+							}}
+						/>
+					)}
 					{category && (
 						<Chip label={category} size="small" variant="outlined" />
 					)}
