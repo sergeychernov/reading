@@ -48,9 +48,9 @@ export function createExtractMeaningEnJob(adapter: LlmAdapter): JobDefinition {
 				`Extracting EN meanings for chapter ${input.chapterIndex}: "${input.chapterTitle}"`,
 			);
 
-			const idioms = await adapter.translateMeanings(input.idioms, 'en');
-			const phrasalVerbs = await adapter.translateMeanings(input.phrasalVerbs, 'en');
-			const rareWords = await adapter.translateMeanings(input.rareWords, 'en');
+			const idioms = await adapter.translateMeanings(input.idioms, 'en', 'idiom');
+			const phrasalVerbs = await adapter.translateMeanings(input.phrasalVerbs, 'en', 'phrasal-verb');
+			const rareWords = await adapter.translateMeanings(input.rareWords, 'en', 'rare-word');
 
 			context.logger.info(
 				`Extracted EN meanings for chapter ${input.chapterIndex} ` +

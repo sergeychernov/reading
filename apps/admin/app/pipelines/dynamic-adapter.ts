@@ -1,4 +1,4 @@
-import type { LlmAdapter } from '@reading/jobs';
+import type { ItemCategory, LlmAdapter } from '@reading/jobs';
 import { StubAdapter, GatewayAdapter } from '@reading/jobs';
 import type { LanguageItemBase, LanguageItemScored, MeaningTranslations, RareWordItem } from '@reading/llm-schemas';
 import { getLlmConfig } from '../../lib/db/llm-config';
@@ -49,8 +49,9 @@ export class DynamicAdapter implements LlmAdapter {
 	async translateMeanings(
 		items: LanguageItemScored[],
 		language: keyof MeaningTranslations,
+		category: ItemCategory,
 	): Promise<string[]> {
 		const jobName: LlmJobName = language === 'ru' ? 'extract-meaning-ru' : 'extract-meaning-en';
-		return (await this.getAdapter(jobName)).translateMeanings(items, language);
+		return (await this.getAdapter(jobName)).translateMeanings(items, language, category);
 	}
 }

@@ -1,5 +1,5 @@
 import { MongoClient } from 'mongodb';
-import type { LlmAdapter } from '@reading/jobs';
+import type { ItemCategory, LlmAdapter } from '@reading/jobs';
 import { StubAdapter, GatewayAdapter } from '@reading/jobs';
 import type { LanguageItemBase, LanguageItemScored, MeaningTranslations, RareWordItem } from '@reading/llm-schemas';
 
@@ -159,8 +159,9 @@ export class DynamicAdapter implements LlmAdapter {
 	async translateMeanings(
 		items: LanguageItemScored[],
 		language: keyof MeaningTranslations,
+		category: ItemCategory,
 	): Promise<string[]> {
 		const jobName = language === 'ru' ? 'extract-meaning-ru' : 'extract-meaning-en';
-		return (await this.getAdapter(jobName)).translateMeanings(items, language);
+		return (await this.getAdapter(jobName)).translateMeanings(items, language, category);
 	}
 }

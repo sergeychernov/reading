@@ -1,5 +1,5 @@
 import type { LanguageItemBase, LanguageItemScored, RareWordItem } from '@reading/llm-schemas';
-import type { LlmAdapter } from '../types';
+import type { ItemCategory, LlmAdapter } from '../types';
 
 export class StubAdapter implements LlmAdapter {
 	async extractSummary(): Promise<string> {
@@ -22,7 +22,7 @@ export class StubAdapter implements LlmAdapter {
 		return items.map((item) => ({ ...item, rarity: 5 }));
 	}
 
-	async translateMeanings(items: LanguageItemScored[]): Promise<string[]> {
+	async translateMeanings(items: LanguageItemScored[], _language: 'en' | 'ru', _category: ItemCategory): Promise<string[]> {
 		return items.map((item) => item.term);
 	}
 }
