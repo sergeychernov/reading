@@ -2,6 +2,7 @@ export type {
 	BookProcessingInput,
 	ChapterProcessingInput,
 	ChapterExtractionInput,
+	ItemCategory,
 	LlmAdapter,
 	PipelineConfig,
 } from './types';

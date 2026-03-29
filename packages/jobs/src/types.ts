@@ -26,6 +26,8 @@ export interface ChapterExtractionInput {
 	chapterText: string;
 }
 
+export type ItemCategory = 'idiom' | 'phrasal-verb' | 'rare-word';
+
 /**
  * LLM adapter interface used by extraction jobs.
  * Implemented by pipeline (DynamicAdapter, GatewayAdapter, StubAdapter) or by admin for testing.
@@ -39,6 +41,7 @@ export interface LlmAdapter {
 	translateMeanings(
 		items: LanguageItemScored[],
 		language: 'en' | 'ru',
+		category: ItemCategory,
 	): Promise<string[]>;
 }
 

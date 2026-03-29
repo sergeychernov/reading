@@ -2,7 +2,7 @@ import { createGateway, generateObject, generateText } from 'ai';
 import { z } from 'zod';
 import type { LanguageItemBase, LanguageItemScored, MeaningTranslations, RareWordItem } from '@reading/llm-schemas';
 import { idiomItemSchema, phrasalVerbItemSchema, rareWordItemSchema } from '@reading/llm-schemas';
-import type { LlmAdapter } from '../types';
+import type { ItemCategory, LlmAdapter } from '../types';
 
 const BASE_SYSTEM_PROMPT =
 	'You are an English language tutor assistant. ' +
@@ -47,20 +47,56 @@ const RARITY_SYSTEM_PROMPT =
 	'Keep the same order by using the given index values. ' +
 	'Do not skip any index.';
 
-function buildMeaningSystemPrompt(language: 'en' | 'ru'): string {
+function buildMeaningSystemPrompt(language: 'en' | 'ru', category: ItemCategory): string {
+	const categoryInstruction = buildCategoryInstruction(language, category);
+
+	return (
+		'You are an English language tutor assistant. ' +
+		categoryInstruction +
+		'Return a JSON object with "translations": an array of objects with exact keys "index" and "meaning". ' +
+		'Do not skip any index. Do not return alternatives.'
+	);
+}
+
+function buildCategoryInstruction(language: 'en' | 'ru', category: ItemCategory): string {
 	const languageName = language === 'en' ? 'English' : 'Russian';
+
+	if (category === 'idiom') {
+		if (language === 'ru') {
+			return (
+				'Each item is an English idiom. ' +
+				'For each idiom provide a well-known equivalent Russian idiom, proverb, or set phrase that carries the same figurative meaning. ' +
+				'If no established Russian idiom exists, give a short idiomatic Russian paraphrase of the figurative meaning — NEVER translate the words literally. ' +
+				'Use dictionary form: verbs in the infinitive, nouns in the nominative singular. '
+			);
+		}
+		return (
+			'Each item is an English idiom. ' +
+			'Provide a concise English explanation of the figurative meaning — do NOT restate the literal words. ' +
+			'Give each meaning in dictionary form: verbs in the bare infinitive, nouns in the singular. '
+		);
+	}
+
+	if (category === 'phrasal-verb') {
+		const dictionaryForm =
+			language === 'ru'
+				? 'Give each meaning in dictionary form: verbs in the infinitive, nouns in the nominative singular, adjectives in the masculine nominative singular.'
+				: 'Give each meaning in dictionary form: verbs in the bare infinitive, nouns in the singular.';
+		return (
+			'Each item is an English phrasal verb. ' +
+			`Provide one concise and context-aware ${languageName} meaning for the phrasal verb as used in the given sentence. ` +
+			`${dictionaryForm} `
+		);
+	}
+
 	const dictionaryForm =
 		language === 'ru'
 			? 'Give each meaning in dictionary form: verbs in the infinitive, nouns in the nominative singular, adjectives in the masculine nominative singular.'
 			: 'Give each meaning in dictionary form: verbs in the bare infinitive, nouns in the singular.';
-
 	return (
-		'You are an English language tutor assistant. ' +
-		`Your task is to provide one concise and context-aware ${languageName} meaning for each given item. ` +
+		`Your task is to provide one concise and context-aware ${languageName} meaning for each given word. ` +
 		'Use the sentence from the book to pick exactly one best meaning for that context. ' +
-		`${dictionaryForm} ` +
-		'Return a JSON object with "translations": an array of objects with exact keys "index" and "meaning". ' +
-		'Do not skip any index. Do not return alternatives.'
+		`${dictionaryForm} `
 	);
 }
 
@@ -196,9 +232,10 @@ export class GatewayAdapter implements LlmAdapter {
 	async translateMeanings(
 		items: LanguageItemScored[],
 		language: keyof MeaningTranslations,
+		category: ItemCategory,
 	): Promise<string[]> {
 		console.log(
-			`[GatewayAdapter] translateMeanings language=${language} model=${this.model} items=${items.length}`,
+			`[GatewayAdapter] translateMeanings language=${language} category=${category} model=${this.model} items=${items.length}`,
 		);
 		try {
 			const { object, usage } = await generateObject({
@@ -209,7 +246,7 @@ export class GatewayAdapter implements LlmAdapter {
 						meaning: z.string(),
 					})),
 				}),
-				system: buildMeaningSystemPrompt(language),
+				system: buildMeaningSystemPrompt(language, category),
 				prompt: items.map((item, i) => `${i}. "${item.term}" — "${item.exampleFromBook}"`).join('\n'),
 				maxOutputTokens: this.maxTokens,
 				temperature: this.temperature,

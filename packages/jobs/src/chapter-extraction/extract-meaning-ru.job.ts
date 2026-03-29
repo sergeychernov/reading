@@ -48,9 +48,9 @@ export function createExtractMeaningRuJob(adapter: LlmAdapter): JobDefinition {
 				`Extracting RU meanings for chapter ${input.chapterIndex}: "${input.chapterTitle}"`,
 			);
 
-			const idioms = await adapter.translateMeanings(input.idioms, 'ru');
-			const phrasalVerbs = await adapter.translateMeanings(input.phrasalVerbs, 'ru');
-			const rareWords = await adapter.translateMeanings(input.rareWords, 'ru');
+			const idioms = await adapter.translateMeanings(input.idioms, 'ru', 'idiom');
+			const phrasalVerbs = await adapter.translateMeanings(input.phrasalVerbs, 'ru', 'phrasal-verb');
+			const rareWords = await adapter.translateMeanings(input.rareWords, 'ru', 'rare-word');
 
 			context.logger.info(
 				`Extracted RU meanings for chapter ${input.chapterIndex} ` +
