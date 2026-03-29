@@ -27,7 +27,7 @@ const PHRASAL_VERBS_SYSTEM_PROMPT =
 	BASE_SYSTEM_PROMPT +
 	' Extract all phrasal verbs found in the chapter.' +
 	' A phrasal verb is a verb combined with one or two particles (preposition or adverb) that together form a new meaning (e.g. "give up", "run into", "run out").' +
-	' Allowed particles are strictly limited to: about, across, after, along, around, aside, away, back, by, down, for, forward, in, off, on, out, over, round, through, together, under, up.' +
+	' Allowed particles are strictly limited to: about, across, after, along, around, aside, away, back, by, down, for, forward, in, into, off, on, out, over, round, through, together, under, up.' +
 	' "to" is NOT an allowed particle for this task; never extract verb + to combinations (e.g. "screech to a halt", "turn to look").' +
 	' The verb + particle combination must be the core unit — do NOT include fixed multi-word expressions or idioms (e.g. "seize hold of", "make the most of" are idioms, not phrasal verbs).' +
 	' Do NOT include bare verbs without a particle, and do NOT include nouns or adjectives.' +

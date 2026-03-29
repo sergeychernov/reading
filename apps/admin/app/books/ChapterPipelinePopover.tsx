@@ -93,11 +93,12 @@ export function ChapterPipelinePopover({
 		if (!open || !isActive) {
 			pollingRef.current?.stop();
 			pollingRef.current = null;
-			return;
+			return undefined;
 		}
-		if (pollingRef.current) {
-			return;
-		}
+		// Always restart when pipelineId (or other deps) change; do not keep polling the previous id.
+		pollingRef.current?.stop();
+		pollingRef.current = null;
+
 		const { stop, completed } = client.poll(pipelineId, (event) => {
 			setPipeline(statusToDisplayData(event.status));
 		});
@@ -109,6 +110,11 @@ export function ChapterPipelinePopover({
 			setError(err instanceof Error ? err.message : String(err));
 		});
 		pollingRef.current = { stop };
+
+		return () => {
+			pollingRef.current?.stop();
+			pollingRef.current = null;
+		};
 	}, [open, isActive, client, pipelineId]);
 
 	const handleJobRetry = useCallback(async (job: JobDisplayInfo) => {

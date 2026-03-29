@@ -19,6 +19,7 @@ const ALLOWED_PARTICLES = new Set([
 	'for',
 	'forward',
 	'in',
+	'into',
 	'off',
 	'on',
 	'out',
