@@ -16,7 +16,7 @@ export const idiomItemSchema = z.object({
 });
 
 export const phrasalVerbItemSchema = z.object({
-	term: z.string().describe('The phrasal verb in base infinitive form (e.g. "give up", "run into", "look forward to")'),
+	term: z.string().describe('Canonical phrasal verb in base infinitive form: verb + allowed particle only (about, across, after, along, around, aside, away, back, by, down, for, forward, in, off, on, out, over, round, through, together, under, up). Exclude verb + to patterns (e.g. "screech to a halt"), verb + noun collocations (e.g. "cut costs"), and verb + possessive pronoun + noun patterns (e.g. "clear his throat"). Examples: "give up", "run into", "run out".'),
 	exampleFromBook: z.string().describe('The exact sentence from the book containing this phrasal verb'),
 });
 

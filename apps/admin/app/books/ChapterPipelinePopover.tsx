@@ -98,9 +98,17 @@ export function ChapterPipelinePopover({
 		if (pollingRef.current) {
 			return;
 		}
-		pollingRef.current = client.poll(pipelineId, (event) => {
+		const { stop, completed } = client.poll(pipelineId, (event) => {
 			setPipeline(statusToDisplayData(event.status));
 		});
+		// neuroline rejects `completed` when `stop()` runs; must catch to avoid uncaught rejections.
+		void completed.catch((err) => {
+			if (err instanceof Error && err.message === 'Polling stopped') {
+				return;
+			}
+			setError(err instanceof Error ? err.message : String(err));
+		});
+		pollingRef.current = { stop };
 	}, [open, isActive, client, pipelineId]);
 
 	const handleJobRetry = useCallback(async (job: JobDisplayInfo) => {
