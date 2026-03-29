@@ -96,7 +96,7 @@ export class ParsedChapterXhtml {
 	} {
 		const trimmed = fullText.trim();
 		return {
-			characterCount: [...fullText].length,
+			characterCount: [...trimmed].length,
 			wordCount: trimmed.length === 0 ? 0 : trimmed.split(/\s+/).length,
 		};
 	}
