@@ -13,6 +13,7 @@ interface ChapterData {
 	title: string;
 	summary: string | null;
 	textPreview: string;
+	chapterTextCharCount?: number;
 	processingStatus: string;
 	failed: boolean;
 }

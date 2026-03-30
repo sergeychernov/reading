@@ -66,12 +66,12 @@ export interface ChapterDocument {
 	createdAt: Date;
 	updatedAt: Date;
 	title?: string;
-	rawText?: string;
 	summary?: string | null;
-	rawTextLength?: number;
 	/** Populated by admin chapter-processing extract job (plain text stats). */
 	chapterTextCharCount?: number;
 	chapterTextWordCount?: number;
+	/** First plain-text slice of paragraph body for lightweight list/status APIs (set in extract-chapter). */
+	textPreview?: string;
 	processingStatus?: ChapterProcessingStatus;
 	failed: boolean;
 }
@@ -109,4 +109,10 @@ export interface SerializedChapter {
 	chapterTextWordCount?: number;
 	processingStatus: string;
 	failed: boolean;
+}
+
+/** Chapter JSON for public HTTP APIs (no body blob fields). */
+export interface SerializedChapterPublic extends SerializedChapter {
+	summary: string | null;
+	textPreview: string;
 }

@@ -1,4 +1,10 @@
-import type { BookDocument, ChapterDocument, SerializedBook, SerializedChapter } from './types';
+import type {
+	BookDocument,
+	ChapterDocument,
+	SerializedBook,
+	SerializedChapter,
+	SerializedChapterPublic,
+} from './types';
 
 function toIso(d: Date | unknown): string {
 	if (d instanceof Date) return d.toISOString();
@@ -41,16 +47,10 @@ export function serializeChapter(doc: ChapterDocument): SerializedChapter {
 	};
 }
 
-/**
- * Plain-text body for UI previews: if rawText starts with title, strip that prefix.
- */
-export function chapterRawBodyForPreview(doc: Pick<ChapterDocument, 'rawText' | 'title'>): string {
-	const rawText = doc.rawText ?? '';
-	const title = doc.title ?? '';
-	if (!rawText) {
-		return '';
-	}
-	return title && rawText.startsWith(title)
-		? rawText.slice(title.length).trimStart()
-		: rawText;
+export function serializeChapterPublic(doc: ChapterDocument): SerializedChapterPublic {
+	return {
+		...serializeChapter(doc),
+		summary: doc.summary ?? null,
+		textPreview: doc.textPreview ?? '',
+	};
 }

@@ -45,6 +45,7 @@ export interface ChapterExtractFields {
 	title: string;
 	chapterTextCharCount: number;
 	chapterTextWordCount: number;
+	textPreview: string;
 }
 
 export async function updateChapterStatus(
@@ -95,6 +96,7 @@ export async function updateChapterExtractFields(
 				title: fields.title,
 				chapterTextCharCount: fields.chapterTextCharCount,
 				chapterTextWordCount: fields.chapterTextWordCount,
+				textPreview: fields.textPreview,
 				updatedAt: new Date(),
 			},
 		},

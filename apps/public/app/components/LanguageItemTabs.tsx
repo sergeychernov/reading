@@ -32,7 +32,7 @@ function resolveMeaning(meaning: MeaningTranslations | string, lang: Translation
 interface LanguageItemTabsProps {
 	chapterId: string;
 	bookId: string;
-	/** When this value changes, language items are refetched (e.g. after reprocessing). */
+	/** When this value changes, language items are refetched. */
 	refreshTrigger?: number;
 	translationLanguage?: TranslationLanguage;
 	summary?: string | null;

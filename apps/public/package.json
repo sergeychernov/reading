@@ -4,6 +4,7 @@
   "private": true,
   "packageManager": "yarn@4.12.0",
   "scripts": {
+    "predev": "yarn workspace @reading/data build",
     "dev": "next dev -p 3000",
     "build": "next build --webpack",
     "start": "next start -p 3000",

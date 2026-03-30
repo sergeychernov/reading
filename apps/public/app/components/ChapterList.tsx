@@ -8,13 +8,16 @@ import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { StatusBadge } from '@reading/ui';
+import { chapterPreviewLine } from '../../lib/chapter-preview-display';
 
 interface ChapterData {
 	_id: string;
 	chapterIndex: number;
 	title: string;
 	summary: string | null;
+	/** Stored slice from extract; ellipsis for truncation is applied in the UI. */
 	textPreview: string;
+	chapterTextCharCount?: number;
 	processingStatus: string;
 	failed: boolean;
 }
@@ -39,6 +42,10 @@ export function ChapterList({ bookId, chapters }: ChapterListProps) {
 		<List disablePadding>
 			{chapters.map((chapter) => {
 				const badgeStatus = chapter.failed ? 'failed' : chapter.processingStatus;
+				const previewLine = chapterPreviewLine(
+					chapter.textPreview,
+					chapter.chapterTextCharCount,
+				);
 				return (
 					<ListItem key={chapter._id} disablePadding divider>
 						<ListItemButton
@@ -52,9 +59,9 @@ export function ChapterList({ bookId, chapters }: ChapterListProps) {
 										<Typography variant="body2" sx={{ flexShrink: 0 }}>
 											{chapter.chapterIndex + 1}. {chapter.title}
 										</Typography>
-										{chapter.textPreview && (
+										{previewLine && (
 											<Typography variant="body2" color="text.secondary" noWrap sx={{ flexGrow: 1 }}>
-												— {chapter.textPreview}
+												— {previewLine}
 											</Typography>
 										)}
 										<StatusBadge

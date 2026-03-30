@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getDb, getChapterById } from '@reading/data';
+import { getDb, getChapterById, serializeChapterPublic } from '@reading/data';
 
 export async function GET(
 	_request: Request,
@@ -16,7 +16,7 @@ export async function GET(
 				{ status: 404 },
 			);
 		}
-		return NextResponse.json(chapter);
+		return NextResponse.json(serializeChapterPublic(chapter));
 	} catch (error) {
 		console.error('Failed to fetch chapter:', error);
 		return NextResponse.json(
