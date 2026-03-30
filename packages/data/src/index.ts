@@ -10,6 +10,7 @@ export type {
 	LanguageItemCategory,
 	SerializedBook,
 	SerializedChapter,
+	SerializedChapterPublic,
 } from './types';
 
 export type { ChapterExtractFields } from './chapters';
@@ -68,8 +69,13 @@ export {
 export {
 	serializeBook,
 	serializeChapter,
-	chapterRawBodyForPreview,
+	serializeChapterPublic,
 } from './serialization';
 
 // Utilities
 export { computeContentHash } from './hash';
+
+export {
+	CHAPTER_TEXT_PREVIEW_MAX_CODE_POINTS,
+	chapterTextPreviewFromParagraphs,
+} from './chapter-text-preview';

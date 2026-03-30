@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Container from '@mui/material/Container';
-import { getDb, getBookById, getChaptersByBookId, chapterRawBodyForPreview } from '@reading/data';
+import { getDb, getBookById, getChaptersByBookId } from '@reading/data';
 import { BookHeader } from '../../components/BookHeader';
 import { BookContent } from '../../components/BookContent';
 
@@ -20,9 +20,6 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
 	const chapters = await getChaptersByBookId(db, bookId);
 
 	const serializedChapters = chapters.map((ch) => {
-		const body = chapterRawBodyForPreview(ch);
-		const previewLen = 24;
-		const textPreview = body.length > previewLen ? body.slice(0, previewLen) + '…' : body.slice(0, previewLen);
 		const legacyChapterStatusFailed =
 			(ch.processingStatus as string | undefined) === 'failed';
 
@@ -31,7 +28,8 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
 			chapterIndex: ch.chapterIndex,
 			title: ch.title ?? '',
 			summary: ch.summary ?? null,
-			textPreview,
+			textPreview: ch.textPreview ?? '',
+			chapterTextCharCount: ch.chapterTextCharCount,
 			processingStatus: ch.processingStatus ?? 'unknown',
 			failed: ch.failed === true || legacyChapterStatusFailed,
 		};

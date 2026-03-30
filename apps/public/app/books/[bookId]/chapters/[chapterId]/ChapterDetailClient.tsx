@@ -8,7 +8,6 @@ import Typography from '@mui/material/Typography';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Link from 'next/link';
-import { ReprocessButton } from '../../../../components/ReprocessButton';
 import { LanguageItemTabs } from '../../../../components/LanguageItemTabs';
 import type { TranslationLanguage } from '../../../../../lib/types/user';
 
@@ -21,7 +20,6 @@ interface ChapterDetailClientProps {
 	textPreview: string | null;
 	nextChapterId: string | null;
 	summary: string | null;
-	canReprocess: boolean;
 }
 
 export function ChapterDetailClient({
@@ -33,9 +31,7 @@ export function ChapterDetailClient({
 	textPreview,
 	nextChapterId,
 	summary,
-	canReprocess,
 }: ChapterDetailClientProps) {
-	const [refreshTrigger, setRefreshTrigger] = useState(0);
 	const [translationLanguage, setTranslationLanguage] = useState<TranslationLanguage>('en');
 
 	useEffect(() => {
@@ -60,9 +56,6 @@ export function ChapterDetailClient({
 						</Typography>
 					</Button>
 				</Link>
-				{canReprocess && (
-					<ReprocessButton bookId={bookId} chapterId={chapterId} onDone={() => setRefreshTrigger((k) => k + 1)} />
-				)}
 			</Box>
 			<Box display='flex' alignItems='flex-start' justifyContent='space-between' gap={1} mb={1}>
 				<Typography
@@ -98,7 +91,6 @@ export function ChapterDetailClient({
 			<LanguageItemTabs
 				chapterId={chapterId}
 				bookId={bookId}
-				refreshTrigger={refreshTrigger}
 				translationLanguage={translationLanguage}
 				summary={summary}
 			/>

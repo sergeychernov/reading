@@ -5,10 +5,8 @@ import {
 	getChapterById,
 	getChaptersByBookId,
 	getBookById,
-	chapterRawBodyForPreview,
 } from '@reading/data';
-import { auth } from '../../../../../auth';
-import { getUserByEmail } from '../../../../../lib/db/users';
+import { chapterPreviewLine } from '../../../../../lib/chapter-preview-display';
 import { ChapterDetailClient } from './ChapterDetailClient';
 
 interface ChapterDetailPageProps {
@@ -17,11 +15,6 @@ interface ChapterDetailPageProps {
 
 export default async function ChapterDetailPage({ params }: ChapterDetailPageProps) {
 	const { bookId, chapterId } = await params;
-	const session = await auth();
-	const user = session?.user?.email
-		? await getUserByEmail(session.user.email)
-		: null;
-	const canReprocess = user?.subscription === 'pro';
 
 	const db = await getDb();
 	const [book, chapter, chapters] = await Promise.all([
@@ -34,9 +27,10 @@ export default async function ChapterDetailPage({ params }: ChapterDetailPagePro
 		notFound();
 	}
 
-	const body = chapterRawBodyForPreview(chapter);
-	const previewLen = 24;
-	const textPreview = body.length > previewLen ? body.slice(0, previewLen) + '…' : body.slice(0, previewLen);
+	const textPreview = chapterPreviewLine(
+		chapter.textPreview ?? '',
+		chapter.chapterTextCharCount,
+	);
 	const nextChapter = chapters.find((item) => item.chapterIndex === chapter.chapterIndex + 1);
 	const chapterTitle = chapter.title ?? `Chapter ${chapter.chapterIndex + 1}`;
 
@@ -51,7 +45,6 @@ export default async function ChapterDetailPage({ params }: ChapterDetailPagePro
 				textPreview={textPreview || null}
 				nextChapterId={nextChapter?._id.toString() ?? null}
 				summary={chapter.summary ?? null}
-				canReprocess={canReprocess}
 			/>
 		</Container>
 	);

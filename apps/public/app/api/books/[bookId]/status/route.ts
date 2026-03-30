@@ -6,7 +6,6 @@ import {
 	markBookChapterBatchFailed,
 	getChaptersByBookId,
 	countChaptersByStatus,
-	chapterRawBodyForPreview,
 } from '@reading/data';
 
 export async function GET(
@@ -52,10 +51,6 @@ export async function GET(
 		const bookOut = await getBookById(db, bookId);
 
 		const chapterStatuses = chapters.map((ch) => {
-			const body = chapterRawBodyForPreview(ch);
-
-			const previewLen = 24;
-			const textPreview = body.length > previewLen ? body.slice(0, previewLen) + '…' : body.slice(0, previewLen);
 			const legacyChapterStatusFailed =
 				(ch.processingStatus as string | undefined) === 'failed';
 			return {
@@ -63,7 +58,8 @@ export async function GET(
 				chapterIndex: ch.chapterIndex,
 				title: ch.title ?? '',
 				summary: ch.summary ?? null,
-				textPreview,
+				textPreview: ch.textPreview ?? '',
+				chapterTextCharCount: ch.chapterTextCharCount,
 				processingStatus: ch.processingStatus ?? 'unknown',
 				failed: ch.failed === true || legacyChapterStatusFailed,
 			};

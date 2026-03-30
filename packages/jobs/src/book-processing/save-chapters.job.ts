@@ -28,7 +28,7 @@ export interface SaveChaptersOutput {
 /**
  * Saves parsed EPUB data to MongoDB:
  * - Updates book document with title, author, description
- * - Inserts chapter documents with rawText
+ * - Inserts chapter rows (title + status; body stays in Blob / EPUB until extract-chapter)
  * - Sets book processingStatus to 'extracting'
  */
 export const saveChaptersJob: JobDefinition = {
@@ -61,9 +61,7 @@ export const saveChaptersJob: JobDefinition = {
 						bookId: bookOid,
 						chapterIndex: ch.index,
 						title,
-						rawText: text,
 						summary: null,
-						rawTextLength: text.length,
 						processingStatus: 'pending' as const,
 						failed: false,
 						createdAt: now,

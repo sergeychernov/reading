@@ -2,6 +2,8 @@ import type { JobDefinition, JobContext } from 'neuroline';
 import { ObjectId } from 'mongodb';
 import {
 	bookFileKey,
+	CHAPTER_TEXT_PREVIEW_MAX_CODE_POINTS,
+	chapterTextPreviewFromParagraphs,
 	downloadBlob,
 	type ChapterKind,
 	getChapterById,
@@ -74,6 +76,10 @@ export const extractChapterJob: JobDefinition = {
 			const textJsonBlobKey = bookFileKey(bookId, jsonRelPath);
 			const characterCount = parsed.characterCount;
 			const wordCount = parsed.wordCount;
+			const textPreview = chapterTextPreviewFromParagraphs(
+				parsed.paragraphs,
+				CHAPTER_TEXT_PREVIEW_MAX_CODE_POINTS,
+			);
 
 			context.logger.info(
 				`extract-chapter: bookId=${bookId} index=${chapterIndex} kind=${kind} title=${JSON.stringify(title)} chars=${characterCount} words=${wordCount}`,
@@ -91,6 +97,7 @@ export const extractChapterJob: JobDefinition = {
 				title,
 				chapterTextCharCount: characterCount,
 				chapterTextWordCount: wordCount,
+				textPreview,
 			}));
 
 			return {
