@@ -93,14 +93,35 @@ export function ChapterPipelinePopover({
 		if (!open || !isActive) {
 			pollingRef.current?.stop();
 			pollingRef.current = null;
-			return;
+			return undefined;
 		}
-		if (pollingRef.current) {
-			return;
-		}
-		pollingRef.current = client.poll(pipelineId, (event) => {
-			setPipeline(statusToDisplayData(event.status));
+		// Always restart when pipelineId (or other deps) change; do not keep polling the previous id.
+		pollingRef.current?.stop();
+		pollingRef.current = null;
+
+		let isMounted = true;
+		const { stop, completed } = client.poll(pipelineId, (event) => {
+			if (isMounted) {
+				setPipeline(statusToDisplayData(event.status));
+			}
 		});
+		// neuroline rejects `completed` when `stop()` runs; must catch to avoid uncaught rejections.
+		void completed.catch((err) => {
+			if (!isMounted) {
+				return;
+			}
+			if (err instanceof Error && err.message === 'Polling stopped') {
+				return;
+			}
+			setError(err instanceof Error ? err.message : String(err));
+		});
+		pollingRef.current = { stop };
+
+		return () => {
+			isMounted = false;
+			pollingRef.current?.stop();
+			pollingRef.current = null;
+		};
 	}, [open, isActive, client, pipelineId]);
 
 	const handleJobRetry = useCallback(async (job: JobDisplayInfo) => {
