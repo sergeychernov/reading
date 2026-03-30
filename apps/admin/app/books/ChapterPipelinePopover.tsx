@@ -99,11 +99,17 @@ export function ChapterPipelinePopover({
 		pollingRef.current?.stop();
 		pollingRef.current = null;
 
+		let isMounted = true;
 		const { stop, completed } = client.poll(pipelineId, (event) => {
-			setPipeline(statusToDisplayData(event.status));
+			if (isMounted) {
+				setPipeline(statusToDisplayData(event.status));
+			}
 		});
 		// neuroline rejects `completed` when `stop()` runs; must catch to avoid uncaught rejections.
 		void completed.catch((err) => {
+			if (!isMounted) {
+				return;
+			}
 			if (err instanceof Error && err.message === 'Polling stopped') {
 				return;
 			}
@@ -112,6 +118,7 @@ export function ChapterPipelinePopover({
 		pollingRef.current = { stop };
 
 		return () => {
+			isMounted = false;
 			pollingRef.current?.stop();
 			pollingRef.current = null;
 		};
