@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { Analytics } from "@vercel/analytics/react";
+import { Analytics } from "@vercel/analytics/next";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import { AppThemeProvider } from "@reading/ui";
 import { NavBar } from "./components/NavBar";
