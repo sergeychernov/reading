@@ -17,7 +17,11 @@ interface ConsentRecord {
 	analytics: boolean;
 }
 
-type ConsentPhase = 'pending' | 'ready';
+interface ConsentState {
+	analyticsEnabled: boolean;
+	showBanner: boolean;
+	ready: boolean;
+}
 
 function readStoredConsent(): ConsentRecord | null {
 	if (typeof window === 'undefined') {
@@ -48,8 +52,13 @@ function readStoredConsent(): ConsentRecord | null {
 }
 
 function persistConsent(analytics: boolean): void {
-	const record: ConsentRecord = { version: CONSENT_VERSION, analytics };
-	localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(record));
+	try {
+		const record: ConsentRecord = { version: CONSENT_VERSION, analytics };
+		localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(record));
+	} catch {
+		// localStorage may be unavailable in private browsing or when storage is blocked.
+		// The user's choice is still applied for the current session via setState.
+	}
 }
 
 interface Props {
@@ -66,42 +75,39 @@ interface Props {
  * in jurisdictions that require it (EEA, UK, CH).
  */
 export function CookieConsentAndAnalytics({ requiresConsent }: Props) {
-	const [phase, setPhase] = useState<ConsentPhase>('pending');
-	const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
-	const [showBanner, setShowBanner] = useState(false);
+	const [state, setState] = useState<ConsentState>({
+		analyticsEnabled: false,
+		showBanner: false,
+		ready: false,
+	});
 
 	useEffect(() => {
 		if (!requiresConsent) {
-			setAnalyticsEnabled(true);
-			setPhase('ready');
+			setState({ analyticsEnabled: true, showBanner: false, ready: true });
 			return;
 		}
 		const stored = readStoredConsent();
 		if (stored === null) {
-			setShowBanner(true);
-			setPhase('ready');
+			setState({ analyticsEnabled: false, showBanner: true, ready: true });
 			return;
 		}
-		setAnalyticsEnabled(stored.analytics);
-		setPhase('ready');
+		setState({ analyticsEnabled: stored.analytics, showBanner: false, ready: true });
 	}, [requiresConsent]);
 
 	const acceptAnalytics = () => {
 		persistConsent(true);
-		setAnalyticsEnabled(true);
-		setShowBanner(false);
+		setState({ analyticsEnabled: true, showBanner: false, ready: true });
 	};
 
 	const essentialOnly = () => {
 		persistConsent(false);
-		setAnalyticsEnabled(false);
-		setShowBanner(false);
+		setState({ analyticsEnabled: false, showBanner: false, ready: true });
 	};
 
 	return (
 		<>
-			{phase === 'ready' && analyticsEnabled ? <Analytics /> : null}
-			{showBanner ? (
+			{state.ready && state.analyticsEnabled ? <Analytics /> : null}
+			{state.showBanner ? (
 				<Paper
 					elevation={8}
 					role='dialog'
@@ -153,3 +159,4 @@ export function CookieConsentAndAnalytics({ requiresConsent }: Props) {
 		</>
 	);
 }
+
