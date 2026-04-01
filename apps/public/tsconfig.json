@@ -5,7 +5,10 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "paths": {
+      "@vercel/analytics/next": ["../../node_modules/@vercel/analytics/dist/next/index.d.ts"]
+    }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules", "**/*.test.ts", "**/*.test.tsx"]
